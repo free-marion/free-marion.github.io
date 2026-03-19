@@ -1,0 +1,378 @@
+/* ============================================
+   CHERRYWOOD FARM & GOLF COURSE
+   style.css
+   ============================================ */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --green-dark:   #1a2e1a;
+  --green-mid:    #2d5a27;
+  --green-light:  #4a7c3f;
+  --cream:        #f5f0e8;
+  --cream-dark:   #ede6d6;
+  --brown:        #6b4c2a;
+  --text-dark:    #1c1c1c;
+  --text-mid:     #444;
+  --text-light:   #f0ede6;
+  --font-serif:   'Playfair Display', Georgia, serif;
+  --font-sans:    'Inter', system-ui, sans-serif;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-sans);
+  color: var(--text-dark);
+  background: var(--cream);
+}
+
+/* ---- NAV ---- */
+#navbar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  background: transparent;
+  transition: background 0.3s, box-shadow 0.3s;
+}
+
+#navbar.scrolled {
+  background: var(--green-dark);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+}
+
+.nav-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 1.2rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nav-logo {
+  font-family: var(--font-serif);
+  font-size: 1.4rem;
+  color: #fff;
+  text-decoration: none;
+  letter-spacing: 0.02em;
+}
+
+.nav-links {
+  list-style: none;
+  display: flex;
+  gap: 2.5rem;
+}
+
+.nav-links a {
+  color: rgba(255,255,255,0.85);
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  transition: color 0.2s;
+}
+
+.nav-links a:hover { color: #fff; }
+
+.nav-toggle {
+  display: none;
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 1.6rem;
+  cursor: pointer;
+}
+
+/* ---- HERO ---- */
+.hero {
+  min-height: 100vh;
+  background-image: url('images/hero.jpg');
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  position: relative;
+}
+
+/* Fallback gradient when no photo is present */
+.hero:not([style*="background-image"]),
+.hero {
+  background-color: var(--green-dark);
+}
+
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(10, 25, 10, 0.55) 0%,
+    rgba(10, 25, 10, 0.7) 100%
+  );
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+  color: #fff;
+  padding: 2rem;
+}
+
+.hero-eyebrow {
+  font-size: 0.85rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.7);
+  margin-bottom: 1rem;
+}
+
+.hero-content h1 {
+  font-family: var(--font-serif);
+  font-size: clamp(2.8rem, 7vw, 5.5rem);
+  line-height: 1.1;
+  margin-bottom: 1.2rem;
+  text-shadow: 0 2px 20px rgba(0,0,0,0.4);
+}
+
+.hero-sub {
+  font-size: 1.2rem;
+  font-weight: 300;
+  color: rgba(255,255,255,0.8);
+  margin-bottom: 2.5rem;
+  font-style: italic;
+}
+
+/* ---- BUTTONS ---- */
+.btn {
+  display: inline-block;
+  padding: 0.9rem 2.2rem;
+  background: var(--green-light);
+  color: #fff;
+  text-decoration: none;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.btn:hover {
+  background: var(--green-mid);
+  transform: translateY(-2px);
+}
+
+.btn-outline {
+  background: transparent;
+  border: 2px solid var(--green-light);
+  color: var(--green-light);
+}
+
+.btn-outline:hover {
+  background: var(--green-light);
+  color: #fff;
+}
+
+/* ---- SECTIONS ---- */
+.section { padding: 6rem 2rem; }
+
+.section-light { background: var(--cream); }
+.section-dark  { background: var(--green-dark); color: var(--text-light); }
+.section-green { background: var(--green-mid);  color: var(--text-light); }
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.section-label {
+  display: block;
+  font-size: 0.75rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--green-light);
+  margin-bottom: 0.8rem;
+  font-weight: 500;
+}
+
+.section-label.light { color: rgba(255,255,255,0.6); }
+
+h2 {
+  font-family: var(--font-serif);
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 1.2;
+  margin-bottom: 1.5rem;
+}
+
+.section-intro {
+  font-size: 1.1rem;
+  line-height: 1.8;
+  color: var(--text-mid);
+  max-width: 640px;
+  margin-bottom: 3rem;
+}
+
+.section-intro.light { color: rgba(255,255,255,0.75); }
+
+/* ---- TWO COLUMN ---- */
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5rem;
+  align-items: center;
+}
+
+.two-col.reverse { direction: rtl; }
+.two-col.reverse > * { direction: ltr; }
+
+.col-text p {
+  font-size: 1.05rem;
+  line-height: 1.85;
+  color: var(--text-mid);
+  margin-bottom: 1rem;
+}
+
+.col-text p:last-of-type { margin-bottom: 1.8rem; }
+
+.image-placeholder {
+  width: 100%;
+  aspect-ratio: 4/3;
+  background: var(--cream-dark);
+  border: 2px dashed #c5b99a;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #a89070;
+  font-size: 0.9rem;
+  font-style: italic;
+}
+
+/* ---- CARDS ---- */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  margin-top: 1rem;
+}
+
+.card {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  padding: 2rem 1.8rem;
+  text-align: center;
+  transition: transform 0.2s, background 0.2s;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  background: rgba(255,255,255,0.09);
+}
+
+.card-icon {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.card h3 {
+  font-family: var(--font-serif);
+  font-size: 1.3rem;
+  margin-bottom: 0.8rem;
+  color: #fff;
+}
+
+.card p {
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: rgba(255,255,255,0.65);
+}
+
+/* ---- CONTACT ---- */
+.contact-container { text-align: center; }
+
+.contact-container h2 { color: #fff; }
+
+.contact-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  margin-top: 3rem;
+}
+
+.contact-item {
+  background: rgba(255,255,255,0.1);
+  border-radius: 8px;
+  padding: 2rem 1.5rem;
+}
+
+.contact-icon { font-size: 2rem; margin-bottom: 0.8rem; }
+
+.contact-item h4 {
+  font-family: var(--font-serif);
+  font-size: 1.1rem;
+  color: #fff;
+  margin-bottom: 0.5rem;
+}
+
+.contact-item p,
+.contact-item a {
+  color: rgba(255,255,255,0.75);
+  text-decoration: none;
+  font-size: 1rem;
+  transition: color 0.2s;
+}
+
+.contact-item a:hover { color: #fff; }
+
+/* ---- FOOTER ---- */
+footer {
+  background: var(--green-dark);
+  color: rgba(255,255,255,0.45);
+  text-align: center;
+  padding: 1.8rem 2rem;
+  font-size: 0.85rem;
+}
+
+/* ---- RESPONSIVE ---- */
+@media (max-width: 768px) {
+  .nav-links {
+    display: none;
+    flex-direction: column;
+    gap: 0;
+    position: absolute;
+    top: 100%;
+    left: 0; right: 0;
+    background: var(--green-dark);
+    padding: 1rem 0;
+  }
+
+  .nav-links.open { display: flex; }
+
+  .nav-links li a {
+    display: block;
+    padding: 0.9rem 2rem;
+  }
+
+  .nav-toggle { display: block; }
+
+  .two-col {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
+
+  .two-col.reverse { direction: ltr; }
+
+  .cards { grid-template-columns: 1fr; }
+
+  .contact-grid { grid-template-columns: 1fr; }
+
+  .section { padding: 4rem 1.5rem; }
+}
