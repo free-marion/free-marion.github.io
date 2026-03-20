@@ -167,11 +167,7 @@
         </div>
 
         <div class="notepad">
-          <form
-            action="https://formspree.io/f/events@cherrywoodfgc.com"
-            method="POST"
-            class="egg-form"
-          >
+          <form id="eggForm" class="egg-form">
             <div class="form-row">
               <div class="form-field">
                 <label for="egg-name">Name</label>
@@ -203,7 +199,8 @@
               <label for="egg-notes">Anything else?</label>
               <input type="text" id="egg-notes" name="notes" placeholder="Optional" />
             </div>
-            <button type="submit" class="btn-reserve">Reserve My Eggs</button>
+            <p id="eggMsg" style="display:none;padding:0.5rem 0;font-weight:600;"></p>
+            <button type="submit" id="eggSubmitBtn" class="btn-reserve">Reserve My Eggs</button>
           </form>
         </div>
 
@@ -420,5 +417,6 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="script.js"></script>
   <script src="tee-times.js"></script>
+  <script src="egg-form.js"></script>
 </body>
 </html>

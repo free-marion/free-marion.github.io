@@ -3,506 +3,117 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cherrywood Team Portal</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+  <title>Cherrywood Portal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Lora:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=4">
 </head>
 <body>
 
-<!-- LOGIN SCREEN -->
+<!-- LOGIN -->
 <div id="loginScreen" class="login-screen">
   <div class="login-card">
-    <div class="login-logo">
-      <svg viewBox="0 0 60 70" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <line x1="30" y1="70" x2="30" y2="30" stroke="#1C3320" stroke-width="3"/>
-        <path d="M30 30 Q18 20 10 8" stroke="#1C3320" stroke-width="2" fill="none"/>
-        <path d="M30 30 Q42 20 50 8" stroke="#1C3320" stroke-width="2" fill="none"/>
-        <path d="M30 38 Q20 28 14 18" stroke="#1C3320" stroke-width="1.5" fill="none"/>
-        <path d="M30 38 Q40 28 46 18" stroke="#1C3320" stroke-width="1.5" fill="none"/>
-        <circle cx="10" cy="7" r="3" fill="#C4627A"/>
-        <circle cx="50" cy="7" r="3" fill="#C4627A"/>
-        <circle cx="14" cy="17" r="2.5" fill="#C4627A"/>
-        <circle cx="46" cy="17" r="2.5" fill="#C4627A"/>
-        <circle cx="20" cy="13" r="2" fill="#E8A0B0"/>
-        <circle cx="40" cy="13" r="2" fill="#E8A0B0"/>
-      </svg>
-    </div>
-    <h1 class="login-title">Team Portal</h1>
-    <p class="login-sub">Cherrywood Farm &amp; Golf Club</p>
-    <form id="loginForm" class="login-form" novalidate>
-      <div class="form-group">
-        <label for="loginEmail">Email</label>
-        <input type="email" id="loginEmail" autocomplete="email" required placeholder="you@cherrywoodgolf.com">
+    <h1 class="login-title">Cherrywood</h1>
+    <p class="login-sub">Team Portal</p>
+    <form id="loginForm">
+      <div class="field">
+        <label>Email</label>
+        <input type="email" id="loginEmail" required autocomplete="email">
       </div>
-      <div class="form-group">
-        <label for="loginPassword">Password</label>
-        <input type="password" id="loginPassword" autocomplete="current-password" required placeholder="••••••••">
+      <div class="field">
+        <label>Password</label>
+        <input type="password" id="loginPassword" required autocomplete="current-password">
       </div>
-      <div id="loginError" class="login-error" hidden></div>
-      <button type="submit" class="btn btn--primary btn--full" id="loginBtn">Sign In</button>
+      <p id="loginError" class="error-msg" hidden></p>
+      <button type="submit" id="loginBtn" class="btn btn--primary btn--full">Sign In</button>
     </form>
   </div>
 </div>
 
-<!-- APP SHELL (hidden until logged in) -->
-<div id="appShell" class="app-shell" hidden>
+<!-- APP -->
+<div id="appShell" hidden>
 
-  <!-- Top Bar -->
   <header class="portal-header">
-    <div class="portal-header__left">
-      <svg class="portal-logo-icon" viewBox="0 0 40 46" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <line x1="20" y1="46" x2="20" y2="20" stroke="#F0C8D0" stroke-width="2.5"/>
-        <path d="M20 20 Q12 13 6 4" stroke="#F0C8D0" stroke-width="1.5" fill="none"/>
-        <path d="M20 20 Q28 13 34 4" stroke="#F0C8D0" stroke-width="1.5" fill="none"/>
-        <path d="M20 26 Q13 19 9 11" stroke="#F0C8D0" stroke-width="1.2" fill="none"/>
-        <path d="M20 26 Q27 19 31 11" stroke="#F0C8D0" stroke-width="1.2" fill="none"/>
-        <circle cx="6" cy="3.5" r="2.5" fill="#F0C8D0"/>
-        <circle cx="34" cy="3.5" r="2.5" fill="#F0C8D0"/>
-        <circle cx="9" cy="10" r="2" fill="#F0C8D0"/>
-        <circle cx="31" cy="10" r="2" fill="#F0C8D0"/>
-      </svg>
-      <span class="portal-header__title">Cherrywood</span>
-    </div>
+    <span class="portal-header__title">Cherrywood</span>
     <div class="portal-header__right">
-      <a href="https://cherrywoodgolf.com" class="btn btn--ghost btn--sm">← Site</a>
       <span id="userEmail" class="user-email"></span>
-      <button id="signOutBtn" class="btn btn--ghost btn--sm" onclick="(async()=>{ await db.auth.signOut(); window.location.href='/portal/'; })()">Sign Out</button>
+      <a href="https://cherrywoodgolf.com" class="btn btn--ghost btn--sm">← Site</a>
+      <button class="btn btn--ghost btn--sm" onclick="(async()=>{ await db.auth.signOut(); window.location.reload(); })()">Sign Out</button>
     </div>
   </header>
 
-  <!-- Tab Nav -->
-  <nav class="tab-nav" role="tablist">
-    <button class="tab-btn tab-btn--active" data-tab="dashboard" role="tab" aria-selected="true" aria-controls="tabDashboard">
-      <span class="tab-icon">🏠</span> Dashboard
-    </button>
-    <button class="tab-btn" data-tab="vto" role="tab" aria-selected="false" aria-controls="tabVto">
-      <span class="tab-icon">🎯</span> V/TO
-    </button>
-    <button class="tab-btn" data-tab="accountability" role="tab" aria-selected="false" aria-controls="tabAccountability">
-      <span class="tab-icon">👥</span> Accountability
-    </button>
-    <button class="tab-btn" data-tab="meetings" role="tab" aria-selected="false" aria-controls="tabMeetings">
-      <span class="tab-icon">🤝</span> Meetings
-    </button>
-    <button class="tab-btn" data-tab="scorecard" role="tab" aria-selected="false" aria-controls="tabScorecard">
-      <span class="tab-icon">📊</span> Scorecard
-    </button>
-    <button class="tab-btn" data-tab="rocks" role="tab" aria-selected="false" aria-controls="tabRocks">
-      <span class="tab-icon">🪨</span> Rocks
-    </button>
-    <button class="tab-btn" data-tab="issues" role="tab" aria-selected="false" aria-controls="tabIssues">
-      <span class="tab-icon">⚡</span> Issues
-    </button>
-    <button class="tab-btn" data-tab="todos" role="tab" aria-selected="false" aria-controls="tabTodos">
-      <span class="tab-icon">✅</span> To-Dos
-    </button>
-    <button class="tab-btn" data-tab="bookings" role="tab" aria-selected="false" aria-controls="tabBookings">
-      <span class="tab-icon">⛳</span> Bookings
-    </button>
+  <nav class="tab-nav">
+    <button class="tab-btn tab-btn--active" data-tab="vto">V/TO</button>
+    <button class="tab-btn" data-tab="bookings">Bookings</button>
+    <button class="tab-btn" data-tab="eggs">Egg Orders</button>
+    <button class="tab-btn" data-tab="todos">My To-Dos</button>
+    <button class="tab-btn" data-tab="docs">Documents</button>
   </nav>
 
-  <!-- TAB: DASHBOARD -->
-  <section id="tabDashboard" class="tab-panel tab-panel--active" role="tabpanel">
-    <div class="panel-header">
-      <div>
-        <h2 class="panel-title">Dashboard</h2>
-        <p class="panel-sub">Your business at a glance.</p>
-      </div>
-    </div>
-    <div class="dashboard-grid" id="dashboardGrid">
-      <!-- injected by JS -->
-    </div>
+  <!-- V/TO -->
+  <section id="tabVto" class="tab-panel tab-panel--active">
+    <div class="panel-header"><h2 class="panel-title">Vision / Traction Organizer</h2></div>
+    <div id="vtoContent" class="vto-grid"></div>
   </section>
 
-  <!-- TAB: V/TO -->
-  <section id="tabVto" class="tab-panel" role="tabpanel" hidden>
-    <div class="panel-header">
-      <div>
-        <h2 class="panel-title">Vision / Traction Organizer</h2>
-        <p class="panel-sub">Your company's vision and how you'll achieve it.</p>
-      </div>
-      <button id="saveVtoBtn" class="btn btn--primary btn--sm">Save V/TO</button>
-    </div>
-    <div class="vto-grid">
-
-      <!-- VISION COLUMN -->
-      <div class="vto-col">
-        <h3 class="vto-col-heading">Vision</h3>
-
-        <div class="vto-section">
-          <div class="vto-section-title">Core Values</div>
-          <div class="vto-section-sub">What we stand for, non-negotiably.</div>
-          <div id="coreValuesList" class="vto-list-editor"></div>
-          <button id="addCoreValueBtn" class="l10-add-row-btn">+ Add value</button>
-        </div>
-
-        <div class="vto-section">
-          <div class="vto-section-title">Core Focus</div>
-          <div class="form-group">
-            <label>Purpose / Cause / Passion</label>
-            <textarea id="vtoCoreFocusPurpose" rows="2" placeholder="Why do we exist?"></textarea>
-          </div>
-          <div class="form-group">
-            <label>Our Niche</label>
-            <textarea id="vtoCoreFocusNiche" rows="2" placeholder="What we do best and for whom."></textarea>
-          </div>
-        </div>
-
-        <div class="vto-section">
-          <div class="vto-section-title">10-Year Target</div>
-          <div class="form-group">
-            <textarea id="vtoTenYear" rows="3" placeholder="The big hairy audacious goal for 10 years from now."></textarea>
-          </div>
-        </div>
-
-        <div class="vto-section">
-          <div class="vto-section-title">Marketing Strategy</div>
-          <div class="form-group">
-            <label>Target Market</label>
-            <textarea id="vtoMktgTarget" rows="2" placeholder="Who is your ideal customer?"></textarea>
-          </div>
-          <div class="form-group">
-            <label>3 Uniques</label>
-            <div id="vtoUniquesList" class="vto-list-editor"></div>
-            <button id="addUniqueBtn" class="l10-add-row-btn">+ Add unique</button>
-          </div>
-          <div class="form-group">
-            <label>Proven Process</label>
-            <textarea id="vtoMktgProcess" rows="2" placeholder="Your step-by-step method."></textarea>
-          </div>
-          <div class="form-group">
-            <label>Guarantee</label>
-            <textarea id="vtoMktgGuarantee" rows="2" placeholder="What do you promise?"></textarea>
-          </div>
-        </div>
-      </div>
-
-      <!-- TRACTION COLUMN -->
-      <div class="vto-col">
-        <h3 class="vto-col-heading">Traction</h3>
-
-        <div class="vto-section">
-          <div class="vto-section-title">3-Year Picture</div>
-          <div class="form-group">
-            <textarea id="vtoThreeYear" rows="4" placeholder="Revenue, profit, measurables — what does the company look like in 3 years?"></textarea>
-          </div>
-        </div>
-
-        <div class="vto-section">
-          <div class="vto-section-title">1-Year Plan</div>
-          <div class="form-group">
-            <textarea id="vtoOneYear" rows="4" placeholder="Revenue, profit, measurables — what does this year look like?"></textarea>
-          </div>
-        </div>
-
-        <div class="vto-section">
-          <div class="vto-section-title">Rocks <span style="font-size:0.78rem;font-weight:400;color:var(--text-muted);">(this quarter)</span></div>
-          <div id="vtoRocksList" class="vto-rocks-list"></div>
-        </div>
-
-        <div class="vto-section">
-          <div class="vto-section-title">Issues</div>
-          <div id="vtoIssuesList" class="vto-issues-list"></div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- TAB: ACCOUNTABILITY CHART -->
-  <section id="tabAccountability" class="tab-panel" role="tabpanel" hidden>
-    <div class="panel-header">
-      <div>
-        <h2 class="panel-title">Accountability Chart</h2>
-        <p class="panel-sub">Who owns what — every seat has a name.</p>
-      </div>
-      <button id="addRootNodeBtn" class="btn btn--primary btn--sm">+ Add Role</button>
-    </div>
-
-    <div id="nodeForm" class="inline-form" hidden>
-      <h3 class="form-heading" id="nodeFormHeading">New Role</h3>
-      <input type="hidden" id="nodeId">
-      <input type="hidden" id="nodeParentId">
-      <div class="form-row">
-        <div class="form-group form-group--grow">
-          <label for="nodeRole">Role / Seat</label>
-          <input type="text" id="nodeRole" placeholder="e.g. Head of Golf Operations" maxlength="80">
-        </div>
-        <div class="form-group form-group--grow">
-          <label for="nodePerson">Person</label>
-          <input type="text" id="nodePerson" placeholder="Name (leave blank if unfilled)" maxlength="80">
-        </div>
-      </div>
-      <div class="form-actions">
-        <button id="saveNodeBtn" class="btn btn--primary">Save</button>
-        <button id="cancelNodeBtn" class="btn btn--ghost">Cancel</button>
-      </div>
-    </div>
-
-    <div id="accountabilityChart" class="accountability-chart">
-      <div class="empty-state" id="accountabilityEmpty">
-        <p>No roles yet. Add the top-level role above.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- TAB: ROCKS -->
-  <section id="tabRocks" class="tab-panel" role="tabpanel" hidden>
-    <div class="panel-header">
-      <div>
-        <h2 class="panel-title">Rocks</h2>
-        <p class="panel-sub">90-day priorities — the big moves that matter this quarter.</p>
-      </div>
-      <button id="addRockBtn" class="btn btn--primary btn--sm">+ Add Rock</button>
-    </div>
-
-    <!-- Add/Edit Rock Form -->
-    <div id="rockForm" class="inline-form" hidden>
-      <h3 class="form-heading" id="rockFormHeading">New Rock</h3>
-      <input type="hidden" id="rockId">
-      <div class="form-row">
-        <div class="form-group form-group--grow">
-          <label for="rockTitle">Rock</label>
-          <input type="text" id="rockTitle" placeholder="What needs to get done?" maxlength="120">
-        </div>
-        <div class="form-group">
-          <label for="rockDue">Due Date</label>
-          <input type="date" id="rockDue">
-        </div>
-      </div>
-      <div class="form-group">
-        <label for="rockDesc">Details <span class="optional">(optional)</span></label>
-        <textarea id="rockDesc" rows="2" placeholder="Success criteria, notes…"></textarea>
-      </div>
-      <div class="form-actions">
-        <button id="saveRockBtn" class="btn btn--primary">Save Rock</button>
-        <button id="cancelRockBtn" class="btn btn--ghost">Cancel</button>
-      </div>
-    </div>
-
-    <!-- Rocks List -->
-    <div id="rocksList" class="rocks-list">
-      <div class="empty-state" id="rocksEmpty" hidden>
-        <p>No rocks yet. Add the first one above.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- TAB: SCORECARD -->
-  <section id="tabScorecard" class="tab-panel" role="tabpanel" hidden>
-    <div class="panel-header">
-      <div>
-        <h2 class="panel-title">Scorecard</h2>
-        <p class="panel-sub">Weekly pulse — green means on track, red means attention needed.</p>
-      </div>
-      <button id="addMeasurableBtn" class="btn btn--primary btn--sm">+ Add Metric</button>
-    </div>
-
-    <!-- Add/Edit Measurable Form -->
-    <div id="measurableForm" class="inline-form" hidden>
-      <h3 class="form-heading" id="measurableFormHeading">New Metric</h3>
-      <input type="hidden" id="measurableId">
-      <div class="form-row">
-        <div class="form-group form-group--grow">
-          <label for="metricName">Metric</label>
-          <input type="text" id="metricName" placeholder="e.g. Rounds played, Egg cartons sold" maxlength="80">
-        </div>
-        <div class="form-group">
-          <label for="metricGoal">Goal</label>
-          <input type="number" id="metricGoal" placeholder="e.g. 50" step="any">
-        </div>
-        <div class="form-group">
-          <label for="metricDir">Direction</label>
-          <select id="metricDir">
-            <option value="gte">≥ (at least)</option>
-            <option value="lte">≤ (at most)</option>
-          </select>
-        </div>
-      </div>
-      <div class="form-actions">
-        <button id="saveMeasurableBtn" class="btn btn--primary">Save Metric</button>
-        <button id="cancelMeasurableBtn" class="btn btn--ghost">Cancel</button>
-      </div>
-    </div>
-
-    <!-- Scorecard Table -->
-    <div class="scorecard-wrap">
-      <table class="scorecard-table" id="scorecardTable">
-        <thead>
-          <tr id="scorecardHeaderRow">
-            <th class="sc-metric-col">Metric</th>
-            <th class="sc-goal-col">Goal</th>
-            <!-- week columns injected by JS -->
-          </tr>
-        </thead>
-        <tbody id="scorecardBody">
-        </tbody>
-      </table>
-      <div class="empty-state" id="scorecardEmpty" hidden>
-        <p>No metrics yet. Add the first one above.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- TAB: ISSUES -->
-  <section id="tabIssues" class="tab-panel" role="tabpanel" hidden>
-    <div class="panel-header">
-      <div>
-        <h2 class="panel-title">Issues List</h2>
-        <p class="panel-sub">Identify, Discuss, Solve — work the list until it's empty.</p>
-      </div>
-      <button id="addIssueBtn" class="btn btn--primary btn--sm">+ Add Issue</button>
-    </div>
-
-    <!-- Filter Bar -->
-    <div class="filter-bar">
-      <button class="filter-btn filter-btn--active" data-filter="open">Open</button>
-      <button class="filter-btn" data-filter="discussing">Discussing</button>
-      <button class="filter-btn" data-filter="solved">Solved</button>
-      <button class="filter-btn" data-filter="all">All</button>
-    </div>
-
-    <!-- Add/Edit Issue Form -->
-    <div id="issueForm" class="inline-form" hidden>
-      <h3 class="form-heading" id="issueFormHeading">New Issue</h3>
-      <input type="hidden" id="issueId">
-      <div class="form-group">
-        <label for="issueTitle">Issue</label>
-        <input type="text" id="issueTitle" placeholder="State the issue clearly" maxlength="160">
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label for="issuePriority">Priority</label>
-          <select id="issuePriority">
-            <option value="normal">Normal</option>
-            <option value="high">High</option>
-          </select>
-        </div>
-      </div>
-      <div class="form-group">
-        <label for="issueDesc">Notes <span class="optional">(optional)</span></label>
-        <textarea id="issueDesc" rows="2" placeholder="Context, background…"></textarea>
-      </div>
-      <div class="form-actions">
-        <button id="saveIssueBtn" class="btn btn--primary">Save Issue</button>
-        <button id="cancelIssueBtn" class="btn btn--ghost">Cancel</button>
-      </div>
-    </div>
-
-    <!-- Issues List -->
-    <div id="issuesList" class="issues-list"></div>
-    <div class="empty-state" id="issuesEmpty" hidden>
-      <p>No issues found. Keep it that way.</p>
-    </div>
-  </section>
-
-  <!-- TAB: TO-DOS -->
-  <section id="tabTodos" class="tab-panel" role="tabpanel" hidden>
-    <div class="panel-header">
-      <div>
-        <h2 class="panel-title">To-Do List</h2>
-        <p class="panel-sub">7-day action items. Complete them before the next L10.</p>
-      </div>
-      <button id="addTodoBtn" class="btn btn--primary btn--sm">+ Add To-Do</button>
-    </div>
-
-    <div class="filter-bar">
-      <button class="filter-btn todo-filter-btn todo-filter-btn--active" data-filter="open">Open</button>
-      <button class="filter-btn todo-filter-btn" data-filter="done">Done</button>
-      <button class="filter-btn todo-filter-btn" data-filter="all">All</button>
-    </div>
-
-    <!-- Add/Edit To-Do Form -->
-    <div id="todoForm" class="inline-form" hidden>
-      <h3 class="form-heading" id="todoFormHeading">New To-Do</h3>
-      <input type="hidden" id="todoId">
-      <div class="form-row">
-        <div class="form-group form-group--grow">
-          <label for="todoTitle">To-Do</label>
-          <input type="text" id="todoTitle" placeholder="What needs to happen this week?" maxlength="160">
-        </div>
-        <div class="form-group">
-          <label for="todoDue">Due</label>
-          <input type="date" id="todoDue">
-        </div>
-      </div>
-      <div class="form-actions">
-        <button id="saveTodoBtn" class="btn btn--primary">Save</button>
-        <button id="cancelTodoBtn" class="btn btn--ghost">Cancel</button>
-      </div>
-    </div>
-
-    <div id="todosList" class="todos-list"></div>
-    <div class="empty-state" id="todosEmpty" hidden><p>No to-dos. Add one above.</p></div>
-  </section>
-
-  <!-- TAB: L10 MEETING -->
-  <section id="tabMeetings" class="tab-panel" role="tabpanel" hidden>
-
-    <!-- Pre-meeting: start screen -->
-    <div id="l10Start" class="l10-start">
-      <h2 class="panel-title">L10 Meeting</h2>
-      <p class="panel-sub">Same time, same agenda, every week. 90 minutes. Let's go.</p>
-      <div class="l10-prev-meetings" id="l10PrevMeetings"></div>
-      <button id="startL10Btn" class="btn btn--primary l10-start-btn">Start This Week's L10</button>
-    </div>
-
-    <!-- In-meeting runner -->
-    <div id="l10Runner" class="l10-runner" hidden>
-
-      <!-- Progress bar -->
-      <div class="l10-progress-bar">
-        <div class="l10-progress-fill" id="l10ProgressFill"></div>
-      </div>
-
-      <!-- Header -->
-      <div class="l10-runner-header">
-        <div class="l10-segment-info">
-          <span class="l10-segment-number" id="l10SegmentNum">1 / 7</span>
-          <h2 class="l10-segment-title" id="l10SegmentTitle">Segue</h2>
-          <span class="l10-segment-alloc" id="l10SegmentAlloc">5 min</span>
-        </div>
-        <div class="l10-timer-wrap">
-          <div class="l10-timer" id="l10Timer">5:00</div>
-          <div class="l10-timer-controls">
-            <button class="btn btn--ghost btn--sm" id="l10TimerToggle">Pause</button>
-            <button class="btn btn--ghost btn--sm" id="l10TimerReset">Reset</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Segment content area -->
-      <div class="l10-segment-body" id="l10SegmentBody">
-        <!-- injected by JS per segment -->
-      </div>
-
-      <!-- Navigation -->
-      <div class="l10-nav">
-        <button class="btn btn--ghost" id="l10PrevBtn">← Back</button>
-        <button class="btn btn--primary" id="l10NextBtn">Next →</button>
-      </div>
-
-    </div><!-- /l10Runner -->
-
-  </section>
-
-  <!-- TAB: BOOKINGS -->
-  <section id="tabBookings" class="tab-panel" role="tabpanel" hidden>
+  <!-- BOOKINGS -->
+  <section id="tabBookings" class="tab-panel" hidden>
     <div class="panel-header">
       <h2 class="panel-title">Tee Time Bookings</h2>
-      <div class="bookings-filters">
-        <button class="bookings-filter-btn bookings-filter-btn--active" data-filter="upcoming">Upcoming</button>
-        <button class="bookings-filter-btn" data-filter="all">All</button>
+      <div class="filter-row">
+        <button class="filter-btn filter-btn--active" data-filter="upcoming">Upcoming</button>
+        <button class="filter-btn" data-filter="all">All</button>
       </div>
     </div>
     <div id="bookingsList"></div>
-    <p id="bookingsEmpty" class="empty-state" hidden>No bookings found.</p>
+    <p id="bookingsEmpty" class="empty-msg" hidden>No bookings found.</p>
   </section>
 
-</div><!-- /app-shell -->
+  <!-- EGG ORDERS -->
+  <section id="tabEggs" class="tab-panel" hidden>
+    <div class="panel-header">
+      <h2 class="panel-title">Egg Orders</h2>
+      <div class="filter-row">
+        <button class="filter-btn filter-btn--active" data-filter="pending">Pending</button>
+        <button class="filter-btn" data-filter="all">All</button>
+      </div>
+    </div>
+    <div id="eggsList"></div>
+    <p id="eggsEmpty" class="empty-msg" hidden>No egg orders found.</p>
+  </section>
+
+  <!-- TO-DOS -->
+  <section id="tabTodos" class="tab-panel" hidden>
+    <div class="panel-header">
+      <h2 class="panel-title">My To-Dos</h2>
+      <button id="addTodoBtn" class="btn btn--primary btn--sm">+ Add</button>
+    </div>
+    <div id="todoForm" class="inline-form" hidden>
+      <input type="text" id="todoTitle" placeholder="What needs to be done?" maxlength="200">
+      <input type="date" id="todoDue">
+      <div class="inline-form__actions">
+        <button id="saveTodoBtn" class="btn btn--primary btn--sm">Save</button>
+        <button id="cancelTodoBtn" class="btn btn--ghost btn--sm">Cancel</button>
+      </div>
+    </div>
+    <div id="todosList"></div>
+    <p id="todosEmpty" class="empty-msg" hidden>No to-dos yet.</p>
+  </section>
+
+  <!-- DOCUMENTS -->
+  <section id="tabDocs" class="tab-panel" hidden>
+    <div class="panel-header"><h2 class="panel-title">Document Vault</h2></div>
+    <div class="docs-card">
+      <div class="docs-icon">📁</div>
+      <h3>Cherrywood Shared Drive</h3>
+      <p>All company documents, forms, and resources.</p>
+      <a href="https://drive.google.com/drive/folders/1dEpiEXbIOwgCCM1ZdUCACBpZyg_jLpz3?usp=drive_link"
+         target="_blank" class="btn btn--primary">Open Google Drive →</a>
+    </div>
+  </section>
+
+</div><!-- /appShell -->
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="app.js?v=3"></script>
+<script src="app.js?v=4"></script>
 </body>
 </html>
