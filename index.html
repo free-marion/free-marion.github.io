@@ -21,6 +21,7 @@
         <li><a href="#tee-times">Tee Times</a></li>
         <li><a href="#eggs">Farm Eggs</a></li>
         <li><a href="#course">The Course</a></li>
+        <li><a href="#conditions">Conditions</a></li>
         <li><a href="#contact">Visit</a></li>
       </ul>
     </div>
@@ -134,6 +135,64 @@
         <li><strong>3,007 yards</strong> from the tips</li>
         <li><strong>Bent grass greens</strong></li>
       </ul>
+    </div>
+  </section>
+
+  <!-- COURSE CONDITIONS -->
+  <section id="conditions" class="conditions">
+    <div class="conditions-inner">
+      <span class="panel-kicker panel-kicker--light">Live Weather</span>
+      <h2>Course Conditions</h2>
+      <p class="conditions-subtitle">Fredericktown, MO &mdash; updated live</p>
+
+      <div class="conditions-dashboard">
+
+        <!-- Wind compass -->
+        <div class="wind-compass-wrap">
+          <div class="compass-ring">
+            <span class="compass-cardinal n">N</span>
+            <span class="compass-cardinal s">S</span>
+            <span class="compass-cardinal e">E</span>
+            <span class="compass-cardinal w">W</span>
+            <!-- tick marks -->
+            <svg class="compass-ticks" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+              <g id="ticks"></g>
+            </svg>
+            <!-- needle -->
+            <div class="needle-wrap" id="needleWrap">
+              <svg class="needle-svg" viewBox="0 0 40 100" xmlns="http://www.w3.org/2000/svg">
+                <!-- north tip (points up = wind coming FROM that direction) -->
+                <polygon points="20,4 26,52 14,52" fill="#C4627A"/>
+                <!-- south tail -->
+                <polygon points="20,96 26,52 14,52" fill="rgba(255,255,255,0.18)"/>
+                <!-- center dot -->
+                <circle cx="20" cy="52" r="5" fill="#fff"/>
+              </svg>
+            </div>
+          </div>
+          <p class="wind-direction-label" id="windDirLabel">—</p>
+        </div>
+
+        <!-- Stats -->
+        <div class="conditions-stats">
+          <div class="stat-card">
+            <span class="stat-value" id="windSpeed">—</span>
+            <span class="stat-unit">mph</span>
+            <span class="stat-label">Wind Speed</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-value" id="tempVal">—</span>
+            <span class="stat-unit">°F</span>
+            <span class="stat-label">Temperature</span>
+          </div>
+          <div class="stat-card stat-card--wide">
+            <span class="stat-value stat-value--desc" id="weatherDesc">Loading…</span>
+            <span class="stat-label">Conditions</span>
+          </div>
+        </div>
+
+      </div>
+      <p class="conditions-note" id="conditionsNote"></p>
     </div>
   </section>
 
