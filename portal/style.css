@@ -730,3 +730,194 @@ body {
   .l10-timer { font-size: 2.2rem; }
   .l10-segment-title { font-size: 1.4rem; }
 }
+
+/* ---- DASHBOARD ---- */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 1rem;
+}
+
+.dash-card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  cursor: pointer;
+  transition: box-shadow 0.15s, transform 0.15s;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}
+.dash-card:hover {
+  box-shadow: 0 4px 18px rgba(0,0,0,0.11);
+  transform: translateY(-2px);
+}
+
+.dash-card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.dash-icon { font-size: 1.3rem; }
+
+.dash-title {
+  font-family: var(--serif);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--green);
+}
+
+.dash-body { display: flex; flex-direction: column; gap: 0.4rem; }
+
+.dash-stat {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.dash-num {
+  font-family: var(--serif);
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1;
+}
+.dash-num.green  { color: #27ae60; }
+.dash-num.red    { color: #e74c3c; }
+.dash-num.yellow { color: #f39c12; }
+.dash-num.muted  { color: var(--text-muted); }
+
+.dash-pct {
+  font-size: 0.82rem;
+  font-style: italic;
+  color: var(--text-muted);
+  margin-top: 0.2rem;
+}
+
+/* ---- V/TO ---- */
+.vto-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  align-items: start;
+}
+
+@media (max-width: 768px) {
+  .vto-grid { grid-template-columns: 1fr; }
+}
+
+.vto-col-heading {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 0.5rem 1rem;
+  background: var(--green);
+  color: var(--blossom);
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.vto-section {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.1rem 1.25rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+
+.vto-section-title {
+  font-family: var(--serif);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--green);
+  margin-bottom: 0.2rem;
+}
+
+.vto-section-sub {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-style: italic;
+  margin-bottom: 0.75rem;
+}
+
+.vto-section .form-group { margin-bottom: 0.75rem; }
+.vto-section .form-group:last-child { margin-bottom: 0; }
+
+.vto-list-editor { display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 0.4rem; }
+
+.vto-list-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.vto-list-row input {
+  flex: 1;
+  padding: 0.4rem 0.65rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-family: var(--body);
+  font-size: 0.9rem;
+  background: #fff;
+  color: var(--text);
+}
+.vto-list-row input:focus { outline: none; border-color: var(--cherry-light); }
+
+.vto-remove-btn {
+  background: none;
+  border: none;
+  color: #ccc;
+  cursor: pointer;
+  font-size: 0.85rem;
+  padding: 0.25rem;
+  transition: color 0.15s;
+  flex-shrink: 0;
+}
+.vto-remove-btn:hover { color: #e74c3c; }
+
+.vto-rock-item, .vto-issue-item {
+  font-size: 0.88rem;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+}
+.vto-rock-item:last-child, .vto-issue-item:last-child { border-bottom: none; }
+
+/* ---- ACCOUNTABILITY CHART ---- */
+.accountability-chart { padding: 0.25rem 0; }
+
+.ac-node-wrap { margin-bottom: 0.6rem; }
+
+.ac-node-card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.85rem 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  transition: box-shadow 0.15s;
+}
+.ac-node-card:hover { box-shadow: 0 3px 10px rgba(0,0,0,0.09); }
+.ac-node-card--child { border-left: 3px solid var(--cherry); }
+
+.ac-node-body { flex: 1; min-width: 0; }
+.ac-role { font-weight: 600; font-size: 0.95rem; color: var(--green); }
+.ac-person { font-size: 0.85rem; color: var(--text-muted); margin-top: 0.15rem; }
+
+.ac-node-actions { display: flex; gap: 0.35rem; flex-shrink: 0; }
+
+.ac-children {
+  margin-top: 0.5rem;
+  padding-left: 2rem;
+  border-left: 2px solid var(--border);
+  margin-left: 1.5rem;
+}

@@ -20,6 +20,7 @@ db.auth.onAuthStateChange(async (event, session) => {
   if (currentUser) {
     showApp();
     await Promise.all([loadRocks(), loadMeasurables(), loadIssues(), loadTodos(), loadMeetingLogs()]);
+    loadDashboard();
   } else {
     showLogin();
   }
@@ -1001,11 +1002,316 @@ async function finishL10() {
   alert(`Meeting complete! ${l10State.meetingRating ? 'Rated ' + l10State.meetingRating + '/10.' : ''} Great work.`);
 }
 
-// Load todos and meeting logs when switching to those tabs
-const origTabBtns = document.querySelectorAll('.tab-btn');
-origTabBtns.forEach(btn => {
+// Reload data when switching tabs
+document.querySelectorAll('.tab-btn').forEach(btn => {
   btn.addEventListener('click', async () => {
-    if (btn.dataset.tab === 'todos') await loadTodos();
-    if (btn.dataset.tab === 'l10')   await loadMeetingLogs();
+    if (btn.dataset.tab === 'dashboard')      loadDashboard();
+    if (btn.dataset.tab === 'vto')            await loadVto();
+    if (btn.dataset.tab === 'accountability') await loadAccountability();
+    if (btn.dataset.tab === 'todos')          await loadTodos();
+    if (btn.dataset.tab === 'meetings')       await loadMeetingLogs();
   });
 });
+
+// =====================
+// DASHBOARD
+// =====================
+
+function loadDashboard() {
+  const grid = document.getElementById('dashboardGrid');
+  grid.innerHTML = '';
+
+  // Rocks card
+  const onTrack  = rocks.filter(r => r.status === 'on_track').length;
+  const offTrack = rocks.filter(r => r.status === 'off_track').length;
+  const complete = rocks.filter(r => r.status === 'complete').length;
+  grid.appendChild(dashCard('🪨', 'Rocks', `
+    <div class="dash-stat"><span class="dash-num green">${onTrack}</span> on track</div>
+    <div class="dash-stat"><span class="dash-num red">${offTrack}</span> off track</div>
+    <div class="dash-stat"><span class="dash-num muted">${complete}</span> complete</div>
+  `, 'rocks'));
+
+  // Issues card
+  const openIssues = issues.filter(i => i.status === 'open').length;
+  const discussing = issues.filter(i => i.status === 'discussing').length;
+  grid.appendChild(dashCard('⚡', 'Issues', `
+    <div class="dash-stat"><span class="dash-num ${openIssues > 0 ? 'red' : 'green'}">${openIssues}</span> open</div>
+    <div class="dash-stat"><span class="dash-num yellow">${discussing}</span> discussing</div>
+    <div class="dash-stat"><span class="dash-num muted">${issues.filter(i => i.status === 'solved').length}</span> solved</div>
+  `, 'issues'));
+
+  // To-Dos card
+  const openTodos = todos.filter(t => !t.done).length;
+  const doneTodos = todos.filter(t => t.done).length;
+  const pct = todos.length ? Math.round((doneTodos / todos.length) * 100) : 0;
+  grid.appendChild(dashCard('✅', 'To-Dos', `
+    <div class="dash-stat"><span class="dash-num ${openTodos > 0 ? 'red' : 'green'}">${openTodos}</span> open</div>
+    <div class="dash-stat"><span class="dash-num green">${doneTodos}</span> done</div>
+    <div class="dash-stat dash-pct">${pct}% complete</div>
+  `, 'todos'));
+
+  // Scorecard card
+  const currentWeek = weeks.length ? weeks[weeks.length - 1] : null;
+  let greenCount = 0, redCount = 0;
+  if (currentWeek) {
+    measurables.forEach(m => {
+      const val = scores[m.id]?.[currentWeek];
+      if (val !== undefined) {
+        const color = scoreColor(val, m.goal_value, m.goal_direction);
+        if (color === 'score-cell--green') greenCount++;
+        else redCount++;
+      }
+    });
+  }
+  grid.appendChild(dashCard('📊', 'Scorecard', `
+    <div class="dash-stat"><span class="dash-num green">${greenCount}</span> on target</div>
+    <div class="dash-stat"><span class="dash-num red">${redCount}</span> off target</div>
+    <div class="dash-stat"><span class="dash-num muted">${measurables.length}</span> metrics</div>
+  `, 'scorecard'));
+}
+
+function dashCard(icon, title, bodyHtml, tabTarget) {
+  const card = document.createElement('div');
+  card.className = 'dash-card';
+  card.innerHTML = `
+    <div class="dash-card-header">
+      <span class="dash-icon">${icon}</span>
+      <span class="dash-title">${title}</span>
+    </div>
+    <div class="dash-body">${bodyHtml}</div>
+  `;
+  card.addEventListener('click', () => {
+    document.querySelector(`.tab-btn[data-tab="${tabTarget}"]`)?.click();
+  });
+  return card;
+}
+
+// =====================
+// V/TO
+// =====================
+
+let vtoData = {};
+let coreValues = [];
+let mktgUniques = [];
+
+async function loadVto() {
+  const { data, error } = await db.from('vto').select('*').eq('id', 1).single();
+  if (error && error.code !== 'PGRST116') { console.error(error); return; }
+  vtoData = data || {};
+
+  coreValues  = JSON.parse(vtoData.core_values  || '[]');
+  mktgUniques = JSON.parse(vtoData.mktg_uniques || '[]');
+
+  document.getElementById('vtoCoreFocusPurpose').value  = vtoData.core_focus_purpose  || '';
+  document.getElementById('vtoCoreFocusNiche').value    = vtoData.core_focus_niche    || '';
+  document.getElementById('vtoTenYear').value           = vtoData.ten_year_target     || '';
+  document.getElementById('vtoMktgTarget').value        = vtoData.mktg_target_market  || '';
+  document.getElementById('vtoMktgProcess').value       = vtoData.mktg_proven_process || '';
+  document.getElementById('vtoMktgGuarantee').value     = vtoData.mktg_guarantee      || '';
+  document.getElementById('vtoThreeYear').value         = vtoData.three_year_picture  || '';
+  document.getElementById('vtoOneYear').value           = vtoData.one_year_plan       || '';
+
+  renderCoreValues();
+  renderMktgUniques();
+  renderVtoRocks();
+  renderVtoIssues();
+}
+
+function renderCoreValues() {
+  const list = document.getElementById('coreValuesList');
+  list.innerHTML = '';
+  coreValues.forEach((val, i) => {
+    const row = document.createElement('div');
+    row.className = 'vto-list-row';
+    row.innerHTML = `
+      <input type="text" value="${escHtml(val)}" placeholder="Core value…">
+      <button class="vto-remove-btn" title="Remove">✕</button>
+    `;
+    row.querySelector('input').addEventListener('change', e => { coreValues[i] = e.target.value; });
+    row.querySelector('.vto-remove-btn').addEventListener('click', () => {
+      coreValues.splice(i, 1);
+      renderCoreValues();
+    });
+    list.appendChild(row);
+  });
+}
+
+function renderMktgUniques() {
+  const list = document.getElementById('vtoUniquesList');
+  list.innerHTML = '';
+  mktgUniques.forEach((val, i) => {
+    const row = document.createElement('div');
+    row.className = 'vto-list-row';
+    row.innerHTML = `
+      <input type="text" value="${escHtml(val)}" placeholder="Unique differentiator…">
+      <button class="vto-remove-btn" title="Remove">✕</button>
+    `;
+    row.querySelector('input').addEventListener('change', e => { mktgUniques[i] = e.target.value; });
+    row.querySelector('.vto-remove-btn').addEventListener('click', () => {
+      mktgUniques.splice(i, 1);
+      renderMktgUniques();
+    });
+    list.appendChild(row);
+  });
+}
+
+function renderVtoRocks() {
+  const list = document.getElementById('vtoRocksList');
+  const active = rocks.filter(r => r.status !== 'complete');
+  if (active.length === 0) {
+    list.innerHTML = '<p style="color:var(--text-muted);font-size:0.85rem;font-style:italic;">No active rocks.</p>';
+    return;
+  }
+  list.innerHTML = active.map(r => {
+    const dot = r.status === 'on_track' ? '🟢' : '🔴';
+    return `<div class="vto-rock-item">${dot} ${escHtml(r.title)} <span style="color:var(--text-muted);font-size:0.8rem;">— ${escHtml(r.owner_name || '')}</span></div>`;
+  }).join('');
+}
+
+function renderVtoIssues() {
+  const list = document.getElementById('vtoIssuesList');
+  const open = issues.filter(i => i.status !== 'solved');
+  if (open.length === 0) {
+    list.innerHTML = '<p style="color:var(--text-muted);font-size:0.85rem;font-style:italic;">Issues list is clear.</p>';
+    return;
+  }
+  list.innerHTML = open.slice(0, 5).map(i =>
+    `<div class="vto-issue-item">${i.priority === 'high' ? '🔴' : '⚡'} ${escHtml(i.title)}</div>`
+  ).join('') + (open.length > 5 ? `<div style="color:var(--text-muted);font-size:0.8rem;margin-top:0.4rem;">+${open.length - 5} more</div>` : '');
+}
+
+document.getElementById('addCoreValueBtn').addEventListener('click', () => {
+  coreValues.push('');
+  renderCoreValues();
+});
+
+document.getElementById('addUniqueBtn').addEventListener('click', () => {
+  mktgUniques.push('');
+  renderMktgUniques();
+});
+
+document.getElementById('saveVtoBtn').addEventListener('click', async () => {
+  const payload = {
+    core_values:          JSON.stringify(coreValues.filter(Boolean)),
+    core_focus_purpose:   document.getElementById('vtoCoreFocusPurpose').value.trim(),
+    core_focus_niche:     document.getElementById('vtoCoreFocusNiche').value.trim(),
+    ten_year_target:      document.getElementById('vtoTenYear').value.trim(),
+    mktg_target_market:   document.getElementById('vtoMktgTarget').value.trim(),
+    mktg_uniques:         JSON.stringify(mktgUniques.filter(Boolean)),
+    mktg_proven_process:  document.getElementById('vtoMktgProcess').value.trim(),
+    mktg_guarantee:       document.getElementById('vtoMktgGuarantee').value.trim(),
+    three_year_picture:   document.getElementById('vtoThreeYear').value.trim(),
+    one_year_plan:        document.getElementById('vtoOneYear').value.trim(),
+    updated_by:           currentUser.id,
+    updated_at:           new Date().toISOString(),
+  };
+  const { error } = await db.from('vto').update(payload).eq('id', 1);
+  if (error) { alert('Save failed: ' + error.message); return; }
+  alert('V/TO saved.');
+});
+
+// =====================
+// ACCOUNTABILITY CHART
+// =====================
+
+let accountabilityNodes = [];
+let editingNodeId = null;
+
+async function loadAccountability() {
+  const { data, error } = await db.from('accountability_nodes').select('*').order('sort_order').order('created_at');
+  if (error) { console.error(error); return; }
+  accountabilityNodes = data || [];
+  renderAccountabilityChart();
+}
+
+function renderAccountabilityChart() {
+  const container = document.getElementById('accountabilityChart');
+  const empty     = document.getElementById('accountabilityEmpty');
+  container.querySelectorAll('.ac-node-wrap').forEach(n => n.remove());
+
+  if (accountabilityNodes.length === 0) {
+    empty.hidden = false;
+    return;
+  }
+  empty.hidden = true;
+
+  const roots = accountabilityNodes.filter(n => !n.parent_id);
+  roots.forEach(root => container.appendChild(renderNode(root, 0)));
+}
+
+function renderNode(node, depth) {
+  const children = accountabilityNodes.filter(n => n.parent_id === node.id);
+  const wrap = document.createElement('div');
+  wrap.className = 'ac-node-wrap';
+
+  const card = document.createElement('div');
+  card.className = 'ac-node-card';
+  if (depth > 0) card.classList.add('ac-node-card--child');
+  card.innerHTML = `
+    <div class="ac-node-body">
+      <div class="ac-role">${escHtml(node.role_name)}</div>
+      <div class="ac-person">${node.person_name ? escHtml(node.person_name) : '<span style="color:#aaa;font-style:italic;">Unfilled</span>'}</div>
+    </div>
+    <div class="ac-node-actions">
+      <button class="btn btn--ghost btn--sm ac-add-child-btn">+ Report</button>
+      <button class="btn btn--ghost btn--sm ac-edit-btn">Edit</button>
+      <button class="btn btn--danger btn--sm ac-delete-btn">Del</button>
+    </div>
+  `;
+
+  card.querySelector('.ac-add-child-btn').addEventListener('click', () => openNodeForm(null, node.id));
+  card.querySelector('.ac-edit-btn').addEventListener('click', () => openNodeForm(node, node.parent_id));
+  card.querySelector('.ac-delete-btn').addEventListener('click', () => deleteNode(node.id));
+  wrap.appendChild(card);
+
+  if (children.length > 0) {
+    const childrenWrap = document.createElement('div');
+    childrenWrap.className = 'ac-children';
+    children.forEach(child => childrenWrap.appendChild(renderNode(child, depth + 1)));
+    wrap.appendChild(childrenWrap);
+  }
+
+  return wrap;
+}
+
+document.getElementById('addRootNodeBtn').addEventListener('click', () => openNodeForm(null, null));
+
+function openNodeForm(node, parentId) {
+  editingNodeId = node ? node.id : null;
+  document.getElementById('nodeFormHeading').textContent = node ? 'Edit Role' : 'New Role';
+  document.getElementById('nodeId').value       = node?.id ?? '';
+  document.getElementById('nodeParentId').value = parentId ?? '';
+  document.getElementById('nodeRole').value     = node?.role_name ?? '';
+  document.getElementById('nodePerson').value   = node?.person_name ?? '';
+  document.getElementById('nodeForm').hidden    = false;
+  document.getElementById('nodeRole').focus();
+}
+
+document.getElementById('cancelNodeBtn').addEventListener('click', () => {
+  document.getElementById('nodeForm').hidden = true;
+  editingNodeId = null;
+});
+
+document.getElementById('saveNodeBtn').addEventListener('click', async () => {
+  const role     = document.getElementById('nodeRole').value.trim();
+  const person   = document.getElementById('nodePerson').value.trim() || null;
+  const parentId = document.getElementById('nodeParentId').value || null;
+  if (!role) { alert('Role name is required.'); return; }
+
+  if (editingNodeId) {
+    await db.from('accountability_nodes').update({ role_name: role, person_name: person }).eq('id', editingNodeId);
+  } else {
+    const siblings = accountabilityNodes.filter(n => n.parent_id === parentId);
+    const maxOrder = siblings.reduce((m, n) => Math.max(m, n.sort_order || 0), 0);
+    await db.from('accountability_nodes').insert({ role_name: role, person_name: person, parent_id: parentId, sort_order: maxOrder + 1 });
+  }
+  document.getElementById('nodeForm').hidden = true;
+  editingNodeId = null;
+  await loadAccountability();
+});
+
+async function deleteNode(id) {
+  if (!confirm('Delete this role? Direct reports will become top-level roles.')) return;
+  await db.from('accountability_nodes').delete().eq('id', id);
+  await loadAccountability();
+}

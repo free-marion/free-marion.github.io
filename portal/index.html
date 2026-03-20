@@ -73,11 +73,23 @@
 
   <!-- Tab Nav -->
   <nav class="tab-nav" role="tablist">
-    <button class="tab-btn tab-btn--active" data-tab="rocks" role="tab" aria-selected="true" aria-controls="tabRocks">
-      <span class="tab-icon">🪨</span> Rocks
+    <button class="tab-btn tab-btn--active" data-tab="dashboard" role="tab" aria-selected="true" aria-controls="tabDashboard">
+      <span class="tab-icon">🏠</span> Dashboard
+    </button>
+    <button class="tab-btn" data-tab="vto" role="tab" aria-selected="false" aria-controls="tabVto">
+      <span class="tab-icon">🎯</span> V/TO
+    </button>
+    <button class="tab-btn" data-tab="accountability" role="tab" aria-selected="false" aria-controls="tabAccountability">
+      <span class="tab-icon">👥</span> Accountability
+    </button>
+    <button class="tab-btn" data-tab="meetings" role="tab" aria-selected="false" aria-controls="tabMeetings">
+      <span class="tab-icon">🤝</span> Meetings
     </button>
     <button class="tab-btn" data-tab="scorecard" role="tab" aria-selected="false" aria-controls="tabScorecard">
       <span class="tab-icon">📊</span> Scorecard
+    </button>
+    <button class="tab-btn" data-tab="rocks" role="tab" aria-selected="false" aria-controls="tabRocks">
+      <span class="tab-icon">🪨</span> Rocks
     </button>
     <button class="tab-btn" data-tab="issues" role="tab" aria-selected="false" aria-controls="tabIssues">
       <span class="tab-icon">⚡</span> Issues
@@ -85,13 +97,154 @@
     <button class="tab-btn" data-tab="todos" role="tab" aria-selected="false" aria-controls="tabTodos">
       <span class="tab-icon">✅</span> To-Dos
     </button>
-    <button class="tab-btn" data-tab="l10" role="tab" aria-selected="false" aria-controls="tabL10">
-      <span class="tab-icon">🤝</span> L10
-    </button>
   </nav>
 
+  <!-- TAB: DASHBOARD -->
+  <section id="tabDashboard" class="tab-panel tab-panel--active" role="tabpanel">
+    <div class="panel-header">
+      <div>
+        <h2 class="panel-title">Dashboard</h2>
+        <p class="panel-sub">Your business at a glance.</p>
+      </div>
+    </div>
+    <div class="dashboard-grid" id="dashboardGrid">
+      <!-- injected by JS -->
+    </div>
+  </section>
+
+  <!-- TAB: V/TO -->
+  <section id="tabVto" class="tab-panel" role="tabpanel" hidden>
+    <div class="panel-header">
+      <div>
+        <h2 class="panel-title">Vision / Traction Organizer</h2>
+        <p class="panel-sub">Your company's vision and how you'll achieve it.</p>
+      </div>
+      <button id="saveVtoBtn" class="btn btn--primary btn--sm">Save V/TO</button>
+    </div>
+    <div class="vto-grid">
+
+      <!-- VISION COLUMN -->
+      <div class="vto-col">
+        <h3 class="vto-col-heading">Vision</h3>
+
+        <div class="vto-section">
+          <div class="vto-section-title">Core Values</div>
+          <div class="vto-section-sub">What we stand for, non-negotiably.</div>
+          <div id="coreValuesList" class="vto-list-editor"></div>
+          <button id="addCoreValueBtn" class="l10-add-row-btn">+ Add value</button>
+        </div>
+
+        <div class="vto-section">
+          <div class="vto-section-title">Core Focus</div>
+          <div class="form-group">
+            <label>Purpose / Cause / Passion</label>
+            <textarea id="vtoCoreFocusPurpose" rows="2" placeholder="Why do we exist?"></textarea>
+          </div>
+          <div class="form-group">
+            <label>Our Niche</label>
+            <textarea id="vtoCoreFocusNiche" rows="2" placeholder="What we do best and for whom."></textarea>
+          </div>
+        </div>
+
+        <div class="vto-section">
+          <div class="vto-section-title">10-Year Target</div>
+          <div class="form-group">
+            <textarea id="vtoTenYear" rows="3" placeholder="The big hairy audacious goal for 10 years from now."></textarea>
+          </div>
+        </div>
+
+        <div class="vto-section">
+          <div class="vto-section-title">Marketing Strategy</div>
+          <div class="form-group">
+            <label>Target Market</label>
+            <textarea id="vtoMktgTarget" rows="2" placeholder="Who is your ideal customer?"></textarea>
+          </div>
+          <div class="form-group">
+            <label>3 Uniques</label>
+            <div id="vtoUniquesList" class="vto-list-editor"></div>
+            <button id="addUniqueBtn" class="l10-add-row-btn">+ Add unique</button>
+          </div>
+          <div class="form-group">
+            <label>Proven Process</label>
+            <textarea id="vtoMktgProcess" rows="2" placeholder="Your step-by-step method."></textarea>
+          </div>
+          <div class="form-group">
+            <label>Guarantee</label>
+            <textarea id="vtoMktgGuarantee" rows="2" placeholder="What do you promise?"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- TRACTION COLUMN -->
+      <div class="vto-col">
+        <h3 class="vto-col-heading">Traction</h3>
+
+        <div class="vto-section">
+          <div class="vto-section-title">3-Year Picture</div>
+          <div class="form-group">
+            <textarea id="vtoThreeYear" rows="4" placeholder="Revenue, profit, measurables — what does the company look like in 3 years?"></textarea>
+          </div>
+        </div>
+
+        <div class="vto-section">
+          <div class="vto-section-title">1-Year Plan</div>
+          <div class="form-group">
+            <textarea id="vtoOneYear" rows="4" placeholder="Revenue, profit, measurables — what does this year look like?"></textarea>
+          </div>
+        </div>
+
+        <div class="vto-section">
+          <div class="vto-section-title">Rocks <span style="font-size:0.78rem;font-weight:400;color:var(--text-muted);">(this quarter)</span></div>
+          <div id="vtoRocksList" class="vto-rocks-list"></div>
+        </div>
+
+        <div class="vto-section">
+          <div class="vto-section-title">Issues</div>
+          <div id="vtoIssuesList" class="vto-issues-list"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB: ACCOUNTABILITY CHART -->
+  <section id="tabAccountability" class="tab-panel" role="tabpanel" hidden>
+    <div class="panel-header">
+      <div>
+        <h2 class="panel-title">Accountability Chart</h2>
+        <p class="panel-sub">Who owns what — every seat has a name.</p>
+      </div>
+      <button id="addRootNodeBtn" class="btn btn--primary btn--sm">+ Add Role</button>
+    </div>
+
+    <div id="nodeForm" class="inline-form" hidden>
+      <h3 class="form-heading" id="nodeFormHeading">New Role</h3>
+      <input type="hidden" id="nodeId">
+      <input type="hidden" id="nodeParentId">
+      <div class="form-row">
+        <div class="form-group form-group--grow">
+          <label for="nodeRole">Role / Seat</label>
+          <input type="text" id="nodeRole" placeholder="e.g. Head of Golf Operations" maxlength="80">
+        </div>
+        <div class="form-group form-group--grow">
+          <label for="nodePerson">Person</label>
+          <input type="text" id="nodePerson" placeholder="Name (leave blank if unfilled)" maxlength="80">
+        </div>
+      </div>
+      <div class="form-actions">
+        <button id="saveNodeBtn" class="btn btn--primary">Save</button>
+        <button id="cancelNodeBtn" class="btn btn--ghost">Cancel</button>
+      </div>
+    </div>
+
+    <div id="accountabilityChart" class="accountability-chart">
+      <div class="empty-state" id="accountabilityEmpty">
+        <p>No roles yet. Add the top-level role above.</p>
+      </div>
+    </div>
+  </section>
+
   <!-- TAB: ROCKS -->
-  <section id="tabRocks" class="tab-panel tab-panel--active" role="tabpanel">
+  <section id="tabRocks" class="tab-panel" role="tabpanel" hidden>
     <div class="panel-header">
       <div>
         <h2 class="panel-title">Rocks</h2>
@@ -281,7 +434,7 @@
   </section>
 
   <!-- TAB: L10 MEETING -->
-  <section id="tabL10" class="tab-panel" role="tabpanel" hidden>
+  <section id="tabMeetings" class="tab-panel" role="tabpanel" hidden>
 
     <!-- Pre-meeting: start screen -->
     <div id="l10Start" class="l10-start">
