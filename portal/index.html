@@ -66,8 +66,9 @@
       <span class="portal-header__title">Cherrywood</span>
     </div>
     <div class="portal-header__right">
+      <a href="https://cherrywoodgolf.com" class="btn btn--ghost btn--sm">← Site</a>
       <span id="userEmail" class="user-email"></span>
-      <button id="signOutBtn" class="btn btn--ghost btn--sm">Sign Out</button>
+      <button id="signOutBtn" class="btn btn--ghost btn--sm" onclick="(async()=>{ await db.auth.signOut(); window.location.href='/portal/'; })()">Sign Out</button>
     </div>
   </header>
 
