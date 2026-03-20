@@ -78,11 +78,9 @@ async function loadConditions() {
     const desc     = WMO_CODES[c.weathercode] || 'Unknown';
     const updated  = new Date(c.time).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', timeZoneName: 'short' });
 
-    document.getElementById('windSpeed').textContent  = windSpd;
-    document.getElementById('tempVal').textContent    = temp;
-    document.getElementById('weatherDesc').textContent = desc;
+    document.getElementById('windSpeed').textContent   = windSpd;
+    document.getElementById('tempVal').textContent     = temp;
     document.getElementById('windDirLabel').textContent = degreesToCompass(windDeg) + ' wind';
-    document.getElementById('conditionsNote').textContent = 'Last updated ' + updated;
 
     // Rotate needle — wind direction = where wind is coming FROM, needle points that way
     document.getElementById('needleWrap').style.transform = `rotate(${windDeg}deg)`;
@@ -93,3 +91,20 @@ async function loadConditions() {
 }
 
 loadConditions();
+
+// =====================
+// FARM FLIP CARDS
+// =====================
+document.querySelectorAll('.farm-card').forEach(card => {
+  card.addEventListener('click', () => {
+    const flipped = card.classList.toggle('flipped');
+    card.setAttribute('aria-pressed', flipped ? 'true' : 'false');
+  });
+  card.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      const flipped = card.classList.toggle('flipped');
+      card.setAttribute('aria-pressed', flipped ? 'true' : 'false');
+    }
+  });
+});

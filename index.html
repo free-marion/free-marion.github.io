@@ -6,7 +6,7 @@
   <title>Cherrywood Farm & Golf Club | Fredericktown, MO</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&family=Great+Vibes&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lora:ital,wght@0,400;0,500;1,400&family=Great+Vibes&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -19,7 +19,7 @@
       <ul class="nav-links" id="navLinks">
         <li><a href="#about">About</a></li>
         <li><a href="#tee-times">Tee Times</a></li>
-        <li><a href="#eggs">Farm Eggs</a></li>
+        <li><a href="#farm">The Farm</a></li>
         <li><a href="#course">The Course</a></li>
         <li><a href="#conditions">Conditions</a></li>
         <li><a href="#contact">Visit</a></li>
@@ -44,13 +44,19 @@
   <!-- ABOUT -->
   <section id="about" class="about">
     <div class="about-inner">
+
+      <h2 class="about-heading">Our Story</h2>
+
+      <p class="about-intro">Tucked into the rolling Ozark foothills of Fredericktown, Missouri, Cherrywood Farm &amp; Golf Club is one of those rare places that earns the word <em>destination</em>. Nine holes of golf laid down in 1948, still playing true on bent grass greens. A working farm — cattle, chickens, goats, sheep, ducks, and honeybees — all raised with intention. Conestoga wagon rentals that put you inside the history of a state that once launched a nation westward. Come for a round. Stay for the eggs. Breathe easier.</p>
+
       <p class="about-text">Dale Cooper started Cherrywood with a piece of land and a desire to create something meaningful.  A farm came first; regenerative agriculture, cattle, chickens, sheep, ducks, even honeybees!  A vision for a sustainable community, designed to connect people with nature, each other, and their Creator.  Then came a need for Dale's waterslide restoration company to find a headquarters.  The neighboring golf course came up for sale, and the pieces clicked into place.</p>
 
-      <p class="about-text">Now here we are almost a year into the adventure, and the vision has only grown! In December we welcomed the first of our 8 Conestoga Wagon vacation rentals, adding to the truly unique experience of Cherrywood.  Immerse yourself in the proud history of our state,  honoring the brave pioneers who set out from our "Gateway to the West" with dreams of a brighter future for their families.  </p>
+      <p class="about-text">Now here we are almost a year into the adventure, and the vision has only grown! In December we welcomed the first of our 8 Conestoga Wagon vacation rentals, adding to the truly unique experience of Cherrywood.  Immerse yourself in the proud history of our state,  honoring the brave pioneers who set out from our "Gateway to the West" with dreams of a brighter future for their families.</p>
 
       <p class="about-text">Farm fresh eggs are now available for purchase.  The superiority of these eggs is clear from the deep color of the yolk to the rich flavor that can't be replicated within a commercial operation.  Be kind to your body, eat good food!</p>
 
       <p class="about-text">Cherrywood Farm &amp; Golf Club is named for Dale's true passion, his wife Cherry.  Their 12 children and (for now) 10 grandchildren are their proudest legacy.  They hope you will stop by for a round of golf, some eggs, or simply take a peaceful stroll in the meadow.  Just watch out for the goats, they are very annoying.</p>
+
     </div>
   </section>
 
@@ -75,11 +81,8 @@
         <h2>Farm Fresh Eggs</h2>
         <p>Our chickens are raised right here on the property. Reserve your dozen below and we'll have them waiting for you.</p>
 
-        <div class="egg-photos">
-          <figure class="egg-photo">
-            <img src="images/eggs-basket.jpg" alt="Fresh farm eggs in a basket" />
-          </figure>
-          <figure class="egg-photo">
+        <div class="egg-photos egg-photos--single">
+          <figure class="egg-photo egg-photo--featured">
             <img src="images/son-of-chicken.jpg" alt="Son of Dale holding son of Chicken" />
             <figcaption>son of Dale holding son of Chicken</figcaption>
           </figure>
@@ -131,6 +134,60 @@
 
   </div>
 
+  <!-- THE FARM FAMILY -->
+  <section id="farm" class="farm-section">
+    <div class="farm-inner">
+      <span class="panel-kicker">Life on the Land</span>
+      <h2 class="farm-heading">The Farm Family</h2>
+      <p class="farm-subhead">Everyone here has a job. Most of them are doing it.</p>
+      <div class="farm-cards">
+
+        <div class="farm-card" tabindex="0" role="button" aria-pressed="false">
+          <div class="farm-card-inner">
+            <div class="farm-card-front"><span class="farm-emoji">🐔</span><span class="farm-name">Chickens</span></div>
+            <div class="farm-card-back"><p>They wake up early, they work hard, and they produce something genuinely worth driving for. The yolks are deep orange. You'll notice.</p></div>
+          </div>
+        </div>
+
+        <div class="farm-card" tabindex="0" role="button" aria-pressed="false">
+          <div class="farm-card-inner">
+            <div class="farm-card-front"><span class="farm-emoji">🐄</span><span class="farm-name">Cattle</span></div>
+            <div class="farm-card-back"><p>Raised on the property, slow and unhurried. They keep the pasture honest and have a surprisingly calming effect on golfers in the rough.</p></div>
+          </div>
+        </div>
+
+        <div class="farm-card" tabindex="0" role="button" aria-pressed="false">
+          <div class="farm-card-inner">
+            <div class="farm-card-front"><span class="farm-emoji">🐐</span><span class="farm-name">Goats</span></div>
+            <div class="farm-card-back"><p>Dale's official assessment: "They are very annoying." We include them anyway. Personality, apparently, counts for something.</p></div>
+          </div>
+        </div>
+
+        <div class="farm-card" tabindex="0" role="button" aria-pressed="false">
+          <div class="farm-card-inner">
+            <div class="farm-card-front"><span class="farm-emoji">🦆</span><span class="farm-name">Ducks</span></div>
+            <div class="farm-card-back"><p>They have claimed the low ground near the water holes. Nobody has formally disputed this. The ducks consider it settled.</p></div>
+          </div>
+        </div>
+
+        <div class="farm-card" tabindex="0" role="button" aria-pressed="false">
+          <div class="farm-card-inner">
+            <div class="farm-card-front"><span class="farm-emoji">🐑</span><span class="farm-name">Sheep</span></div>
+            <div class="farm-card-back"><p>The quiet ones. They graze, they wander, they occasionally stare at you with an expression that suggests they know something you don't.</p></div>
+          </div>
+        </div>
+
+        <div class="farm-card" tabindex="0" role="button" aria-pressed="false">
+          <div class="farm-card-inner">
+            <div class="farm-card-front"><span class="farm-emoji">🐝</span><span class="farm-name">Bees</span></div>
+            <div class="farm-card-back"><p>The hardest workers on the property. They pollinate the whole operation, ask for nothing, and produce something extraordinary. Respect the bees.</p></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
   <!-- THE COURSE -->
   <section id="course" class="course">
     <div class="course-image">
@@ -139,7 +196,7 @@
     <div class="course-text">
       <span class="panel-kicker panel-kicker--light">The Course</span>
       <h2>Nine Holes.<br>Since 1948.</h2>
-      <p>Set in the foothills of the Ozark Mountains with bent grass greens, rolling terrain, and water on two holes. This course has been part of Fredericktown for generations. We're glad it still is.</p>
+      <p>Set in the foothills of the Ozark Mountains with bent grass greens, rolling terrain, and water on two holes. This course has been part of Fredericktown for generations. We're proud to be the next.</p>
       <ul class="course-facts">
         <li><strong>Par 36</strong> &mdash; 9 holes</li>
         <li><strong>3,007 yards</strong> from the tips</li>
@@ -153,29 +210,22 @@
     <div class="conditions-inner">
       <span class="panel-kicker panel-kicker--light">Live Weather</span>
       <h2>Course Conditions</h2>
-      <p class="conditions-subtitle">Fredericktown, MO &mdash; updated live</p>
 
       <div class="conditions-dashboard">
 
-        <!-- Wind compass -->
         <div class="wind-compass-wrap">
           <div class="compass-ring">
             <span class="compass-cardinal n">N</span>
             <span class="compass-cardinal s">S</span>
             <span class="compass-cardinal e">E</span>
             <span class="compass-cardinal w">W</span>
-            <!-- tick marks -->
             <svg class="compass-ticks" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
               <g id="ticks"></g>
             </svg>
-            <!-- needle -->
             <div class="needle-wrap" id="needleWrap">
               <svg class="needle-svg" viewBox="0 0 40 100" xmlns="http://www.w3.org/2000/svg">
-                <!-- north tip (points up = wind coming FROM that direction) -->
                 <polygon points="20,4 26,52 14,52" fill="#C4627A"/>
-                <!-- south tail -->
                 <polygon points="20,96 26,52 14,52" fill="rgba(255,255,255,0.18)"/>
-                <!-- center dot -->
                 <circle cx="20" cy="52" r="5" fill="#fff"/>
               </svg>
             </div>
@@ -183,26 +233,18 @@
           <p class="wind-direction-label" id="windDirLabel">—</p>
         </div>
 
-        <!-- Stats -->
         <div class="conditions-stats">
           <div class="stat-card">
             <span class="stat-value" id="windSpeed">—</span>
             <span class="stat-unit">mph</span>
-            <span class="stat-label">Wind Speed</span>
           </div>
           <div class="stat-card">
             <span class="stat-value" id="tempVal">—</span>
             <span class="stat-unit">°F</span>
-            <span class="stat-label">Temperature</span>
-          </div>
-          <div class="stat-card stat-card--wide">
-            <span class="stat-value stat-value--desc" id="weatherDesc">Loading…</span>
-            <span class="stat-label">Conditions</span>
           </div>
         </div>
 
       </div>
-      <p class="conditions-note" id="conditionsNote"></p>
     </div>
   </section>
 
@@ -240,16 +282,52 @@
   </section>
 
   <!-- FOOTER -->
-  <footer>
-    <p class="footer-name">Cherrywood Farm &amp; Golf Club</p>
-    <p>Fredericktown, Missouri &mdash; &copy; 2026</p>
-    <div class="footer-social">
-      <a href="https://www.facebook.com/beavervalleyfredericktown/" target="_blank" rel="noopener" aria-label="Facebook">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
-      </a>
-      <a href="https://www.instagram.com/cherrywood_farm/" target="_blank" rel="noopener" aria-label="Instagram">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
-      </a>
+  <footer class="footer">
+    <div class="footer-tree" aria-hidden="true">
+      <svg viewBox="0 0 600 520" xmlns="http://www.w3.org/2000/svg" fill="none">
+        <path d="M290,520 C288,480 284,440 286,380 C287,340 280,310 282,290" stroke="#F0C8D0" stroke-width="18" stroke-linecap="round"/>
+        <path d="M310,520 C312,478 316,438 314,376 C313,336 320,308 318,290" stroke="#F0C8D0" stroke-width="12" stroke-linecap="round"/>
+        <path d="M284,310 C270,295 240,270 200,245 C165,222 130,210 100,198" stroke="#F0C8D0" stroke-width="9" stroke-linecap="round"/>
+        <path d="M286,345 C265,340 230,330 195,318 C165,308 140,295 115,282" stroke="#F0C8D0" stroke-width="7" stroke-linecap="round"/>
+        <path d="M316,310 C330,295 360,270 400,245 C435,222 470,210 500,198" stroke="#F0C8D0" stroke-width="9" stroke-linecap="round"/>
+        <path d="M314,345 C335,340 370,330 405,318 C435,308 460,295 485,282" stroke="#F0C8D0" stroke-width="7" stroke-linecap="round"/>
+        <path d="M300,288 C298,265 295,238 290,210 C286,186 280,165 272,142" stroke="#F0C8D0" stroke-width="8" stroke-linecap="round"/>
+        <path d="M200,245 C185,230 165,212 148,200" stroke="#F0C8D0" stroke-width="4" stroke-linecap="round"/>
+        <path d="M160,222 C148,208 130,194 115,185" stroke="#F0C8D0" stroke-width="3" stroke-linecap="round"/>
+        <path d="M200,245 C195,225 188,205 182,190" stroke="#F0C8D0" stroke-width="3" stroke-linecap="round"/>
+        <path d="M195,318 C178,308 158,295 142,285" stroke="#F0C8D0" stroke-width="4" stroke-linecap="round"/>
+        <path d="M155,300 C140,290 122,280 108,272" stroke="#F0C8D0" stroke-width="3" stroke-linecap="round"/>
+        <path d="M400,245 C415,230 435,212 452,200" stroke="#F0C8D0" stroke-width="4" stroke-linecap="round"/>
+        <path d="M440,222 C452,208 470,194 485,185" stroke="#F0C8D0" stroke-width="3" stroke-linecap="round"/>
+        <path d="M400,245 C405,225 412,205 418,190" stroke="#F0C8D0" stroke-width="3" stroke-linecap="round"/>
+        <path d="M405,318 C422,308 442,295 458,285" stroke="#F0C8D0" stroke-width="4" stroke-linecap="round"/>
+        <path d="M445,300 C460,290 478,280 492,272" stroke="#F0C8D0" stroke-width="3" stroke-linecap="round"/>
+        <path d="M280,210 C265,198 248,182 235,168" stroke="#F0C8D0" stroke-width="4" stroke-linecap="round"/>
+        <path d="M272,142 C260,128 248,115 238,100" stroke="#F0C8D0" stroke-width="3" stroke-linecap="round"/>
+        <path d="M272,142 C282,126 290,110 294,94" stroke="#F0C8D0" stroke-width="3" stroke-linecap="round"/>
+        <path d="M280,210 C292,196 302,180 308,165" stroke="#F0C8D0" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="100" cy="196" r="7" fill="#F0C8D0"/><circle cx="112" cy="188" r="5" fill="#E8A0B0"/><circle cx="90" cy="186" r="5" fill="#F0C8D0"/><circle cx="104" cy="178" r="5" fill="#E8A0B0"/><circle cx="118" cy="194" r="4" fill="#F0C8D0"/><circle cx="130" cy="184" r="5" fill="#F0C8D0"/><circle cx="122" cy="176" r="4" fill="#E8A0B0"/><circle cx="148" cy="198" r="5" fill="#F0C8D0"/><circle cx="138" cy="190" r="4" fill="#E8A0B0"/>
+        <circle cx="108" cy="270" r="6" fill="#F0C8D0"/><circle cx="118" cy="263" r="4" fill="#E8A0B0"/><circle cx="100" cy="263" r="4" fill="#F0C8D0"/><circle cx="142" cy="283" r="5" fill="#F0C8D0"/><circle cx="132" cy="276" r="4" fill="#E8A0B0"/>
+        <circle cx="500" cy="196" r="7" fill="#F0C8D0"/><circle cx="488" cy="188" r="5" fill="#E8A0B0"/><circle cx="510" cy="186" r="5" fill="#F0C8D0"/><circle cx="496" cy="178" r="5" fill="#E8A0B0"/><circle cx="482" cy="194" r="4" fill="#F0C8D0"/><circle cx="470" cy="184" r="5" fill="#F0C8D0"/><circle cx="478" cy="176" r="4" fill="#E8A0B0"/><circle cx="452" cy="198" r="5" fill="#F0C8D0"/><circle cx="462" cy="190" r="4" fill="#E8A0B0"/>
+        <circle cx="492" cy="270" r="6" fill="#F0C8D0"/><circle cx="482" cy="263" r="4" fill="#E8A0B0"/><circle cx="500" cy="263" r="4" fill="#F0C8D0"/><circle cx="458" cy="283" r="5" fill="#F0C8D0"/><circle cx="468" cy="276" r="4" fill="#E8A0B0"/>
+        <circle cx="238" cy="98" r="7" fill="#F0C8D0"/><circle cx="248" cy="88" r="6" fill="#E8A0B0"/><circle cx="228" cy="90" r="5" fill="#F0C8D0"/><circle cx="242" cy="78" r="5" fill="#C4627A"/><circle cx="256" cy="96" r="4" fill="#F0C8D0"/><circle cx="235" cy="108" r="4" fill="#E8A0B0"/>
+        <circle cx="294" cy="92" r="7" fill="#F0C8D0"/><circle cx="304" cy="82" r="6" fill="#E8A0B0"/><circle cx="284" cy="84" r="5" fill="#F0C8D0"/><circle cx="298" cy="72" r="5" fill="#C4627A"/><circle cx="308" cy="98" r="4" fill="#F0C8D0"/>
+        <circle cx="182" cy="188" r="5" fill="#F0C8D0"/><circle cx="175" cy="198" r="4" fill="#E8A0B0"/><circle cx="235" cy="166" r="5" fill="#F0C8D0"/><circle cx="243" cy="158" r="4" fill="#E8A0B0"/><circle cx="308" cy="163" r="5" fill="#F0C8D0"/><circle cx="316" cy="155" r="4" fill="#E8A0B0"/><circle cx="418" cy="188" r="5" fill="#F0C8D0"/><circle cx="425" cy="198" r="4" fill="#E8A0B0"/>
+        <circle cx="270" cy="515" r="3" fill="#F0C8D0" opacity="0.5"/><circle cx="285" cy="518" r="2" fill="#E8A0B0" opacity="0.4"/><circle cx="320" cy="514" r="3" fill="#F0C8D0" opacity="0.5"/><circle cx="335" cy="518" r="2" fill="#E8A0B0" opacity="0.3"/>
+      </svg>
+    </div>
+    <div class="footer-content">
+      <p class="footer-name">Cherrywood Farm &amp; Golf Club</p>
+      <p class="footer-tagline">Fredericktown, Missouri</p>
+      <div class="footer-social">
+        <a href="https://www.facebook.com/beavervalleyfredericktown/" target="_blank" rel="noopener" aria-label="Facebook">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+        </a>
+        <a href="https://www.instagram.com/cherrywood_farm/" target="_blank" rel="noopener" aria-label="Instagram">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+        </a>
+      </div>
+      <p class="footer-copy">&copy; 2026</p>
     </div>
   </footer>
 
