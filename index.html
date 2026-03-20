@@ -64,13 +64,91 @@
   <div class="actions-row" id="tee-times">
 
     <!-- TEE TIMES -->
-    <div class="action-panel action-panel--tee">
-      <div class="action-panel-inner">
+    <div class="action-panel action-panel--tee" id="tee-times-panel">
+      <div class="action-panel-inner tee-booking-wrap">
+
         <span class="panel-kicker">Golf</span>
         <h2>Book a Tee Time</h2>
-        <p>Online booking is coming soon. In the meantime, give us a call — we'd love to get you on the course.</p>
-        <div class="coming-soon-badge">Online Booking Coming Soon</div>
-        <a href="#contact" class="btn-text-link">Call to Reserve &rarr;</a>
+
+        <!-- STEP 1: Date + Holes -->
+        <div class="tee-step" id="teeStep1">
+          <p class="tee-step-hint">Choose a date and how many holes you'd like to play.</p>
+          <div class="tee-step1-fields">
+            <div class="tee-field">
+              <label for="teeDate">Date</label>
+              <input type="date" id="teeDate" />
+            </div>
+            <div class="tee-field">
+              <label>Holes</label>
+              <div class="holes-toggle">
+                <button type="button" class="holes-btn holes-btn--active" data-holes="9">9</button>
+                <button type="button" class="holes-btn" data-holes="18">18</button>
+              </div>
+            </div>
+          </div>
+          <button type="button" class="btn-tee-primary" id="teeShowSlots">Show Available Times</button>
+          <p class="tee-error" id="teeStep1Error"></p>
+        </div>
+
+        <!-- STEP 2: Time slot picker -->
+        <div class="tee-step tee-step--hidden" id="teeStep2">
+          <button type="button" class="tee-back-link" id="teeBackTo1">&larr; Change date</button>
+          <p class="tee-date-label" id="teeDateLabel"></p>
+          <p class="tee-step-hint">Select an available time below.</p>
+          <div class="tee-slots-loading" id="teeSlotsLoading">Loading&hellip;</div>
+          <div class="tee-slots-grid" id="teeSlotsGrid"></div>
+          <p class="tee-error" id="teeStep2Error"></p>
+        </div>
+
+        <!-- STEP 3: Booking form -->
+        <div class="tee-step tee-step--hidden" id="teeStep3">
+          <button type="button" class="tee-back-link" id="teeBackTo2">&larr; Change time</button>
+          <p class="tee-selected-slot" id="teeSelectedSlotLabel"></p>
+          <form class="tee-form" id="teeBookingForm" novalidate>
+            <div class="tee-form-row">
+              <div class="tee-form-field">
+                <label for="teeName">Name</label>
+                <input type="text" id="teeName" name="name" required autocomplete="name" />
+              </div>
+              <div class="tee-form-field">
+                <label for="teePhone">Phone</label>
+                <input type="tel" id="teePhone" name="phone" required autocomplete="tel" />
+              </div>
+            </div>
+            <div class="tee-form-field">
+              <label for="teeEmail">Email <span class="tee-optional">(optional)</span></label>
+              <input type="email" id="teeEmail" name="email" autocomplete="email" />
+            </div>
+            <div class="tee-form-row">
+              <div class="tee-form-field">
+                <label for="teeNumPlayers">Players</label>
+                <select id="teeNumPlayers" name="num_players" required></select>
+              </div>
+              <div class="tee-form-field">
+                <label for="teeNumCarts">Carts</label>
+                <select id="teeNumCarts" name="num_carts"></select>
+              </div>
+            </div>
+            <div class="tee-form-field">
+              <label for="teeNotes">Notes <span class="tee-optional">(optional)</span></label>
+              <input type="text" id="teeNotes" name="notes" placeholder="Anything we should know?" />
+            </div>
+            <button type="submit" class="btn-tee-primary" id="teeConfirmBtn">Confirm Booking</button>
+            <p class="tee-error" id="teeStep3Error"></p>
+          </form>
+        </div>
+
+        <!-- STEP 4: Confirmation -->
+        <div class="tee-step tee-step--hidden" id="teeStep4">
+          <div class="tee-confirmation">
+            <div class="tee-confirm-check">&#10003;</div>
+            <p class="tee-confirm-title">You&rsquo;re on the course!</p>
+            <p class="tee-confirm-no" id="teeConfirmNo"></p>
+            <div class="tee-confirm-details" id="teeConfirmDetails"></div>
+            <button type="button" class="btn-tee-ghost" id="teeBookAnother">Book Another Time</button>
+          </div>
+        </div>
+
       </div>
     </div>
 
@@ -331,6 +409,8 @@
     </div>
   </footer>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="script.js"></script>
+  <script src="tee-times.js"></script>
 </body>
 </html>

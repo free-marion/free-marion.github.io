@@ -979,6 +979,433 @@ address {
 }
 
 /* =====================
+   TEE TIME BOOKING
+   ===================== */
+
+/* Override panel inner max-width for the booking flow */
+.tee-booking-wrap {
+  max-width: 400px;
+  width: 100%;
+}
+
+/* Steps */
+.tee-step { width: 100%; }
+.tee-step--hidden { display: none !important; }
+
+/* Step hints / labels */
+.tee-step-hint {
+  font-family: var(--body);
+  font-size: 0.88rem;
+  color: rgba(255,255,255,0.6);
+  line-height: 1.65;
+  margin-bottom: 1.4rem;
+}
+
+.tee-date-label {
+  font-family: var(--serif);
+  font-size: 1.05rem;
+  color: rgba(255,255,255,0.9);
+  margin-bottom: 0.3rem;
+}
+
+.tee-selected-slot {
+  font-family: var(--serif);
+  font-size: 1.05rem;
+  color: rgba(255,255,255,0.9);
+  margin-bottom: 1.3rem;
+  padding: 0.6rem 0.9rem;
+  border-left: 3px solid var(--cherry-light);
+  background: rgba(255,255,255,0.06);
+  border-radius: 0 4px 4px 0;
+}
+
+/* Back link */
+.tee-back-link {
+  background: none;
+  border: none;
+  color: var(--blossom);
+  font-family: var(--body);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: 1rem;
+  opacity: 0.75;
+  transition: opacity 0.2s;
+  display: inline-block;
+}
+
+.tee-back-link:hover { opacity: 1; }
+
+/* Step 1 fields */
+.tee-step1-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.2rem;
+  margin-bottom: 1.5rem;
+}
+
+.tee-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.tee-field label {
+  font-family: var(--body);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.5);
+}
+
+.tee-field input[type="date"] {
+  font-family: var(--body);
+  font-size: 0.9rem;
+  color: #fff;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.18);
+  border-radius: 3px;
+  padding: 0.5rem 0.6rem;
+  outline: none;
+  width: 100%;
+  cursor: pointer;
+  transition: border-color 0.2s;
+  color-scheme: dark;
+}
+
+.tee-field input[type="date"]:focus {
+  border-color: var(--cherry-light);
+}
+
+/* Holes toggle */
+.holes-toggle {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.holes-btn {
+  flex: 1;
+  padding: 0.5rem 0;
+  font-family: var(--body);
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.55);
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 3px;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s, border-color 0.18s;
+}
+
+.holes-btn--active {
+  background: var(--cherry);
+  border-color: var(--cherry);
+  color: #fff;
+}
+
+.holes-btn:hover:not(.holes-btn--active) {
+  background: rgba(255,255,255,0.12);
+  color: rgba(255,255,255,0.85);
+}
+
+/* Primary tee button */
+.btn-tee-primary {
+  display: inline-block;
+  padding: 0.78rem 1.8rem;
+  background: var(--cherry);
+  color: #fff;
+  border: 2px solid var(--cherry);
+  border-radius: 2px;
+  font-family: var(--body);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+  width: 100%;
+}
+
+.btn-tee-primary:hover {
+  background: #5e1522;
+  border-color: #5e1522;
+  transform: translateY(-1px);
+}
+
+.btn-tee-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Ghost button */
+.btn-tee-ghost {
+  display: inline-block;
+  padding: 0.65rem 1.5rem;
+  background: transparent;
+  color: var(--blossom);
+  border: 1px solid rgba(240, 200, 208, 0.4);
+  border-radius: 2px;
+  font-family: var(--body);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  margin-top: 1.4rem;
+}
+
+.btn-tee-ghost:hover {
+  border-color: var(--blossom);
+  background: rgba(240, 200, 208, 0.08);
+}
+
+/* Error text */
+.tee-error {
+  font-family: var(--body);
+  font-size: 0.82rem;
+  color: #f5a0a8;
+  margin-top: 0.8rem;
+  min-height: 1.2em;
+  line-height: 1.5;
+}
+
+/* Loading indicator */
+.tee-slots-loading {
+  font-family: var(--body);
+  font-size: 0.88rem;
+  color: rgba(255,255,255,0.45);
+  margin: 0.5rem 0 1rem;
+  letter-spacing: 0.04em;
+}
+
+/* Slot grid */
+.tee-slots-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-bottom: 0.8rem;
+  max-height: 220px;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+/* Custom scrollbar for slots */
+.tee-slots-grid::-webkit-scrollbar {
+  width: 4px;
+}
+.tee-slots-grid::-webkit-scrollbar-track {
+  background: rgba(255,255,255,0.05);
+  border-radius: 2px;
+}
+.tee-slots-grid::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.18);
+  border-radius: 2px;
+}
+
+/* Individual slot pills */
+.slot-pill {
+  padding: 0.38rem 0.7rem;
+  font-family: var(--body);
+  font-size: 0.78rem;
+  font-weight: 600;
+  border-radius: 3px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, transform 0.1s;
+  line-height: 1;
+  white-space: nowrap;
+  background: rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.82);
+  border-color: rgba(255,255,255,0.14);
+}
+
+.slot-pill:hover:not(.slot-pill--full):not(.slot-pill--blocked):not(.slot-pill--selected) {
+  background: rgba(255,255,255,0.18);
+  border-color: rgba(255,255,255,0.3);
+  transform: translateY(-1px);
+}
+
+.slot-pill--selected {
+  background: var(--cherry);
+  border-color: var(--cherry);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(122, 30, 46, 0.5);
+}
+
+.slot-pill--full,
+.slot-pill--blocked {
+  background: rgba(255,255,255,0.04);
+  color: rgba(255,255,255,0.22);
+  border-color: rgba(255,255,255,0.07);
+  cursor: not-allowed;
+  text-decoration: line-through;
+}
+
+.slot-pill .slot-cap {
+  font-size: 0.68rem;
+  opacity: 0.65;
+  margin-left: 0.25rem;
+}
+
+/* Tee form */
+.tee-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.tee-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.tee-form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.38rem;
+}
+
+.tee-form-field label {
+  font-family: var(--body);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.45);
+}
+
+.tee-optional {
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  opacity: 0.7;
+}
+
+.tee-form-field input,
+.tee-form-field select {
+  font-family: var(--body);
+  font-size: 0.92rem;
+  color: #fff;
+  background: transparent;
+  border: none;
+  border-bottom: 1.5px solid rgba(255,255,255,0.2);
+  padding: 0.38rem 0;
+  outline: none;
+  transition: border-color 0.2s;
+  width: 100%;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.tee-form-field select {
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='rgba(255,255,255,0.4)'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.2rem center;
+  padding-right: 1.2rem;
+}
+
+.tee-form-field select option {
+  background: var(--green);
+  color: #fff;
+}
+
+.tee-form-field input::placeholder { color: rgba(255,255,255,0.22); }
+
+.tee-form-field input:focus,
+.tee-form-field select:focus {
+  border-bottom-color: var(--cherry-light);
+}
+
+/* Confirmation screen */
+.tee-confirmation {
+  text-align: center;
+  padding: 0.5rem 0;
+}
+
+.tee-confirm-check {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--cherry);
+  color: #fff;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  box-shadow: 0 4px 20px rgba(122, 30, 46, 0.45);
+}
+
+.tee-confirm-title {
+  font-family: var(--serif);
+  font-size: 1.35rem;
+  color: #fff;
+  margin-bottom: 0.5rem;
+}
+
+.tee-confirm-no {
+  font-family: var(--body);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--cherry-light);
+  margin-bottom: 1.5rem;
+}
+
+.tee-confirm-details {
+  text-align: left;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 5px;
+  padding: 1.1rem 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.tee-confirm-row {
+  display: flex;
+  gap: 1rem;
+  align-items: baseline;
+}
+
+.tee-confirm-label {
+  font-family: var(--body);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.38);
+  min-width: 60px;
+  flex-shrink: 0;
+}
+
+.tee-confirm-value {
+  font-family: var(--body);
+  font-size: 0.9rem;
+  color: rgba(255,255,255,0.82);
+}
+
+/* No slots message */
+.tee-no-slots {
+  font-family: var(--body);
+  font-size: 0.88rem;
+  color: rgba(255,255,255,0.48);
+  font-style: italic;
+  padding: 0.8rem 0;
+}
+
+/* =====================
    RESPONSIVE
    ===================== */
 @media (max-width: 960px) {
@@ -995,9 +1422,13 @@ address {
   .course-text { padding: 3.5rem 2.5rem; }
 
   .farm-cards { grid-template-columns: repeat(2, 1fr); }
+  .tee-booking-wrap { max-width: 100%; }
 }
 
 @media (max-width: 640px) {
+  .tee-step1-fields { grid-template-columns: 1fr 1fr; }
+  .tee-form-row { grid-template-columns: 1fr; }
+  .tee-slots-grid { max-height: 180px; }
   .nav-links {
     display: none;
     flex-direction: column;
