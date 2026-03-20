@@ -57,7 +57,10 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
   }
 });
 
-document.getElementById('signOutBtn').addEventListener('click', () => db.auth.signOut());
+document.getElementById('signOutBtn').addEventListener('click', async () => {
+  await db.auth.signOut();
+  window.location.reload();
+});
 
 // =====================
 // TAB ROUTING
