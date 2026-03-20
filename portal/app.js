@@ -20,6 +20,7 @@ db.auth.onAuthStateChange((event, session) => {
     document.getElementById('appShell').hidden = false;
     document.getElementById('userEmail').textContent = currentUser.email;
     loadVto();
+    loadCourseStatus();
   } else {
     document.getElementById('loginScreen').hidden = false;
     document.getElementById('appShell').hidden = true;
@@ -309,4 +310,44 @@ document.getElementById('saveTodoBtn').addEventListener('click', async () => {
   document.getElementById('todoTitle').value = '';
   document.getElementById('todoDue').value = '';
   loadTodos();
+});
+
+// ============================================
+// COURSE STATUS
+// ============================================
+
+let courseIsOpen = true;
+
+async function loadCourseStatus() {
+  const { data } = await db.from('course_status').select('*').eq('id', 1).single();
+  if (data) {
+    courseIsOpen = data.is_open;
+    updateCourseBtn();
+  }
+}
+
+function updateCourseBtn() {
+  const btn = document.getElementById('courseToggleBtn');
+  if (courseIsOpen) {
+    btn.textContent = '⛳ Course Open';
+    btn.className = 'btn btn--sm course-open';
+  } else {
+    btn.textContent = '⛔ Course Closed';
+    btn.className = 'btn btn--sm course-closed';
+  }
+}
+
+document.getElementById('courseToggleBtn').addEventListener('click', async () => {
+  const newStatus = !courseIsOpen;
+  const msg = newStatus ? '' : prompt('Closure message (shown on website):', 'Course is closed due to weather conditions. Check back soon.');
+  if (!newStatus && msg === null) return; // cancelled
+  const label = newStatus ? 'reopen' : 'close';
+  if (!confirm(`${label.charAt(0).toUpperCase() + label.slice(1)} the course?`)) return;
+  await db.from('course_status').update({
+    is_open: newStatus,
+    message: msg || 'Course is closed due to weather conditions. Check back soon.',
+    updated_at: new Date().toISOString()
+  }).eq('id', 1);
+  courseIsOpen = newStatus;
+  updateCourseBtn();
 });

@@ -173,3 +173,6 @@ body {
 .docs-icon { font-size: 3rem; }
 .docs-card h3 { font-family: 'Playfair Display', serif; font-size: 1.2rem; color: var(--green); }
 .docs-card p  { color: var(--text-muted); font-size: 0.9rem; }
+
+.course-open   { background: #2e7d32; color: #fff; border: none; }
+.course-closed { background: #c0392b; color: #fff; border: none; }

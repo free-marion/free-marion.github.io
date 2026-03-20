@@ -11,6 +11,11 @@
 </head>
 <body>
 
+  <!-- COURSE STATUS BANNER -->
+  <div id="courseClosedBanner" style="display:none;background:#7B1C2E;color:#fff;text-align:center;padding:0.75rem 1rem;font-family:Georgia,serif;font-size:0.95rem;position:relative;z-index:999;">
+    ⚠️ <span id="courseClosedMsg">Course is closed due to weather conditions. Check back soon.</span>
+  </div>
+
   <!-- NAV -->
   <nav id="navbar">
     <div class="nav-inner">
@@ -359,7 +364,7 @@
         </div>
         <div class="contact-line">
           <span class="contact-label">Hours</span>
-          <span>Mon–Fri 9am–5pm &nbsp;|&nbsp; Sat–Sun 8am–5pm</span>
+          <span id="courseHours">7 Days a Week &nbsp;|&nbsp; 8am–7pm</span>
         </div>
       </address>
       <div class="contact-map">
@@ -435,5 +440,18 @@
   <script src="script.js"></script>
   <script src="tee-times.js"></script>
   <script src="egg-form.js"></script>
+  <script>
+    (function() {
+      const SUPABASE_URL  = 'https://giwfigekjatujubjknjf.supabase.co';
+      const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdpd2ZpZ2VramF0dWp1YmprbmpmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMDEwMDMsImV4cCI6MjA4OTU3NzAwM30.p3OaPA5qYROqz8d0tNyhytl__n_bzH2l2MOX3olDn3A';
+      const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+      db.from('course_status').select('*').eq('id', 1).single().then(({ data }) => {
+        if (data && !data.is_open) {
+          document.getElementById('courseClosedMsg').textContent = data.message;
+          document.getElementById('courseClosedBanner').style.display = 'block';
+        }
+      });
+    })();
+  </script>
 </body>
 </html>

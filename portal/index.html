@@ -38,6 +38,7 @@
   <header class="portal-header">
     <span class="portal-header__title">Cherrywood</span>
     <div class="portal-header__right">
+      <button id="courseToggleBtn" class="btn btn--sm course-open">⛳ Course Open</button>
       <span id="userEmail" class="user-email"></span>
       <a href="https://cherrywoodgolf.com" class="btn btn--ghost btn--sm">← Site</a>
       <button class="btn btn--ghost btn--sm" onclick="(async()=>{ await db.auth.signOut(); window.location.reload(); })()">Sign Out</button>
