@@ -19,7 +19,7 @@ db.auth.onAuthStateChange(async (event, session) => {
   currentUser = session?.user ?? null;
   if (currentUser) {
     showApp();
-    await Promise.all([loadRocks(), loadMeasurables(), loadIssues()]);
+    await Promise.all([loadRocks(), loadMeasurables(), loadIssues(), loadTodos(), loadMeetingLogs()]);
   } else {
     showLogin();
   }
@@ -511,3 +511,501 @@ function escHtml(str) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;');
 }
+
+// =====================
+// TO-DOS
+// =====================
+
+let todos = [];
+let editingTodoId = null;
+let todoFilter = 'open';
+
+async function loadTodos() {
+  const { data, error } = await db.from('todos').select('*').order('created_at', { ascending: true });
+  if (error) { console.error(error); return; }
+  todos = data || [];
+  renderTodos();
+}
+
+function renderTodos() {
+  const list  = document.getElementById('todosList');
+  const empty = document.getElementById('todosEmpty');
+  list.innerHTML = '';
+
+  const filtered = todoFilter === 'all'   ? todos
+    : todoFilter === 'done'  ? todos.filter(t => t.done)
+    : todos.filter(t => !t.done);
+
+  if (filtered.length === 0) { empty.hidden = false; return; }
+  empty.hidden = true;
+
+  filtered.forEach(todo => {
+    const card = document.createElement('div');
+    card.className = 'todo-card' + (todo.done ? ' done' : '');
+
+    const dueStr = todo.due_date
+      ? new Date(todo.due_date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+      : '';
+
+    card.innerHTML = `
+      <button class="todo-check ${todo.done ? 'checked' : ''}" title="Toggle done" aria-label="Mark done">
+        ${todo.done ? '✓' : ''}
+      </button>
+      <div class="todo-body">
+        <div class="todo-title ${todo.done ? 'done' : ''}">${escHtml(todo.title)}</div>
+        <div class="todo-meta">${escHtml(todo.owner_name || currentUser.email)}${dueStr ? ' · Due ' + dueStr : ''}</div>
+      </div>
+      <div class="todo-actions">
+        <button class="btn btn--ghost btn--sm todo-edit-btn">Edit</button>
+        <button class="btn btn--danger btn--sm todo-delete-btn">Delete</button>
+      </div>
+    `;
+
+    card.querySelector('.todo-check').addEventListener('click', () => toggleTodoDone(todo));
+    card.querySelector('.todo-edit-btn').addEventListener('click', () => openTodoForm(todo));
+    card.querySelector('.todo-delete-btn').addEventListener('click', () => deleteTodo(todo.id));
+    list.appendChild(card);
+  });
+}
+
+async function toggleTodoDone(todo) {
+  await db.from('todos').update({ done: !todo.done }).eq('id', todo.id);
+  await loadTodos();
+}
+
+document.getElementById('addTodoBtn').addEventListener('click', () => openTodoForm(null));
+
+function openTodoForm(todo) {
+  editingTodoId = todo ? todo.id : null;
+  document.getElementById('todoFormHeading').textContent = todo ? 'Edit To-Do' : 'New To-Do';
+  document.getElementById('todoId').value    = todo?.id ?? '';
+  document.getElementById('todoTitle').value = todo?.title ?? '';
+  document.getElementById('todoDue').value   = todo?.due_date ?? '';
+  document.getElementById('todoForm').hidden = false;
+  document.getElementById('todoTitle').focus();
+}
+
+document.getElementById('cancelTodoBtn').addEventListener('click', () => {
+  document.getElementById('todoForm').hidden = true;
+  editingTodoId = null;
+});
+
+document.getElementById('saveTodoBtn').addEventListener('click', async () => {
+  const title = document.getElementById('todoTitle').value.trim();
+  const due   = document.getElementById('todoDue').value || null;
+  if (!title) { alert('To-do title is required.'); return; }
+
+  if (editingTodoId) {
+    await db.from('todos').update({ title, due_date: due }).eq('id', editingTodoId);
+  } else {
+    await db.from('todos').insert({ title, due_date: due, owner_id: currentUser.id, owner_name: currentUser.email });
+  }
+  document.getElementById('todoForm').hidden = false;
+  editingTodoId = null;
+  document.getElementById('todoForm').hidden = true;
+  await loadTodos();
+});
+
+async function deleteTodo(id) {
+  if (!confirm('Delete this to-do?')) return;
+  await db.from('todos').delete().eq('id', id);
+  await loadTodos();
+}
+
+document.querySelectorAll('.todo-filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.todo-filter-btn').forEach(b => b.classList.remove('todo-filter-btn--active', 'filter-btn--active'));
+    btn.classList.add('todo-filter-btn--active', 'filter-btn--active');
+    todoFilter = btn.dataset.filter;
+    renderTodos();
+  });
+});
+
+// =====================
+// L10 MEETING RUNNER
+// =====================
+
+const L10_SEGMENTS = [
+  { id: 'segue',      title: 'Segue',           alloc: 5,  desc: 'Share good news — personal or professional. One per person.' },
+  { id: 'scorecard',  title: 'Scorecard',        alloc: 5,  desc: 'Review the weekly numbers. Any off-track metrics?' },
+  { id: 'rocks',      title: 'Rock Review',      alloc: 5,  desc: 'Each rock owner: On Track or Off Track?' },
+  { id: 'headlines',  title: 'Headlines',        alloc: 5,  desc: 'Customer and employee headlines — good news only.' },
+  { id: 'todos',      title: 'To-Do List',       alloc: 5,  desc: 'Did we complete last week\'s to-dos? 90% done?' },
+  { id: 'ids',        title: 'IDS',              alloc: 60, desc: 'Identify, Discuss, Solve. Work through the issues list.' },
+  { id: 'conclude',   title: 'Conclude',         alloc: 5,  desc: 'Rate the meeting 1–10. Cascade messages.' },
+];
+
+let l10State = {
+  active: false,
+  segmentIdx: 0,
+  timerSecs: 0,
+  timerInterval: null,
+  timerRunning: false,
+  meetingRating: null,
+  segueEntries: [],
+  headlines: [],
+  cascadeText: '',
+};
+
+async function loadMeetingLogs() {
+  const { data } = await db.from('meeting_logs')
+    .select('*')
+    .order('meeting_date', { ascending: false })
+    .limit(5);
+
+  const container = document.getElementById('l10PrevMeetings');
+  if (!data || data.length === 0) {
+    container.innerHTML = '<p style="color:var(--text-muted);font-size:0.88rem;font-style:italic;">No previous meetings yet.</p>';
+    return;
+  }
+
+  container.innerHTML = '<p class="l10-section-label" style="margin-bottom:0.75rem;">Recent Meetings</p>' +
+    data.map(m => {
+      const d = new Date(m.meeting_date + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+      return `<div class="l10-prev-meeting-item">
+        <span>${d}</span>
+        ${m.rating ? `<span class="l10-rating-badge">${m.rating}/10</span>` : '<span style="color:#aaa;font-size:0.8rem;">No rating</span>'}
+      </div>`;
+    }).join('');
+}
+
+document.getElementById('startL10Btn').addEventListener('click', () => {
+  l10State = {
+    active: true,
+    segmentIdx: 0,
+    timerSecs: L10_SEGMENTS[0].alloc * 60,
+    timerInterval: null,
+    timerRunning: true,
+    meetingRating: null,
+    segueEntries: [],
+    headlines: [],
+    cascadeText: '',
+  };
+  document.getElementById('l10Start').hidden  = true;
+  document.getElementById('l10Runner').hidden = false;
+  renderL10Segment();
+  startL10Timer();
+});
+
+function renderL10Segment() {
+  const seg = L10_SEGMENTS[l10State.segmentIdx];
+  const total = L10_SEGMENTS.length;
+
+  document.getElementById('l10SegmentNum').textContent   = `${l10State.segmentIdx + 1} / ${total}`;
+  document.getElementById('l10SegmentTitle').textContent = seg.title;
+  document.getElementById('l10SegmentAlloc').textContent = `${seg.alloc} min`;
+  document.getElementById('l10ProgressFill').style.width = `${((l10State.segmentIdx) / total) * 100}%`;
+
+  document.getElementById('l10PrevBtn').disabled = l10State.segmentIdx === 0;
+  document.getElementById('l10NextBtn').textContent = l10State.segmentIdx === total - 1 ? 'Finish Meeting' : 'Next →';
+
+  renderL10SegmentBody(seg);
+}
+
+function renderL10SegmentBody(seg) {
+  const body = document.getElementById('l10SegmentBody');
+  body.innerHTML = `<p style="font-size:0.88rem;color:var(--text-muted);font-style:italic;margin-bottom:1.25rem;">${seg.desc}</p>`;
+
+  if (seg.id === 'segue') {
+    renderSegueSegment(body);
+  } else if (seg.id === 'scorecard') {
+    renderScorecardSegment(body);
+  } else if (seg.id === 'rocks') {
+    renderRocksSegment(body);
+  } else if (seg.id === 'headlines') {
+    renderHeadlinesSegment(body);
+  } else if (seg.id === 'todos') {
+    renderTodosSegment(body);
+  } else if (seg.id === 'ids') {
+    renderIDSSegment(body);
+  } else if (seg.id === 'conclude') {
+    renderConcludeSegment(body);
+  }
+}
+
+function renderSegueSegment(body) {
+  const wrap = document.createElement('div');
+  wrap.className = 'l10-segue-list';
+
+  // Show existing entries
+  l10State.segueEntries.forEach((entry, i) => {
+    const row = document.createElement('div');
+    row.className = 'l10-segue-item';
+    row.innerHTML = `<span style="font-size:0.8rem;color:var(--text-muted);width:20px;">${i+1}.</span>
+      <input type="text" value="${escHtml(entry)}" placeholder="Share something good…">`;
+    row.querySelector('input').addEventListener('change', e => { l10State.segueEntries[i] = e.target.value; });
+    wrap.appendChild(row);
+  });
+
+  const addBtn = document.createElement('button');
+  addBtn.className = 'l10-add-row-btn';
+  addBtn.textContent = '+ Add person';
+  addBtn.addEventListener('click', () => {
+    l10State.segueEntries.push('');
+    renderL10SegmentBody(L10_SEGMENTS[l10State.segmentIdx]);
+  });
+
+  body.appendChild(wrap);
+  body.appendChild(addBtn);
+}
+
+function renderScorecardSegment(body) {
+  if (measurables.length === 0) {
+    body.innerHTML += '<p style="color:var(--text-muted);font-style:italic;">No scorecard metrics yet.</p>';
+    return;
+  }
+  const currentWeek = weeks[weeks.length - 1];
+  const table = document.createElement('table');
+  table.className = 'l10-sc-mini';
+  table.innerHTML = `<thead><tr><th>Metric</th><th>Goal</th><th>This Week</th><th>Status</th></tr></thead>`;
+  const tb = document.createElement('tbody');
+
+  measurables.forEach(m => {
+    const val = scores[m.id]?.[currentWeek];
+    const dirSymbol = m.goal_direction === 'gte' ? '≥' : '≤';
+    let statusHtml = '<span style="color:#aaa;">—</span>';
+    if (val !== undefined) {
+      const color = scoreColor(val, m.goal_value, m.goal_direction);
+      const label = color === 'score-cell--green' ? '🟢' : color === 'score-cell--yellow' ? '🟡' : '🔴';
+      statusHtml = label;
+    }
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${escHtml(m.metric_name)}</td><td>${dirSymbol} ${m.goal_value ?? '—'}</td><td>${val ?? '—'}</td><td>${statusHtml}</td>`;
+    tb.appendChild(tr);
+  });
+  table.appendChild(tb);
+  body.appendChild(table);
+}
+
+function renderRocksSegment(body) {
+  const activeRocks = rocks.filter(r => r.status !== 'complete');
+  if (activeRocks.length === 0) {
+    body.innerHTML += '<p style="color:var(--text-muted);font-style:italic;">No active rocks.</p>';
+    return;
+  }
+  const list = document.createElement('div');
+  activeRocks.forEach(rock => {
+    const row = document.createElement('div');
+    row.className = 'l10-rock-row';
+    row.innerHTML = `
+      <div class="l10-rock-name">
+        ${escHtml(rock.title)}
+        <div class="l10-rock-owner">${escHtml(rock.owner_name || '')}</div>
+      </div>
+      <div class="l10-status-toggle">
+        <button class="${rock.status === 'on_track' ? 'active-on' : ''}" data-status="on_track">On Track</button>
+        <button class="${rock.status === 'off_track' ? 'active-off' : ''}" data-status="off_track">Off Track</button>
+      </div>
+    `;
+    row.querySelectorAll('.l10-status-toggle button').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        await db.from('rocks').update({ status: btn.dataset.status }).eq('id', rock.id);
+        await loadRocks();
+        renderL10SegmentBody(L10_SEGMENTS[l10State.segmentIdx]);
+      });
+    });
+    list.appendChild(row);
+  });
+  body.appendChild(list);
+}
+
+function renderHeadlinesSegment(body) {
+  const wrap = document.createElement('div');
+  wrap.className = 'l10-headlines';
+
+  l10State.headlines.forEach((h, i) => {
+    const row = document.createElement('div');
+    row.className = 'l10-headline-input';
+    row.innerHTML = `<input type="text" value="${escHtml(h)}" placeholder="Headline…">`;
+    row.querySelector('input').addEventListener('change', e => { l10State.headlines[i] = e.target.value; });
+    wrap.appendChild(row);
+  });
+
+  const addBtn = document.createElement('button');
+  addBtn.className = 'l10-add-row-btn';
+  addBtn.textContent = '+ Add headline';
+  addBtn.addEventListener('click', () => {
+    l10State.headlines.push('');
+    renderL10SegmentBody(L10_SEGMENTS[l10State.segmentIdx]);
+  });
+
+  body.appendChild(wrap);
+  body.appendChild(addBtn);
+}
+
+function renderTodosSegment(body) {
+  const openTodos = todos.filter(t => !t.done);
+  if (openTodos.length === 0) {
+    body.innerHTML += '<p style="color:#27ae60;font-weight:600;">✓ All to-dos complete! Great week.</p>';
+    return;
+  }
+  const list = document.createElement('div');
+  list.className = 'l10-todo-review';
+  openTodos.forEach(todo => {
+    const row = document.createElement('div');
+    row.className = 'l10-todo-row';
+    row.innerHTML = `
+      <button class="todo-check" title="Mark done">⬜</button>
+      <div class="todo-body">
+        <div class="todo-title">${escHtml(todo.title)}</div>
+        <div class="todo-meta">${escHtml(todo.owner_name || '')}</div>
+      </div>
+    `;
+    row.querySelector('.todo-check').addEventListener('click', async (e) => {
+      await db.from('todos').update({ done: true }).eq('id', todo.id);
+      await loadTodos();
+      renderL10SegmentBody(L10_SEGMENTS[l10State.segmentIdx]);
+    });
+    list.appendChild(row);
+  });
+  const pct = Math.round(((todos.length - openTodos.length) / todos.length) * 100);
+  body.innerHTML += `<p style="margin-bottom:1rem;font-weight:600;color:${pct >= 90 ? '#27ae60' : '#e74c3c'};">${pct}% complete (${todos.length - openTodos.length}/${todos.length})</p>`;
+  body.appendChild(list);
+}
+
+function renderIDSSegment(body) {
+  const openIssues = issues.filter(i => i.status !== 'solved');
+  if (openIssues.length === 0) {
+    body.innerHTML += '<p style="color:#27ae60;font-weight:600;">✓ Issues list is clear.</p>';
+    return;
+  }
+  const list = document.createElement('div');
+  openIssues.forEach(issue => {
+    const row = document.createElement('div');
+    row.className = 'l10-issue-row' + (issue.status === 'discussing' ? ' solving' : '');
+    row.innerHTML = `
+      <div style="flex:1;">
+        <div class="l10-issue-title">${escHtml(issue.title)}</div>
+        ${issue.description ? `<div style="font-size:0.82rem;color:var(--text-muted);margin-top:0.2rem;font-style:italic;">${escHtml(issue.description)}</div>` : ''}
+      </div>
+      <select class="l10-issue-status-sel">
+        <option value="open"       ${issue.status==='open'       ?'selected':''}>Open</option>
+        <option value="discussing" ${issue.status==='discussing' ?'selected':''}>Discussing</option>
+        <option value="solved"     ${issue.status==='solved'     ?'selected':''}>Solved</option>
+      </select>
+    `;
+    row.querySelector('select').addEventListener('change', async (e) => {
+      await db.from('issues').update({ status: e.target.value }).eq('id', issue.id);
+      await loadIssues();
+      renderL10SegmentBody(L10_SEGMENTS[l10State.segmentIdx]);
+    });
+    list.appendChild(row);
+  });
+  body.appendChild(list);
+}
+
+function renderConcludeSegment(body) {
+  const div = document.createElement('div');
+  div.className = 'l10-conclude';
+  div.innerHTML = `
+    <p class="l10-rating-prompt">How would you rate this meeting?</p>
+    <div class="l10-rating-stars">
+      ${[1,2,3,4,5,6,7,8,9,10].map(n =>
+        `<button class="l10-rating-btn ${l10State.meetingRating === n ? 'selected' : ''}" data-val="${n}">${n}</button>`
+      ).join('')}
+    </div>
+    <p class="l10-cascade-label">Cascading messages — what needs to be communicated to others?</p>
+    <textarea class="l10-cascade-input" placeholder="Messages to share with the rest of the team or outside the room…">${l10State.cascadeText}</textarea>
+  `;
+  div.querySelectorAll('.l10-rating-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      l10State.meetingRating = parseInt(btn.dataset.val);
+      div.querySelectorAll('.l10-rating-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+    });
+  });
+  div.querySelector('.l10-cascade-input').addEventListener('input', e => {
+    l10State.cascadeText = e.target.value;
+  });
+  body.appendChild(div);
+}
+
+// Timer
+function startL10Timer() {
+  clearInterval(l10State.timerInterval);
+  l10State.timerRunning = true;
+  document.getElementById('l10TimerToggle').textContent = 'Pause';
+  l10State.timerInterval = setInterval(() => {
+    l10State.timerSecs--;
+    updateTimerDisplay();
+  }, 1000);
+}
+
+function pauseL10Timer() {
+  clearInterval(l10State.timerInterval);
+  l10State.timerRunning = false;
+  document.getElementById('l10TimerToggle').textContent = 'Resume';
+}
+
+function updateTimerDisplay() {
+  const el = document.getElementById('l10Timer');
+  const abs = Math.abs(l10State.timerSecs);
+  const m = Math.floor(abs / 60);
+  const s = abs % 60;
+  el.textContent = (l10State.timerSecs < 0 ? '-' : '') + m + ':' + String(s).padStart(2, '0');
+  el.classList.toggle('overtime', l10State.timerSecs < 0);
+}
+
+document.getElementById('l10TimerToggle').addEventListener('click', () => {
+  if (l10State.timerRunning) pauseL10Timer(); else startL10Timer();
+});
+
+document.getElementById('l10TimerReset').addEventListener('click', () => {
+  const seg = L10_SEGMENTS[l10State.segmentIdx];
+  l10State.timerSecs = seg.alloc * 60;
+  updateTimerDisplay();
+  if (l10State.timerRunning) { clearInterval(l10State.timerInterval); startL10Timer(); }
+});
+
+document.getElementById('l10NextBtn').addEventListener('click', async () => {
+  const isLast = l10State.segmentIdx === L10_SEGMENTS.length - 1;
+  if (isLast) {
+    await finishL10();
+    return;
+  }
+  l10State.segmentIdx++;
+  const seg = L10_SEGMENTS[l10State.segmentIdx];
+  l10State.timerSecs = seg.alloc * 60;
+  clearInterval(l10State.timerInterval);
+  startL10Timer();
+  renderL10Segment();
+});
+
+document.getElementById('l10PrevBtn').addEventListener('click', () => {
+  if (l10State.segmentIdx === 0) return;
+  l10State.segmentIdx--;
+  const seg = L10_SEGMENTS[l10State.segmentIdx];
+  l10State.timerSecs = seg.alloc * 60;
+  clearInterval(l10State.timerInterval);
+  startL10Timer();
+  renderL10Segment();
+});
+
+async function finishL10() {
+  clearInterval(l10State.timerInterval);
+
+  await db.from('meeting_logs').insert({
+    meeting_date: new Date().toISOString().slice(0, 10),
+    rating: l10State.meetingRating,
+    segue_notes: JSON.stringify(l10State.segueEntries.filter(Boolean)),
+    headlines: JSON.stringify(l10State.headlines.filter(Boolean)),
+    cascading_messages: l10State.cascadeText || null,
+    created_by: currentUser.id,
+  });
+
+  // Reset
+  document.getElementById('l10Runner').hidden = true;
+  document.getElementById('l10Start').hidden  = false;
+  l10State.active = false;
+  await loadMeetingLogs();
+  alert(`Meeting complete! ${l10State.meetingRating ? 'Rated ' + l10State.meetingRating + '/10.' : ''} Great work.`);
+}
+
+// Load todos and meeting logs when switching to those tabs
+const origTabBtns = document.querySelectorAll('.tab-btn');
+origTabBtns.forEach(btn => {
+  btn.addEventListener('click', async () => {
+    if (btn.dataset.tab === 'todos') await loadTodos();
+    if (btn.dataset.tab === 'l10')   await loadMeetingLogs();
+  });
+});
