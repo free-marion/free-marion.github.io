@@ -1,3 +1,57 @@
+// =====================
+// NATURE SOUNDS
+// =====================
+(function() {
+  const audio    = document.getElementById('ambience');
+  const btn      = document.getElementById('soundToggle');
+  const iconOn   = document.getElementById('soundIconOn');
+  const iconOff  = document.getElementById('soundIconOff');
+  let started    = false;
+  let muted      = false;
+
+  // Fade in helper
+  function fadeIn(el, targetVol, duration) {
+    el.volume = 0;
+    const steps = 40;
+    const interval = duration / steps;
+    const increment = targetVol / steps;
+    const timer = setInterval(() => {
+      if (el.volume + increment >= targetVol) {
+        el.volume = targetVol;
+        clearInterval(timer);
+      } else {
+        el.volume += increment;
+      }
+    }, interval);
+  }
+
+  function startAudio() {
+    if (started) return;
+    started = true;
+    audio.play().then(() => {
+      fadeIn(audio, 0.18, 4000); // fade to 18% volume over 4 seconds
+      btn.classList.add('sound-toggle--visible');
+    }).catch(() => {
+      // Autoplay blocked — hide button, try again on next interaction
+      started = false;
+    });
+  }
+
+  // Start on first user interaction
+  ['click', 'scroll', 'touchstart', 'keydown'].forEach(evt => {
+    document.addEventListener(evt, startAudio, { once: true });
+  });
+
+  // Mute / unmute toggle
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    muted = !muted;
+    audio.volume = muted ? 0 : 0.18;
+    iconOn.style.display  = muted ? 'none'  : '';
+    iconOff.style.display = muted ? ''      : 'none';
+  });
+})();
+
 // Navbar scroll effect
 const navbar = document.getElementById('navbar');
 window.addEventListener('scroll', () => {
