@@ -445,9 +445,21 @@
       const SUPABASE_URL  = 'https://giwfigekjatujubjknjf.supabase.co';
       const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdpd2ZpZ2VramF0dWp1YmprbmpmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMDEwMDMsImV4cCI6MjA4OTU3NzAwM30.p3OaPA5qYROqz8d0tNyhytl__n_bzH2l2MOX3olDn3A';
       const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+      function withinHours() {
+        const now = new Date();
+        const ct  = new Date(now.toLocaleString('en-US', { timeZone: 'America/Chicago' }));
+        const h   = ct.getHours();
+        return h >= 8 && h < 19; // 8am–7pm
+      }
+
       db.from('course_status').select('*').eq('id', 1).single().then(({ data }) => {
-        if (data && !data.is_open) {
-          document.getElementById('courseClosedMsg').textContent = data.message;
+        const manualClose = data && !data.is_open;
+        const outsideHours = !withinHours();
+        if (manualClose || outsideHours) {
+          const msg = manualClose
+            ? data.message
+            : 'Course is currently closed. Hours: 8am–7pm daily.';
+          document.getElementById('courseClosedMsg').textContent = msg;
           document.getElementById('courseClosedBanner').style.display = 'block';
         }
       });

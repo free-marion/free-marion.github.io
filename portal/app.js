@@ -326,9 +326,17 @@ async function loadCourseStatus() {
   }
 }
 
+function withinHours() {
+  const now = new Date();
+  const ct  = new Date(now.toLocaleString('en-US', { timeZone: 'America/Chicago' }));
+  const h   = ct.getHours();
+  return h >= 8 && h < 19;
+}
+
 function updateCourseBtn() {
   const btn = document.getElementById('courseToggleBtn');
-  if (courseIsOpen) {
+  const effectivelyOpen = courseIsOpen && withinHours();
+  if (effectivelyOpen) {
     btn.textContent = '⛳ Course Open';
     btn.className = 'btn btn--sm course-open';
   } else {
