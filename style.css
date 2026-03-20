@@ -356,6 +356,37 @@ h2 {
 /* =====================
    EGG FORM / NOTEPAD
    ===================== */
+.egg-photos {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.egg-photo {
+  border-radius: 8px;
+  overflow: hidden;
+  margin: 0;
+}
+
+.egg-photo img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+
+.egg-photo figcaption {
+  background: rgba(0,0,0,0.55);
+  color: rgba(255,255,255,0.8);
+  font-size: 0.72rem;
+  font-style: italic;
+  text-align: center;
+  padding: 0.4rem 0.6rem;
+  letter-spacing: 0.02em;
+}
+
 .notepad {
   background: var(--off-white);
   border-radius: 3px;
@@ -852,6 +883,7 @@ footer p:last-child {
   .form-field--narrow { max-width: 100%; }
 
   .notepad { transform: none; padding: 1.5rem; }
+  .egg-photos { grid-template-columns: 1fr; }
 
   .contact-line { flex-direction: column; gap: 0.3rem; }
 
