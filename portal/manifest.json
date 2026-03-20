@@ -1,0 +1,22 @@
+{
+  "name": "Cherrywood Team Portal",
+  "short_name": "Cherrywood",
+  "description": "Cherrywood Farm & Golf Club staff portal",
+  "start_url": "/portal/",
+  "display": "standalone",
+  "background_color": "#1C3320",
+  "theme_color": "#1C3320",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/portal/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/portal/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

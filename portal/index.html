@@ -6,6 +6,12 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
+  <link rel="manifest" href="/portal/manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Cherrywood">
+  <link rel="apple-touch-icon" href="/portal/icon-192.png">
+  <meta name="theme-color" content="#1C3320">
   <title>Cherrywood Portal</title>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Lora:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css?v=4">
@@ -119,5 +125,10 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="app.js?v=4"></script>
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/portal/sw.js');
+  }
+</script>
 </body>
 </html>
