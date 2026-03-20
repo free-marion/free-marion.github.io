@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Cherrywood Farm & Golf Course | Fredericktown, MO</title>
+  <title>Cherrywood Farm & Golf Club | Fredericktown, MO</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&family=Great+Vibes&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -18,9 +18,10 @@
       <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">&#9776;</button>
       <ul class="nav-links" id="navLinks">
         <li><a href="#about">About</a></li>
+        <li><a href="#tee-times">Tee Times</a></li>
+        <li><a href="#eggs">Farm Eggs</a></li>
         <li><a href="#course">The Course</a></li>
-        <li><a href="#farm">The Farm</a></li>
-        <li><a href="#contact">Contact</a></li>
+        <li><a href="#contact">Visit</a></li>
       </ul>
     </div>
   </nav>
@@ -30,102 +31,157 @@
     <div class="hero-overlay"></div>
     <div class="hero-content">
       <p class="hero-eyebrow">Fredericktown, Missouri</p>
-      <h1>Cherrywood Farm<br>&amp; Golf Course</h1>
-      <p class="hero-sub">Where the fairways meet the fields.</p>
-      <a href="#course" class="btn">Explore the Course</a>
+      <h1>Cherrywood<br>Farm &amp; Golf Club</h1>
+      <p class="hero-tagline">Where Purpose Grows.</p>
+      <div class="hero-actions">
+        <a href="#tee-times" class="hero-cta">Book Tee Time</a>
+        <a href="#eggs" class="hero-cta hero-cta--outline">Reserve Farm Eggs</a>
+      </div>
     </div>
   </section>
 
   <!-- ABOUT -->
-  <section id="about" class="section section-light">
-    <div class="container two-col">
-      <div class="col-text">
-        <span class="section-label">Our Story</span>
-        <h2>A One-of-a-Kind<br>Missouri Experience</h2>
-        <p>Cherrywood is something you don't find every day — a working farm and a beautiful 9-hole golf course living side by side in the heart of Fredericktown, Missouri.</p>
-        <p>Whether you're here to walk the fairways, enjoy the scenery, or connect with the land, Cherrywood offers a relaxed, genuine experience rooted in the rhythm of rural Missouri.</p>
-      </div>
-      <div class="col-image">
-        <div class="image-placeholder">
-          <span>Photo Coming Soon</span>
-        </div>
-      </div>
+  <section id="about" class="about">
+    <div class="about-inner">
+      <p class="about-text">Dale Cooper started Cherrywood with a piece of land and a desire to create something meaningful.  A farm came first; regenerative agriculture, cattle, chickens, sheep, ducks, even honeybees!  A vision for a sustainable community, designed to connect people with nature, each other, and their Creator.  Then came a need for Dale's waterslide restoration company to find a headquarters.  The neighboring golf course came up for sale, and the pieces clicked into place.</p>
+
+      <p class="about-text">Now here we are almost a year into the adventure, and the vision has only grown! In December we welcomed the first of our 8 Conestoga Wagon vacation rentals, adding to the truly unique experience of Cherrywood.  Immerse yourself in the proud history of our state,  honoring the brave pioneers who set out from our "Gateway to the West" with dreams of a brighter future for their families.  </p>
+
+      <p class="about-text">Farm fresh eggs are now available for purchase.  The superiority of these eggs is clear from the deep color of the yolk to the rich flavor that can't be replicated within a commercial operation.  Be kind to your body, eat good food!</p>
+
+      <p class="about-text">Cherrywood Farm &amp; Golf Club is named for Dale's true passion, his wife Cherry.  Their 12 children and (for now) 10 grandchildren are their proudest legacy.  They hope you will stop by for a round of golf, some eggs, or simply take a peaceful stroll in the meadow.  Just watch out for the goats, they are very annoying.</p>
     </div>
   </section>
 
-  <!-- COURSE -->
-  <section id="course" class="section section-dark">
-    <div class="container">
-      <span class="section-label">Golf</span>
-      <h2>The Course</h2>
-      <p class="section-intro">A classic 9-hole layout set against the natural beauty of the Missouri countryside. Relaxed, scenic, and fun for all skill levels.</p>
-      <div class="cards">
-        <div class="card">
-          <div class="card-icon">&#9971;</div>
-          <h3>9 Holes</h3>
-          <p>A well-maintained 9-hole course with a layout that challenges and rewards players of every level.</p>
-        </div>
-        <div class="card">
-          <div class="card-icon">&#127807;</div>
-          <h3>Scenic Setting</h3>
-          <p>Surrounded by rolling farmland and mature trees, every round feels like a breath of fresh air.</p>
-        </div>
-        <div class="card">
-          <div class="card-icon">&#128101;</div>
-          <h3>All Are Welcome</h3>
-          <p>Whether you're a seasoned golfer or picking up a club for the first time, you'll feel right at home here.</p>
-        </div>
+  <!-- ACTIONS: TEE TIMES + EGGS -->
+  <div class="actions-row" id="tee-times">
+
+    <!-- TEE TIMES -->
+    <div class="action-panel action-panel--tee">
+      <div class="action-panel-inner">
+        <span class="panel-kicker">Golf</span>
+        <h2>Book a Tee Time</h2>
+        <p>Online booking is coming soon. In the meantime, give us a call — we'd love to get you on the course.</p>
+        <div class="coming-soon-badge">Online Booking Coming Soon</div>
+        <a href="#contact" class="btn-text-link">Call to Reserve &rarr;</a>
       </div>
     </div>
-  </section>
 
-  <!-- FARM -->
-  <section id="farm" class="section section-light">
-    <div class="container two-col reverse">
-      <div class="col-image">
-        <div class="image-placeholder">
-          <span>Photo Coming Soon</span>
+    <!-- EGGS -->
+    <div class="action-panel action-panel--eggs" id="eggs">
+      <div class="action-panel-inner">
+        <span class="panel-kicker">The Farm</span>
+        <h2>Farm Fresh Eggs</h2>
+        <p>Our chickens are raised right here on the property. Reserve your dozen below and we'll have them waiting for you.</p>
+
+        <div class="notepad">
+          <form
+            action="https://formspree.io/f/events@cherrywoodfgc.com"
+            method="POST"
+            class="egg-form"
+          >
+            <div class="form-row">
+              <div class="form-field">
+                <label for="egg-name">Name</label>
+                <input type="text" id="egg-name" name="name" required autocomplete="name" />
+              </div>
+              <div class="form-field">
+                <label for="egg-contact">Phone or Email</label>
+                <input type="text" id="egg-contact" name="contact" required />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-field form-field--narrow">
+                <label for="egg-qty">How many dozen?</label>
+                <select id="egg-qty" name="dozens" required>
+                  <option value="">—</option>
+                  <option>1</option>
+                  <option>2</option>
+                  <option>3</option>
+                  <option>4</option>
+                  <option>5+</option>
+                </select>
+              </div>
+              <div class="form-field">
+                <label for="egg-date">Pickup date</label>
+                <input type="date" id="egg-date" name="pickup_date" required />
+              </div>
+            </div>
+            <div class="form-field">
+              <label for="egg-notes">Anything else?</label>
+              <input type="text" id="egg-notes" name="notes" placeholder="Optional" />
+            </div>
+            <button type="submit" class="btn-reserve">Reserve My Eggs</button>
+          </form>
         </div>
+
       </div>
-      <div class="col-text">
-        <span class="section-label">The Farm</span>
-        <h2>More Than<br>a Golf Course</h2>
-        <p>Cherrywood is a working farm first — the golf course grew out of our love for this land. The farm side of the property is available to visit by appointment.</p>
-        <p>Interested in visiting the farm? Reach out and we'll set something up.</p>
-        <a href="#contact" class="btn btn-outline">Get in Touch</a>
-      </div>
+    </div>
+
+  </div>
+
+  <!-- THE COURSE -->
+  <section id="course" class="course">
+    <div class="course-image">
+      <img src="images/course.jpg" alt="Cherrywood golf course" />
+    </div>
+    <div class="course-text">
+      <span class="panel-kicker panel-kicker--light">The Course</span>
+      <h2>Nine Holes.<br>Since 1948.</h2>
+      <p>Set in the foothills of the Ozark Mountains with bent grass greens, rolling terrain, and water on two holes. This course has been part of Fredericktown for generations. We're glad it still is.</p>
+      <ul class="course-facts">
+        <li><strong>Par 36</strong> &mdash; 9 holes</li>
+        <li><strong>3,007 yards</strong> from the tips</li>
+        <li><strong>Bent grass greens</strong></li>
+      </ul>
     </div>
   </section>
 
   <!-- CONTACT -->
-  <section id="contact" class="section section-green">
-    <div class="container contact-container">
-      <span class="section-label light">Find Us</span>
-      <h2>Come Visit</h2>
-      <p class="section-intro light">We'd love to have you out. Give us a call or send a message to plan your visit.</p>
-      <div class="contact-grid">
-        <div class="contact-item">
-          <div class="contact-icon">&#128205;</div>
-          <h4>Location</h4>
-          <p>Fredericktown, Missouri</p>
+  <section id="contact" class="contact">
+    <div class="contact-inner">
+      <h2>Come Find Us</h2>
+      <address>
+        <div class="contact-line">
+          <span class="contact-label">Where</span>
+          <span>1157 Madison 502, Fredericktown, MO 63645</span>
         </div>
-        <div class="contact-item">
-          <div class="contact-icon">&#128222;</div>
-          <h4>Phone</h4>
-          <p><a href="tel:+15550000000">(555) 000-0000</a></p>
+        <div class="contact-line">
+          <span class="contact-label">Phone</span>
+          <a href="tel:+15737830012">(573) 783-0012</a>
         </div>
-        <div class="contact-item">
-          <div class="contact-icon">&#9993;</div>
-          <h4>Email</h4>
-          <p><a href="mailto:info@cherrywoodgolf.com">info@cherrywoodgolf.com</a></p>
+        <div class="contact-line">
+          <span class="contact-label">Email</span>
+          <a href="mailto:events@cherrywoodfgc.com">events@cherrywoodfgc.com</a>
         </div>
+        <div class="contact-line">
+          <span class="contact-label">Hours</span>
+          <span>Mon–Fri 9am–5pm &nbsp;|&nbsp; Sat–Sun 8am–5pm</span>
+        </div>
+      </address>
+      <div class="contact-map">
+        <iframe
+          title="Cherrywood Farm &amp; Golf Club location"
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3131.0!2d-90.2955!3d37.5583!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x87d8b3e3e3e3e3e3%3A0x0!2s1157+Madison+502%2C+Fredericktown%2C+MO+63645!5e0!3m2!1sen!2sus!4v1700000000000"
+          width="100%" height="300" style="border:0;" allowfullscreen="" loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade">
+        </iframe>
       </div>
     </div>
   </section>
 
   <!-- FOOTER -->
   <footer>
-    <p>&copy; 2026 Cherrywood Farm &amp; Golf Course &mdash; Fredericktown, MO</p>
+    <p class="footer-name">Cherrywood Farm &amp; Golf Club</p>
+    <p>Fredericktown, Missouri &mdash; &copy; 2026</p>
+    <div class="footer-social">
+      <a href="https://www.facebook.com/beavervalleyfredericktown/" target="_blank" rel="noopener" aria-label="Facebook">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+      </a>
+      <a href="https://www.instagram.com/cherrywood_farm/" target="_blank" rel="noopener" aria-label="Instagram">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+      </a>
+    </div>
   </footer>
 
   <script src="script.js"></script>
