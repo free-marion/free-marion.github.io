@@ -97,7 +97,7 @@ img { display: block; max-width: 100%; height: auto; }
 }
 
 #navbar.scrolled {
-  background: rgba(180, 62, 88, 0.96);
+  background: rgba(122, 30, 46, 0.96);
   backdrop-filter: blur(8px);
   box-shadow: 0 1px 0 rgba(255,255,255,0.1);
 }
@@ -948,7 +948,7 @@ address {
    FOOTER — CHERRY TREE
    ===================== */
 .footer {
-  background: #B84068;
+  background: #7A1E2E;
   border-top: 1px solid rgba(255,255,255,0.15);
   position: relative;
   overflow: hidden;
@@ -1472,7 +1472,7 @@ address {
     position: absolute;
     top: 100%;
     inset-inline: 0;
-    background: rgba(180, 62, 88, 0.98);
+    background: rgba(122, 30, 46, 0.98);
     padding: 0.75rem 0 1rem;
     gap: 0;
   }
