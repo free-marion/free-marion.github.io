@@ -77,6 +77,7 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.classList.add('tab-btn--active');
     btn.setAttribute('aria-selected', 'true');
     document.getElementById('tab' + capitalize(btn.dataset.tab)).hidden = false;
+    if (btn.dataset.tab === 'bookings') loadBookings();
   });
 });
 
@@ -1318,3 +1319,74 @@ async function deleteNode(id) {
   await db.from('accountability_nodes').delete().eq('id', id);
   await loadAccountability();
 }
+
+// =====================
+// BOOKINGS
+// =====================
+
+let bookingsFilter = 'upcoming';
+
+async function loadBookings() {
+  let query = db.from('bookings')
+    .select('*')
+    .order('slot_time', { ascending: true });
+
+  if (bookingsFilter === 'upcoming') {
+    query = query.gte('slot_time', new Date().toISOString()).neq('status', 'cancelled');
+  }
+
+  const { data, error } = await query;
+  if (error) { console.error(error); return; }
+  renderBookings(data || []);
+}
+
+function renderBookings(bookings) {
+  const list  = document.getElementById('bookingsList');
+  const empty = document.getElementById('bookingsEmpty');
+  list.innerHTML = '';
+
+  if (bookings.length === 0) {
+    empty.hidden = false;
+    return;
+  }
+  empty.hidden = true;
+
+  bookings.forEach(b => {
+    const slotDate = new Date(b.slot_time);
+    const dateStr = slotDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric', timeZone: 'America/Chicago' });
+    const timeStr = slotDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', timeZone: 'America/Chicago' });
+
+    const card = document.createElement('div');
+    card.className = 'booking-card' + (b.status === 'cancelled' ? ' booking-card--cancelled' : '');
+    card.innerHTML = `
+      <div class="booking-card__header">
+        <span class="booking-card__time">${timeStr} &mdash; ${dateStr}</span>
+        <span class="booking-card__conf">${escHtml(b.confirmation_no)}</span>
+      </div>
+      <div class="booking-card__body">
+        <span class="booking-card__name">${escHtml(b.name)}</span>
+        <span class="booking-card__meta">${b.num_players} player${b.num_players !== 1 ? 's' : ''} &bull; ${b.holes} holes${b.num_carts > 0 ? ' &bull; ' + b.num_carts + ' cart' + (b.num_carts !== 1 ? 's' : '') : ''}</span>
+        <span class="booking-card__contact">${escHtml(b.phone)}${b.email ? ' &bull; ' + escHtml(b.email) : ''}</span>
+        ${b.notes ? `<span class="booking-card__notes">${escHtml(b.notes)}</span>` : ''}
+      </div>
+      ${b.status !== 'cancelled' ? `<button class="btn btn--ghost btn--sm booking-cancel-btn" data-id="${b.id}">Cancel</button>` : '<span class="booking-card__cancelled-label">Cancelled</span>'}
+    `;
+
+    card.querySelector('.booking-cancel-btn')?.addEventListener('click', async () => {
+      if (!confirm('Cancel this booking?')) return;
+      await db.from('bookings').update({ status: 'cancelled' }).eq('id', b.id);
+      await loadBookings();
+    });
+
+    list.appendChild(card);
+  });
+}
+
+document.querySelectorAll('.bookings-filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.bookings-filter-btn').forEach(b => b.classList.remove('bookings-filter-btn--active'));
+    btn.classList.add('bookings-filter-btn--active');
+    bookingsFilter = btn.dataset.filter;
+    loadBookings();
+  });
+});

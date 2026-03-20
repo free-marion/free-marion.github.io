@@ -921,3 +921,88 @@ body {
   border-left: 2px solid var(--border);
   margin-left: 1.5rem;
 }
+
+/* =====================
+   BOOKINGS
+   ===================== */
+
+.bookings-filters {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.bookings-filter-btn {
+  padding: 0.35rem 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.bookings-filter-btn--active {
+  background: var(--green-dark);
+  color: #fff;
+  border-color: var(--green-dark);
+}
+
+.booking-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1rem 1.2rem;
+  margin-bottom: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.booking-card--cancelled {
+  opacity: 0.5;
+}
+
+.booking-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.booking-card__time {
+  font-weight: 600;
+  color: var(--text);
+  font-size: 1rem;
+}
+
+.booking-card__conf {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-family: monospace;
+}
+
+.booking-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.booking-card__name {
+  font-weight: 500;
+  color: var(--text);
+}
+
+.booking-card__meta,
+.booking-card__contact,
+.booking-card__notes {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+}
+
+.booking-card__cancelled-label {
+  font-size: 0.8rem;
+  color: #c0392b;
+  font-weight: 600;
+  text-transform: uppercase;
+}

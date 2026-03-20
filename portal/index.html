@@ -97,6 +97,9 @@
     <button class="tab-btn" data-tab="todos" role="tab" aria-selected="false" aria-controls="tabTodos">
       <span class="tab-icon">✅</span> To-Dos
     </button>
+    <button class="tab-btn" data-tab="bookings" role="tab" aria-selected="false" aria-controls="tabBookings">
+      <span class="tab-icon">⛳</span> Bookings
+    </button>
   </nav>
 
   <!-- TAB: DASHBOARD -->
@@ -481,6 +484,19 @@
 
     </div><!-- /l10Runner -->
 
+  </section>
+
+  <!-- TAB: BOOKINGS -->
+  <section id="tabBookings" class="tab-panel" role="tabpanel" hidden>
+    <div class="panel-header">
+      <h2 class="panel-title">Tee Time Bookings</h2>
+      <div class="bookings-filters">
+        <button class="bookings-filter-btn bookings-filter-btn--active" data-filter="upcoming">Upcoming</button>
+        <button class="bookings-filter-btn" data-filter="all">All</button>
+      </div>
+    </div>
+    <div id="bookingsList"></div>
+    <p id="bookingsEmpty" class="empty-state" hidden>No bookings found.</p>
   </section>
 
 </div><!-- /app-shell -->
