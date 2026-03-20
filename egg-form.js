@@ -35,6 +35,7 @@
     }
 
     msg.style.display = 'block';
+    msg.scrollIntoView({ behavior: 'smooth', block: 'center' });
     btn.disabled = false;
     btn.textContent = 'Reserve My Eggs';
   });
