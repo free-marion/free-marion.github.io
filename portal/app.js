@@ -18,7 +18,7 @@ function canEdit()  { return currentRole === 'admin' || currentRole === 'staff';
 // AUTH
 // ============================================
 
-db.auth.onAuthStateChange((event, session) => {
+db.auth.onAuthStateChange(async (event, session) => {
   currentUser = session?.user ?? null;
   if (currentUser) {
     document.getElementById('loginScreen').hidden = true;
