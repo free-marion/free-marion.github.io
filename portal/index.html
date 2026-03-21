@@ -127,7 +127,7 @@
 <script src="app.js?v=4"></script>
 <script>
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/portal/sw.js');
+    navigator.serviceWorker.getRegistrations().then(regs => regs.forEach(r => r.unregister()));
   }
 </script>
 </body>
