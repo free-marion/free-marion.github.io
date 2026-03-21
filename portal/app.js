@@ -19,6 +19,16 @@ function canEdit()  { return currentRole === 'admin' || currentRole === 'staff';
 // ============================================
 
 db.auth.onAuthStateChange(async (event, session) => {
+  // Verify the session is actually valid before showing the app
+  if (session) {
+    const { error: userError } = await db.auth.getUser();
+    if (userError) {
+      // Session is stale/invalid — clear it and show login
+      await db.auth.signOut();
+      return;
+    }
+  }
+
   currentUser = session?.user ?? null;
   if (currentUser) {
     document.getElementById('loginScreen').hidden = true;
@@ -57,7 +67,10 @@ document.getElementById('loginForm').addEventListener('submit', async e => {
 // ============================================
 
 async function loadProfile() {
-  const { data } = await db.from('profiles').select('role').eq('id', currentUser.id).single();
+  const { data, error } = await db.from('profiles').select('role').eq('id', currentUser.id).single();
+  if (error?.code === 'PGRST301' || error?.message?.includes('JWT')) {
+    await db.auth.signOut(); return;
+  }
   currentRole = data?.role ?? 'viewer';
   applyPermissions();
 }
@@ -110,6 +123,9 @@ function fmtDateTime(iso) {
 
 async function loadVto() {
   const { data, error } = await db.from('vto').select('*').eq('id', 1).single();
+  if (error?.code === 'PGRST301' || error?.message?.includes('JWT')) {
+    await db.auth.signOut(); return;
+  }
   if (error || !data) return;
   renderVto(data);
 }
