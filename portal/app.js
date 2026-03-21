@@ -8,6 +8,11 @@ const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFz
 const { createClient } = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_ANON);
 let currentUser = null;
+let currentRole  = 'viewer'; // admin | staff | viewer
+
+function isAdmin()  { return currentRole === 'admin'; }
+function isStaff()  { return currentRole === 'admin' || currentRole === 'staff'; }
+function canEdit()  { return currentRole === 'admin' || currentRole === 'staff'; }
 
 // ============================================
 // AUTH
@@ -19,6 +24,7 @@ db.auth.onAuthStateChange((event, session) => {
     document.getElementById('loginScreen').hidden = true;
     document.getElementById('appShell').hidden = false;
     document.getElementById('userEmail').textContent = currentUser.email;
+    await loadProfile();
     loadVto();
     loadCourseStatus();
   } else {
@@ -45,6 +51,24 @@ document.getElementById('loginForm').addEventListener('submit', async e => {
     btn.textContent = 'Sign In';
   }
 });
+
+// ============================================
+// PROFILE & PERMISSIONS
+// ============================================
+
+async function loadProfile() {
+  const { data } = await db.from('profiles').select('role').eq('id', currentUser.id).single();
+  currentRole = data?.role ?? 'viewer';
+  applyPermissions();
+}
+
+function applyPermissions() {
+  // Course toggle — admin only
+  document.getElementById('courseToggleBtn').style.display = isAdmin() ? '' : 'none';
+
+  // Add to-do button — staff/admin only
+  document.getElementById('addTodoBtn').style.display = canEdit() ? '' : 'none';
+}
 
 // ============================================
 // TAB ROUTING
@@ -171,7 +195,7 @@ function renderBookings(rows) {
         <span>${b.num_players} player${b.num_players !== 1 ? 's' : ''} &bull; ${b.holes} holes${b.num_carts > 0 ? ' &bull; ' + b.num_carts + ' cart' + (b.num_carts !== 1 ? 's' : '') : ''}</span>
         ${b.notes ? `<span class="data-card__notes">${esc(b.notes)}</span>` : ''}
       </div>
-      ${b.status !== 'cancelled' ? `<button class="btn btn--ghost btn--sm" data-cancel="${b.id}">Cancel</button>` : '<span class="tag tag--cancelled">Cancelled</span>'}
+      ${b.status !== 'cancelled' ? (canEdit() ? `<button class="btn btn--ghost btn--sm" data-cancel="${b.id}">Cancel</button>` : '') : '<span class="tag tag--cancelled">Cancelled</span>'}
     `;
     card.querySelector('[data-cancel]')?.addEventListener('click', async () => {
       if (!confirm('Cancel this booking?')) return;
@@ -225,7 +249,7 @@ function renderEggs(rows) {
         ${o.notes ? `<span class="data-card__notes">${esc(o.notes)}</span>` : ''}
       </div>
       ${o.status !== 'complete'
-        ? `<button class="btn btn--primary btn--sm" data-complete="${o.id}">Mark Picked Up</button>`
+        ? (canEdit() ? `<button class="btn btn--primary btn--sm" data-complete="${o.id}">Mark Picked Up</button>` : '')
         : '<span class="tag tag--complete">Picked Up</span>'}
     `;
     card.querySelector('[data-complete]')?.addEventListener('click', async () => {
