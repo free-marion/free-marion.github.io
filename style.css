@@ -730,6 +730,7 @@ h2 {
   align-self: flex-start;
 }
 .wagon-cta:hover { opacity: 0.85; }
+.wagon-cta--soon { background: none; color: var(--cherry); font-style: italic; padding-left: 0; cursor: default; opacity: 0.8; }
 
 .course {
   display: grid;
