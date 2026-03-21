@@ -108,13 +108,13 @@
     const [y, m, d] = dateStr.split('-').map(Number);
     const slots = [];
 
+    // Don't show slots that are already in the past (with 30-min buffer)
+    const cutoff = new Date(Date.now() + 30 * 60 * 1000);
+
     for (let hour = startHour; hour < endHour; hour++) {
       for (let min = 0; min < 60; min += SLOT_INTERVAL_MINUTES) {
-        // Create date in Chicago time by using a local Date
-        // We build an ISO-ish string that implies Chicago time,
-        // but since we'll store/compare in UTC we use the offset approach.
-        // Best approach: build the Date in local time then format as ISO.
         const dt = new Date(y, m - 1, d, hour, min, 0, 0);
+        if (dt < cutoff) continue; // skip past or too-soon slots
         slots.push(dt.toISOString());
       }
     }
