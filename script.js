@@ -137,14 +137,8 @@ async function loadConditions() {
     document.getElementById('windDirLabel').textContent = degreesToCompass(windDeg) + ' wind';
     document.getElementById('needleWrap').style.transform = `rotate(${windDeg}deg)`;
 
-    // Also populate tee booking weather strip
-    const teeTemp = document.getElementById('teeTemp');
-    const teeWind = document.getElementById('teeWind');
-    const teeWindDir = document.getElementById('teeWindDir');
+    // Weather description in tee booking column
     const teeDesc = document.getElementById('teeWeatherDesc');
-    if (teeTemp) teeTemp.textContent = temp;
-    if (teeWind) teeWind.textContent = windSpd;
-    if (teeWindDir) teeWindDir.textContent = degreesToCompass(windDeg);
     if (teeDesc) teeDesc.textContent = desc;
 
   } catch (e) {

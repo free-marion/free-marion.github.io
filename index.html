@@ -54,49 +54,6 @@
     </div>
   </section>
 
-  <!-- COURSE CONDITIONS -->
-  <section id="conditions" class="conditions">
-    <div class="conditions-inner">
-      <span class="panel-kicker panel-kicker--light">Live Weather</span>
-      <h2>Course Conditions</h2>
-
-      <div class="conditions-dashboard">
-
-        <div class="wind-compass-wrap">
-          <div class="compass-ring">
-            <span class="compass-cardinal n">N</span>
-            <span class="compass-cardinal s">S</span>
-            <span class="compass-cardinal e">E</span>
-            <span class="compass-cardinal w">W</span>
-            <svg class="compass-ticks" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-              <g id="ticks"></g>
-            </svg>
-            <div class="needle-wrap" id="needleWrap">
-              <svg class="needle-svg" viewBox="0 0 40 100" xmlns="http://www.w3.org/2000/svg">
-                <polygon points="20,4 26,52 14,52" fill="#C4627A"/>
-                <polygon points="20,96 26,52 14,52" fill="rgba(255,255,255,0.18)"/>
-                <circle cx="20" cy="52" r="5" fill="#fff"/>
-              </svg>
-            </div>
-          </div>
-          <p class="wind-direction-label" id="windDirLabel">—</p>
-        </div>
-
-        <div class="conditions-stats">
-          <div class="stat-card">
-            <span class="stat-value" id="windSpeed">—</span>
-            <span class="stat-unit">mph</span>
-          </div>
-          <div class="stat-card">
-            <span class="stat-value" id="tempVal">—</span>
-            <span class="stat-unit">°F</span>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
   <!-- ABOUT -->
   <section id="about" class="about">
     <div class="about-inner">
@@ -119,6 +76,46 @@
   <!-- TEE TIMES -->
   <section class="tee-section" id="tee-times">
     <div class="tee-section-inner">
+
+      <!-- CONDITIONS COLUMN -->
+      <div class="tee-conditions-col">
+        <span class="panel-kicker">Live Conditions</span>
+        <h3 class="tee-conditions-heading">Today on the Course</h3>
+        <div class="conditions-dashboard">
+          <div class="wind-compass-wrap">
+            <div class="compass-ring">
+              <span class="compass-cardinal n">N</span>
+              <span class="compass-cardinal s">S</span>
+              <span class="compass-cardinal e">E</span>
+              <span class="compass-cardinal w">W</span>
+              <svg class="compass-ticks" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                <g id="ticks"></g>
+              </svg>
+              <div class="needle-wrap" id="needleWrap">
+                <svg class="needle-svg" viewBox="0 0 40 100" xmlns="http://www.w3.org/2000/svg">
+                  <polygon points="20,4 26,52 14,52" fill="#C4627A"/>
+                  <polygon points="20,96 26,52 14,52" fill="rgba(255,255,255,0.18)"/>
+                  <circle cx="20" cy="52" r="5" fill="#fff"/>
+                </svg>
+              </div>
+            </div>
+            <p class="wind-direction-label" id="windDirLabel">—</p>
+          </div>
+          <div class="conditions-stats">
+            <div class="stat-card">
+              <span class="stat-value" id="windSpeed">—</span>
+              <span class="stat-unit">mph</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-value" id="tempVal">—</span>
+              <span class="stat-unit">°F</span>
+            </div>
+          </div>
+        </div>
+        <p class="tee-conditions-desc" id="teeWeatherDesc">—</p>
+      </div>
+
+      <!-- BOOKING COLUMN -->
       <div class="tee-booking-wrap">
 
         <span class="panel-kicker">Golf</span>
@@ -126,13 +123,6 @@
 
         <!-- STEP 1: Date + Holes -->
         <div class="tee-step" id="teeStep1">
-          <div class="tee-weather-strip" id="teeWeatherStrip">
-            <span class="tee-weather-item">⛅ <span id="teeWeatherDesc">—</span></span>
-            <span class="tee-weather-sep">·</span>
-            <span class="tee-weather-item"><span id="teeTemp">—</span>°F</span>
-            <span class="tee-weather-sep">·</span>
-            <span class="tee-weather-item"><span id="teeWind">—</span> mph <span id="teeWindDir">—</span></span>
-          </div>
           <p class="tee-step-hint">Choose a date and how many holes you'd like to play.</p>
           <div class="tee-step1-fields">
             <div class="tee-field">
@@ -211,7 +201,8 @@
         </div>
 
       </div>
-    </div>
+    </div><!-- /tee-booking-wrap -->
+  </div><!-- /tee-section-inner -->
   </section>
 
   <!-- EGGS -->

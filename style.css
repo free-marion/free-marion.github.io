@@ -352,28 +352,34 @@ img { display: block; max-width: 100%; height: auto; }
 .tee-section-inner {
   position: relative;
   z-index: 1;
-  max-width: 560px;
+  max-width: 1100px;
   margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5rem;
+  align-items: start;
 }
 
 .tee-section h2 { color: #fff; }
 
-/* Weather strip inside booking step 1 */
-.tee-weather-strip {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  background: rgba(255,255,255,0.1);
-  border: 1px solid rgba(255,255,255,0.15);
-  border-radius: 6px;
-  padding: 0.55rem 1rem;
-  margin-bottom: 1.4rem;
-  font-size: 0.85rem;
-  color: rgba(255,255,255,0.85);
-  font-family: var(--body);
+/* Conditions column inside tee section */
+.tee-conditions-col { color: #fff; }
+
+.tee-conditions-heading {
+  font-family: var(--serif);
+  font-size: 1.4rem;
+  font-weight: 400;
+  color: #fff;
+  margin-bottom: 2rem;
 }
 
-.tee-weather-sep { opacity: 0.4; }
+.tee-conditions-desc {
+  margin-top: 1.2rem;
+  color: rgba(255,255,255,0.65);
+  font-size: 0.95rem;
+  text-align: center;
+  font-family: var(--body);
+}
 
 /* =====================
    EGG SECTION
@@ -1685,6 +1691,7 @@ address {
   .tee-section,
   .egg-section { padding: 4rem 2rem; }
 
+  .tee-section-inner { grid-template-columns: 1fr; gap: 3rem; }
   .egg-section-inner { grid-template-columns: 1fr; gap: 2.5rem; }
 
   .course { grid-template-columns: 1fr; }
