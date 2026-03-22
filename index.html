@@ -32,10 +32,8 @@
         <li><a href="#about">About</a></li>
         <li><a href="#tee-times">Tee Times</a></li>
         <li><a href="#farm">The Farm</a></li>
-        <li><a href="#gallery">Farm Life</a></li>
         <li><a href="#stay">Stay</a></li>
         <li><a href="#course">The Course</a></li>
-        <li><a href="#conditions">Conditions</a></li>
         <li><a href="#contact">Visit</a></li>
       </ul>
       <div id="courseStatusBadge" class="course-status-badge" style="display:none"></div>
@@ -52,6 +50,49 @@
       <div class="hero-actions">
         <a href="#tee-times" class="hero-cta">Book Tee Time</a>
         <a href="#eggs" class="hero-cta hero-cta--outline">Reserve Farm Eggs</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- COURSE CONDITIONS -->
+  <section id="conditions" class="conditions">
+    <div class="conditions-inner">
+      <span class="panel-kicker panel-kicker--light">Live Weather</span>
+      <h2>Course Conditions</h2>
+
+      <div class="conditions-dashboard">
+
+        <div class="wind-compass-wrap">
+          <div class="compass-ring">
+            <span class="compass-cardinal n">N</span>
+            <span class="compass-cardinal s">S</span>
+            <span class="compass-cardinal e">E</span>
+            <span class="compass-cardinal w">W</span>
+            <svg class="compass-ticks" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+              <g id="ticks"></g>
+            </svg>
+            <div class="needle-wrap" id="needleWrap">
+              <svg class="needle-svg" viewBox="0 0 40 100" xmlns="http://www.w3.org/2000/svg">
+                <polygon points="20,4 26,52 14,52" fill="#C4627A"/>
+                <polygon points="20,96 26,52 14,52" fill="rgba(255,255,255,0.18)"/>
+                <circle cx="20" cy="52" r="5" fill="#fff"/>
+              </svg>
+            </div>
+          </div>
+          <p class="wind-direction-label" id="windDirLabel">—</p>
+        </div>
+
+        <div class="conditions-stats">
+          <div class="stat-card">
+            <span class="stat-value" id="windSpeed">—</span>
+            <span class="stat-unit">mph</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-value" id="tempVal">—</span>
+            <span class="stat-unit">°F</span>
+          </div>
+        </div>
+
       </div>
     </div>
   </section>
@@ -279,27 +320,6 @@
     </div>
   </section>
 
-  <!-- PHOTO GALLERY -->
-  <section class="photo-gallery" id="gallery">
-    <div class="gallery-inner">
-      <span class="panel-kicker">Life at Cherrywood</span>
-      <div class="hex-row">
-        <div class="hex-item">
-          <img src="images/cattle.jpg" alt="Pasture-raised cattle at Cherrywood Farm">
-          <p class="hex-caption">Pasture-Raised Cattle</p>
-        </div>
-        <div class="hex-item">
-          <img src="images/course-aerial.jpg" alt="The Golf Course">
-          <p class="hex-caption">The Course</p>
-        </div>
-        <div class="hex-item">
-          <img src="images/event-space.jpg" alt="Cherrywood Clubhouse Event Space">
-          <p class="hex-caption">Clubhouse Event Space</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
   <!-- WAGONS -->
   <section id="stay" class="wagon-section">
     <div class="wagon-inner">
@@ -330,49 +350,6 @@
         <li><strong>3,007 yards</strong> from the tips</li>
         <li><strong>Bent grass greens</strong></li>
       </ul>
-    </div>
-  </section>
-
-  <!-- COURSE CONDITIONS -->
-  <section id="conditions" class="conditions">
-    <div class="conditions-inner">
-      <span class="panel-kicker panel-kicker--light">Live Weather</span>
-      <h2>Course Conditions</h2>
-
-      <div class="conditions-dashboard">
-
-        <div class="wind-compass-wrap">
-          <div class="compass-ring">
-            <span class="compass-cardinal n">N</span>
-            <span class="compass-cardinal s">S</span>
-            <span class="compass-cardinal e">E</span>
-            <span class="compass-cardinal w">W</span>
-            <svg class="compass-ticks" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-              <g id="ticks"></g>
-            </svg>
-            <div class="needle-wrap" id="needleWrap">
-              <svg class="needle-svg" viewBox="0 0 40 100" xmlns="http://www.w3.org/2000/svg">
-                <polygon points="20,4 26,52 14,52" fill="#C4627A"/>
-                <polygon points="20,96 26,52 14,52" fill="rgba(255,255,255,0.18)"/>
-                <circle cx="20" cy="52" r="5" fill="#fff"/>
-              </svg>
-            </div>
-          </div>
-          <p class="wind-direction-label" id="windDirLabel">—</p>
-        </div>
-
-        <div class="conditions-stats">
-          <div class="stat-card">
-            <span class="stat-value" id="windSpeed">—</span>
-            <span class="stat-unit">mph</span>
-          </div>
-          <div class="stat-card">
-            <span class="stat-value" id="tempVal">—</span>
-            <span class="stat-unit">°F</span>
-          </div>
-        </div>
-
-      </div>
     </div>
   </section>
 
