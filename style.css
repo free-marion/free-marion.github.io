@@ -331,26 +331,17 @@ img { display: block; max-width: 100%; height: auto; }
 }
 
 /* =====================
-   ACTIONS ROW
+   TEE TIME SECTION
    ===================== */
-.actions-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  min-height: 580px;
-}
-
-/* TEE TIME PANEL */
-.action-panel--tee {
+.tee-section {
   background: var(--green);
   color: #fff;
-  display: flex;
-  align-items: center;
   padding: 5rem 3.5rem;
   position: relative;
   overflow: hidden;
 }
 
-.action-panel--tee::before {
+.tee-section::before {
   content: '';
   position: absolute;
   inset: 0;
@@ -358,37 +349,154 @@ img { display: block; max-width: 100%; height: auto; }
   opacity: 0.15;
 }
 
-.action-panel--tee .action-panel-inner {
+.tee-section-inner {
   position: relative;
   z-index: 1;
-  max-width: 380px;
+  max-width: 560px;
+  margin: 0 auto;
 }
 
-.action-panel--tee h2 { color: #fff; }
+.tee-section h2 { color: #fff; }
 
-.action-panel--tee p {
-  color: rgba(255,255,255,0.72);
-  font-size: 1rem;
-  line-height: 1.8;
-  margin-bottom: 2rem;
+/* Weather strip inside booking step 1 */
+.tee-weather-strip {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 6px;
+  padding: 0.55rem 1rem;
+  margin-bottom: 1.4rem;
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.85);
+  font-family: var(--body);
 }
 
-/* EGG PANEL */
-.action-panel--eggs {
+.tee-weather-sep { opacity: 0.4; }
+
+/* =====================
+   EGG SECTION
+   ===================== */
+.egg-section {
   background: var(--cream-dark);
   padding: 5rem 3.5rem;
-  background-image:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.78' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
 }
 
-.action-panel--eggs h2 { color: var(--bark); }
+.egg-section-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: start;
+}
 
-.action-panel--eggs p {
+.egg-section h2 { color: var(--bark); }
+
+.egg-section p {
   color: var(--ink-mid);
   font-size: 1rem;
   line-height: 1.8;
   margin-bottom: 1.8rem;
 }
+
+/* Egg slideshow */
+.egg-slideshow {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  aspect-ratio: 4/3;
+  background: #1a2e1a;
+}
+
+.egg-slide {
+  position: absolute;
+  inset: 0;
+  transition: opacity 0.5s ease;
+}
+
+.egg-slide--hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.egg-slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 28%;
+  display: block;
+}
+
+.egg-slide-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.egg-slide-emoji {
+  font-size: 4rem;
+  line-height: 1;
+}
+
+.egg-slide-label {
+  font-family: var(--serif);
+  font-size: 1.3rem;
+  color: rgba(255,255,255,0.85);
+  letter-spacing: 0.04em;
+}
+
+.egg-slide-prev,
+.egg-slide-next {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0,0,0,0.4);
+  border: none;
+  color: #fff;
+  font-size: 1.2rem;
+  width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  transition: background 0.2s;
+}
+
+.egg-slide-prev:hover,
+.egg-slide-next:hover { background: rgba(0,0,0,0.65); }
+
+.egg-slide-prev { left: 0.7rem; }
+.egg-slide-next { right: 0.7rem; }
+
+.egg-slide-dots {
+  position: absolute;
+  bottom: 0.7rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 0.4rem;
+  z-index: 2;
+}
+
+.egg-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.4);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.egg-dot--active { background: #fff; }
 
 .action-panel-inner { max-width: 480px; }
 
@@ -409,6 +517,7 @@ img { display: block; max-width: 100%; height: auto; }
 .wagon-text .panel-kicker,
 .course-text .panel-kicker,
 .action-panel-inner .panel-kicker,
+.tee-section-inner .panel-kicker,
 .farm-text .panel-kicker,
 .about-text-block .panel-kicker { color: rgba(255,255,255,0.6); }
 
@@ -1573,13 +1682,10 @@ address {
    RESPONSIVE
    ===================== */
 @media (max-width: 960px) {
-  .actions-row { grid-template-columns: 1fr; }
+  .tee-section,
+  .egg-section { padding: 4rem 2rem; }
 
-  .action-panel--tee,
-  .action-panel--eggs { padding: 4rem 2.5rem; }
-
-  .action-panel--tee .action-panel-inner,
-  .action-panel--eggs .action-panel-inner { max-width: 100%; }
+  .egg-section-inner { grid-template-columns: 1fr; gap: 2.5rem; }
 
   .course { grid-template-columns: 1fr; }
   .course-image { height: 300px; }

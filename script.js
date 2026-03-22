@@ -135,9 +135,17 @@ async function loadConditions() {
     document.getElementById('windSpeed').textContent   = windSpd;
     document.getElementById('tempVal').textContent     = temp;
     document.getElementById('windDirLabel').textContent = degreesToCompass(windDeg) + ' wind';
-
-    // Rotate needle — wind direction = where wind is coming FROM, needle points that way
     document.getElementById('needleWrap').style.transform = `rotate(${windDeg}deg)`;
+
+    // Also populate tee booking weather strip
+    const teeTemp = document.getElementById('teeTemp');
+    const teeWind = document.getElementById('teeWind');
+    const teeWindDir = document.getElementById('teeWindDir');
+    const teeDesc = document.getElementById('teeWeatherDesc');
+    if (teeTemp) teeTemp.textContent = temp;
+    if (teeWind) teeWind.textContent = windSpd;
+    if (teeWindDir) teeWindDir.textContent = degreesToCompass(windDeg);
+    if (teeDesc) teeDesc.textContent = desc;
 
   } catch (e) {
     document.getElementById('weatherDesc').textContent = 'Unable to load';

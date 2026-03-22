@@ -116,18 +116,23 @@
     </div>
   </section>
 
-  <!-- ACTIONS: TEE TIMES + EGGS -->
-  <div class="actions-row" id="tee-times">
-
-    <!-- TEE TIMES -->
-    <div class="action-panel action-panel--tee" id="tee-times-panel">
-      <div class="action-panel-inner tee-booking-wrap">
+  <!-- TEE TIMES -->
+  <section class="tee-section" id="tee-times">
+    <div class="tee-section-inner">
+      <div class="tee-booking-wrap">
 
         <span class="panel-kicker">Golf</span>
         <h2>Book a Tee Time</h2>
 
         <!-- STEP 1: Date + Holes -->
         <div class="tee-step" id="teeStep1">
+          <div class="tee-weather-strip" id="teeWeatherStrip">
+            <span class="tee-weather-item">⛅ <span id="teeWeatherDesc">—</span></span>
+            <span class="tee-weather-sep">·</span>
+            <span class="tee-weather-item"><span id="teeTemp">—</span>°F</span>
+            <span class="tee-weather-sep">·</span>
+            <span class="tee-weather-item"><span id="teeWind">—</span> mph <span id="teeWindDir">—</span></span>
+          </div>
           <p class="tee-step-hint">Choose a date and how many holes you'd like to play.</p>
           <div class="tee-step1-fields">
             <div class="tee-field">
@@ -207,21 +212,64 @@
 
       </div>
     </div>
+  </section>
 
-    <!-- EGGS -->
-    <div class="action-panel action-panel--eggs" id="eggs">
-      <div class="action-panel-inner">
+  <!-- EGGS -->
+  <section class="egg-section" id="eggs">
+    <div class="egg-section-inner">
+
+      <div class="egg-slideshow-col">
+        <div class="egg-slideshow" id="eggSlideshow">
+          <div class="egg-slide" data-index="0">
+            <div class="egg-slide-placeholder" style="background:#2d4a2d;">
+              <span class="egg-slide-emoji">🥚</span>
+              <span class="egg-slide-label">Life Begins</span>
+            </div>
+          </div>
+          <div class="egg-slide egg-slide--hidden" data-index="1">
+            <img src="images/son-of-chicken.jpg" alt="Freshly gathered eggs at Cherrywood Farm" />
+          </div>
+          <div class="egg-slide egg-slide--hidden" data-index="2">
+            <div class="egg-slide-placeholder" style="background:#3a3020;">
+              <span class="egg-slide-emoji">📦</span>
+              <span class="egg-slide-label">Into the Carton</span>
+            </div>
+          </div>
+          <div class="egg-slide egg-slide--hidden" data-index="3">
+            <div class="egg-slide-placeholder" style="background:#1e3a2a;">
+              <span class="egg-slide-emoji">🛒</span>
+              <span class="egg-slide-label">Ready for You</span>
+            </div>
+          </div>
+          <div class="egg-slide egg-slide--hidden" data-index="4">
+            <div class="egg-slide-placeholder" style="background:#2a2a1e;">
+              <span class="egg-slide-emoji">🍳</span>
+              <span class="egg-slide-label">In Your Kitchen</span>
+            </div>
+          </div>
+          <div class="egg-slide egg-slide--hidden" data-index="5">
+            <div class="egg-slide-placeholder" style="background:#3a1e1e;">
+              <span class="egg-slide-emoji">🍽️</span>
+              <span class="egg-slide-label">On the Table</span>
+            </div>
+          </div>
+          <button class="egg-slide-prev" id="eggPrev" aria-label="Previous">&#8592;</button>
+          <button class="egg-slide-next" id="eggNext" aria-label="Next">&#8594;</button>
+          <div class="egg-slide-dots" id="eggDots">
+            <span class="egg-dot egg-dot--active"></span>
+            <span class="egg-dot"></span>
+            <span class="egg-dot"></span>
+            <span class="egg-dot"></span>
+            <span class="egg-dot"></span>
+            <span class="egg-dot"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="egg-form-col">
         <span class="panel-kicker">The Farm</span>
         <h2>Farm Fresh Eggs</h2>
         <p>Our chickens are raised right here on the property. Reserve your dozen below and we'll have them waiting for you.</p>
-
-        <div class="egg-photos egg-photos--single">
-          <figure class="egg-photo egg-photo--featured">
-            <img src="images/son-of-chicken.jpg" alt="Son of Dale holding son of Chicken" />
-            <figcaption>son of Dale holding son of Chicken</figcaption>
-          </figure>
-        </div>
-
         <div class="notepad">
           <form id="eggForm" class="egg-form">
             <div class="form-row">
@@ -260,11 +308,10 @@
             <button type="submit" id="eggSubmitBtn" class="btn-reserve">Reserve My Eggs</button>
           </form>
         </div>
-
       </div>
-    </div>
 
-  </div>
+    </div>
+  </section>
 
   <!-- THE FARM FAMILY -->
   <section id="farm" class="farm-section">
