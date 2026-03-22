@@ -6,7 +6,9 @@ const SUPABASE_URL  = 'https://giwfigekjatujubjknjf.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdpd2ZpZ2VramF0dWp1YmprbmpmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMDEwMDMsImV4cCI6MjA4OTU3NzAwM30.p3OaPA5qYROqz8d0tNyhytl__n_bzH2l2MOX3olDn3A';
 
 const { createClient } = supabase;
-const db = createClient(SUPABASE_URL, SUPABASE_ANON);
+const db = createClient(SUPABASE_URL, SUPABASE_ANON, {
+  auth: { persistSession: false }  // never cache sessions — always require fresh login
+});
 let currentUser = null;
 let currentRole  = 'viewer'; // admin | staff | viewer
 
@@ -19,16 +21,6 @@ function canEdit()  { return currentRole === 'admin' || currentRole === 'staff';
 // ============================================
 
 db.auth.onAuthStateChange(async (event, session) => {
-  // Verify the session is actually valid before showing the app
-  if (session) {
-    const { error: userError } = await db.auth.getUser();
-    if (userError) {
-      // Session is stale/invalid — clear it and show login
-      await db.auth.signOut();
-      return;
-    }
-  }
-
   currentUser = session?.user ?? null;
   if (currentUser) {
     document.getElementById('loginScreen').hidden = true;
@@ -67,10 +59,7 @@ document.getElementById('loginForm').addEventListener('submit', async e => {
 // ============================================
 
 async function loadProfile() {
-  const { data, error } = await db.from('profiles').select('role').eq('id', currentUser.id).single();
-  if (error?.code === 'PGRST301' || error?.message?.includes('JWT')) {
-    await db.auth.signOut(); return;
-  }
+  const { data } = await db.from('profiles').select('role').eq('id', currentUser.id).single();
   currentRole = data?.role ?? 'viewer';
   applyPermissions();
 }
@@ -123,9 +112,6 @@ function fmtDateTime(iso) {
 
 async function loadVto() {
   const { data, error } = await db.from('vto').select('*').eq('id', 1).single();
-  if (error?.code === 'PGRST301' || error?.message?.includes('JWT')) {
-    await db.auth.signOut(); return;
-  }
   if (error || !data) return;
   renderVto(data);
 }
