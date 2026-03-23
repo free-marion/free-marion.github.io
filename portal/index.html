@@ -57,6 +57,7 @@
     <button class="tab-btn" data-tab="eggs">Egg Orders</button>
     <button class="tab-btn" data-tab="todos">My To-Dos</button>
     <button class="tab-btn" data-tab="docs">Documents</button>
+    <button class="tab-btn" data-tab="users">Users</button>
   </nav>
 
   <!-- V/TO -->
@@ -121,10 +122,35 @@
     </div>
   </section>
 
+  <!-- USERS -->
+  <section id="tabUsers" class="tab-panel" hidden>
+    <div class="panel-header">
+      <h2 class="panel-title">User Management</h2>
+      <button id="addUserBtn" class="btn btn--primary btn--sm">+ Add User</button>
+    </div>
+    <div id="userForm" class="inline-form" hidden>
+      <input type="text"     id="newUserName"     placeholder="Full name" maxlength="100">
+      <input type="email"    id="newUserEmail"    placeholder="Email address">
+      <input type="password" id="newUserPassword" placeholder="Password">
+      <select id="newUserRole">
+        <option value="viewer">Viewer — Bookings &amp; Eggs only</option>
+        <option value="staff">Staff — + VTO, Vault, To-Dos</option>
+        <option value="admin">Admin — God Mode</option>
+      </select>
+      <p id="userFormError" class="error-msg" hidden></p>
+      <div class="inline-form__actions">
+        <button id="saveUserBtn"   class="btn btn--primary btn--sm">Create User</button>
+        <button id="cancelUserBtn" class="btn btn--ghost btn--sm">Cancel</button>
+      </div>
+    </div>
+    <div id="usersList"></div>
+    <p id="usersEmpty" class="empty-msg" hidden>No users found.</p>
+  </section>
+
 </div><!-- /appShell -->
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="app.js?v=6"></script>
+<script src="app.js?v=8"></script>
 <script>
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.getRegistrations().then(regs => regs.forEach(r => r.unregister()));

@@ -70,6 +70,29 @@ function applyPermissions() {
 
   // Add to-do button — staff/admin only
   document.getElementById('addTodoBtn').style.display = canEdit() ? '' : 'none';
+
+  // Tabs hidden from viewer
+  const staffOnlyTabs = ['vto', 'todos', 'docs'];
+  staffOnlyTabs.forEach(tabName => {
+    const btn = document.querySelector(`.tab-btn[data-tab="${tabName}"]`);
+    if (btn) btn.style.display = isStaff() ? '' : 'none';
+  });
+
+  // Users tab — admin only
+  const usersTabBtn = document.querySelector('.tab-btn[data-tab="users"]');
+  if (usersTabBtn) usersTabBtn.style.display = isAdmin() ? '' : 'none';
+
+  // Redirect away from restricted tabs
+  const active = document.querySelector('.tab-btn--active');
+  if (active) {
+    const onStaffTab = staffOnlyTabs.includes(active.dataset.tab);
+    const onUsersTab = active.dataset.tab === 'users';
+    if (!isStaff() && (onStaffTab || onUsersTab)) {
+      document.querySelector('.tab-btn[data-tab="bookings"]').click();
+    } else if (isStaff() && !isAdmin() && onUsersTab) {
+      document.querySelector('.tab-btn[data-tab="vto"]').click();
+    }
+  }
 }
 
 // ============================================
@@ -87,6 +110,7 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
     if (btn.dataset.tab === 'bookings') loadBookings();
     if (btn.dataset.tab === 'eggs')     loadEggs();
     if (btn.dataset.tab === 'todos')    loadTodos();
+    if (btn.dataset.tab === 'users')    loadUsers();
   });
 });
 
@@ -197,7 +221,7 @@ function renderBookings(rows) {
         <span>${b.num_players} player${b.num_players !== 1 ? 's' : ''} &bull; ${b.holes} holes${b.num_carts > 0 ? ' &bull; ' + b.num_carts + ' cart' + (b.num_carts !== 1 ? 's' : '') : ''}</span>
         ${b.notes ? `<span class="data-card__notes">${esc(b.notes)}</span>` : ''}
       </div>
-      ${b.status !== 'cancelled' ? (canEdit() ? `<button class="btn btn--ghost btn--sm" data-cancel="${b.id}">Cancel</button>` : '') : '<span class="tag tag--cancelled">Cancelled</span>'}
+      ${b.status !== 'cancelled' ? `<button class="btn btn--ghost btn--sm" data-cancel="${b.id}">Cancel</button>` : '<span class="tag tag--cancelled">Cancelled</span>'}
     `;
     card.querySelector('[data-cancel]')?.addEventListener('click', async () => {
       if (!confirm('Cancel this booking?')) return;
@@ -251,7 +275,7 @@ function renderEggs(rows) {
         ${o.notes ? `<span class="data-card__notes">${esc(o.notes)}</span>` : ''}
       </div>
       ${o.status !== 'complete'
-        ? (canEdit() ? `<button class="btn btn--primary btn--sm" data-complete="${o.id}">Mark Picked Up</button>` : '')
+        ? `<button class="btn btn--primary btn--sm" data-complete="${o.id}">Mark Picked Up</button>`
         : '<span class="tag tag--complete">Picked Up</span>'}
     `;
     card.querySelector('[data-complete]')?.addEventListener('click', async () => {
@@ -385,3 +409,92 @@ document.getElementById('courseToggleBtn').addEventListener('click', async () =>
   courseIsOpen = newStatus;
   updateCourseBtn();
 });
+
+// ============================================
+// USERS (admin only)
+// ============================================
+
+async function loadUsers() {
+  const { data, error } = await db.from('profiles').select('id, email, name, role').order('name');
+  if (error) { console.error(error); return; }
+  renderUsers(data || []);
+}
+
+function renderUsers(rows) {
+  const list  = document.getElementById('usersList');
+  const empty = document.getElementById('usersEmpty');
+  list.innerHTML = '';
+  if (!rows.length) { empty.hidden = false; return; }
+  empty.hidden = true;
+  rows.forEach(u => {
+    const card = document.createElement('div');
+    card.className = 'data-card';
+    card.innerHTML = `
+      <div class="data-card__header">
+        <span class="data-card__title">${esc(u.name || '—')}</span>
+        <span class="data-card__badge">${esc(u.email || '')}</span>
+      </div>
+      <div class="data-card__body">
+        <label style="display:flex;align-items:center;gap:8px;">Role:
+          <select class="role-select" data-id="${u.id}">
+            <option value="viewer" ${u.role === 'viewer' ? 'selected' : ''}>Viewer</option>
+            <option value="staff"  ${u.role === 'staff'  ? 'selected' : ''}>Staff</option>
+            <option value="admin"  ${u.role === 'admin'  ? 'selected' : ''}>Admin</option>
+          </select>
+        </label>
+      </div>
+    `;
+    card.querySelector('.role-select').addEventListener('change', async e => {
+      const newRole = e.target.value;
+      const { error } = await db.from('profiles').update({ role: newRole }).eq('id', u.id);
+      if (error) { alert('Failed to update role: ' + error.message); e.target.value = u.role; return; }
+      u.role = newRole;
+    });
+    list.appendChild(card);
+  });
+}
+
+document.getElementById('addUserBtn').addEventListener('click', () => {
+  document.getElementById('userForm').hidden = false;
+  document.getElementById('newUserName').focus();
+});
+
+document.getElementById('cancelUserBtn').addEventListener('click', () => {
+  document.getElementById('userForm').hidden = true;
+  clearUserForm();
+});
+
+document.getElementById('saveUserBtn').addEventListener('click', async () => {
+  const name     = document.getElementById('newUserName').value.trim();
+  const email    = document.getElementById('newUserEmail').value.trim();
+  const password = document.getElementById('newUserPassword').value;
+  const role     = document.getElementById('newUserRole').value;
+  const errEl    = document.getElementById('userFormError');
+  errEl.hidden   = true;
+
+  if (!name || !email || !password) {
+    errEl.textContent = 'Name, email, and password are all required.';
+    errEl.hidden = false;
+    return;
+  }
+
+  const { data, error } = await db.auth.signUp({ email, password });
+  if (error) { errEl.textContent = error.message; errEl.hidden = false; return; }
+
+  const userId = data.user?.id;
+  if (userId) {
+    await db.from('profiles').upsert({ id: userId, email, name, role });
+  }
+
+  document.getElementById('userForm').hidden = true;
+  clearUserForm();
+  loadUsers();
+});
+
+function clearUserForm() {
+  document.getElementById('newUserName').value     = '';
+  document.getElementById('newUserEmail').value    = '';
+  document.getElementById('newUserPassword').value = '';
+  document.getElementById('newUserRole').value     = 'viewer';
+  document.getElementById('userFormError').hidden  = true;
+}
