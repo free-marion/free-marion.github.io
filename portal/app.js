@@ -128,7 +128,7 @@ function applyPermissions() {
   document.getElementById('addTodoBtn').style.display = canEdit() ? '' : 'none';
 
   // Tabs hidden from viewer
-  const staffOnlyTabs = ['vto', 'todos', 'docs'];
+  const staffOnlyTabs = ['vto', 'todos', 'docs', 'tournaments'];
   staffOnlyTabs.forEach(tabName => {
     const btn = document.querySelector(`.tab-btn[data-tab="${tabName}"]`);
     if (btn) btn.style.display = isStaff() ? '' : 'none';
@@ -166,7 +166,8 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
     if (btn.dataset.tab === 'bookings') loadBookings();
     if (btn.dataset.tab === 'eggs')     loadEggs();
     if (btn.dataset.tab === 'todos')    loadTodos();
-    if (btn.dataset.tab === 'users')    loadUsers();
+    if (btn.dataset.tab === 'users')       loadUsers();
+    if (btn.dataset.tab === 'tournaments') loadTournaments();
   });
 });
 
@@ -569,3 +570,231 @@ function clearUserForm() {
   document.getElementById('newUserRole').value    = 'viewer';
   document.getElementById('userFormError').hidden = true;
 }
+
+// ============================================
+// TOURNAMENTS
+// ============================================
+
+let currentEditingTournamentId = null;
+
+async function loadTournaments() {
+  document.getElementById('registrationsPanel').hidden = true;
+  document.getElementById('tournamentsList').style.display = '';
+  document.getElementById('tournamentsEmpty').hidden = true;
+
+  const { data, error } = await db.from('tournaments').select('*').order('date', { ascending: false });
+  if (error) { console.error(error); return; }
+
+  // Fetch registration counts
+  const ids = (data || []).map(t => t.id);
+  let counts = {};
+  if (ids.length) {
+    const { data: regs } = await db
+      .from('tournament_registrations')
+      .select('tournament_id')
+      .eq('status', 'confirmed')
+      .in('tournament_id', ids);
+    (regs || []).forEach(r => { counts[r.tournament_id] = (counts[r.tournament_id] || 0) + 1; });
+  }
+
+  renderTournaments(data || [], counts);
+}
+
+function renderTournaments(rows, counts) {
+  const list  = document.getElementById('tournamentsList');
+  const empty = document.getElementById('tournamentsEmpty');
+  list.innerHTML = '';
+  if (!rows.length) { empty.hidden = false; return; }
+  empty.hidden = true;
+
+  rows.forEach(t => {
+    const count     = counts[t.id] || 0;
+    const remaining = t.max_slots > 0 ? t.max_slots - count : null;
+    const isSoldOut = remaining !== null && remaining <= 0;
+    const d         = new Date(t.date + 'T00:00:00');
+    const dateStr   = d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+
+    let slotStr = '';
+    if (isSoldOut) slotStr = '<span style="color:#c0392b;font-weight:600;">SOLD OUT</span>';
+    else if (remaining !== null) slotStr = `${count} / ${t.max_slots} registered`;
+    else slotStr = `${count} registered`;
+
+    let statusTag = '';
+    if (t.status === 'cancelled') statusTag = '<span class="tag tag--cancelled">Cancelled</span>';
+    else if (t.status === 'closed') statusTag = '<span class="tag" style="background:#f0e8d6;color:#6b4a1a;">Closed</span>';
+    else if (isSoldOut) statusTag = '<span class="tag" style="background:#fde8e8;color:#a00;">Sold Out</span>';
+
+    const card = document.createElement('div');
+    card.className = 'data-card';
+    card.innerHTML = `
+      <div class="data-card__header">
+        <span class="data-card__title">${esc(t.name)}</span>
+        <span class="data-card__badge">${dateStr}</span>
+      </div>
+      <div class="data-card__body">
+        <span>${t.type === 'team' ? '👥 Team' : '🏌️ Individual'}${t.type === 'team' && t.team_size ? ' · ' + t.team_size + ' players' : ''}${t.format ? ' · ' + esc(t.format) : ''}</span>
+        <span>${slotStr} ${statusTag}</span>
+        ${t.entry_fee ? `<span>$${parseFloat(t.entry_fee).toFixed(2)} entry fee</span>` : ''}
+        ${t.notes ? `<span class="data-card__notes">📋 ${esc(t.notes)}</span>` : ''}
+      </div>
+      <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.5rem;">
+        <button class="btn btn--ghost btn--sm" data-view="${t.id}" data-name="${esc(t.name)}">View Registrations (${count})</button>
+        <button class="btn btn--ghost btn--sm" data-edit="${t.id}">Edit</button>
+        ${t.status !== 'cancelled' ? `<button class="btn btn--ghost btn--sm" data-cancel-t="${t.id}" style="color:#a00;">Cancel Event</button>` : ''}
+      </div>
+    `;
+
+    card.querySelector('[data-view]').addEventListener('click', e => {
+      loadRegistrations(e.target.dataset.view, e.target.dataset.name);
+    });
+    card.querySelector('[data-edit]').addEventListener('click', () => editTournament(t));
+    card.querySelector('[data-cancel-t]')?.addEventListener('click', async () => {
+      if (!confirm(`Cancel "${t.name}"? This cannot be undone.`)) return;
+      await db.from('tournaments').update({ status: 'cancelled' }).eq('id', t.id);
+      loadTournaments();
+    });
+
+    list.appendChild(card);
+  });
+}
+
+function editTournament(t) {
+  currentEditingTournamentId = t.id;
+  document.getElementById('tName').value     = t.name || '';
+  document.getElementById('tDate').value     = t.date || '';
+  document.getElementById('tTime').value     = t.time || '';
+  document.getElementById('tDesc').value     = t.description || '';
+  document.getElementById('tType').value     = t.type || 'individual';
+  document.getElementById('tTeamSize').value = t.team_size || '';
+  document.getElementById('tMaxSlots').value = t.max_slots || '';
+  document.getElementById('tFormat').value   = t.format || '';
+  document.getElementById('tEntryFee').value = t.entry_fee || '';
+  document.getElementById('tStatus').value   = t.status || 'open';
+  document.getElementById('tNotes').value    = t.notes || '';
+  document.getElementById('tournamentForm').hidden = false;
+  document.getElementById('tName').focus();
+  window.scrollTo({ top: document.getElementById('tournamentForm').offsetTop - 80, behavior: 'smooth' });
+}
+
+document.getElementById('addTournamentBtn').addEventListener('click', () => {
+  currentEditingTournamentId = null;
+  clearTournamentForm();
+  document.getElementById('tournamentForm').hidden = false;
+  document.getElementById('tName').focus();
+});
+
+document.getElementById('cancelTournamentBtn').addEventListener('click', () => {
+  document.getElementById('tournamentForm').hidden = true;
+  clearTournamentForm();
+});
+
+document.getElementById('saveTournamentBtn').addEventListener('click', async () => {
+  const name     = document.getElementById('tName').value.trim();
+  const date     = document.getElementById('tDate').value;
+  const maxSlots = document.getElementById('tMaxSlots').value;
+  const errEl    = document.getElementById('tournamentFormError');
+  const btn      = document.getElementById('saveTournamentBtn');
+  errEl.hidden   = true;
+
+  if (!name)     { errEl.textContent = 'Tournament name is required.'; errEl.hidden = false; return; }
+  if (!date)     { errEl.textContent = 'Date is required.'; errEl.hidden = false; return; }
+  if (!maxSlots) { errEl.textContent = 'Max slots is required.'; errEl.hidden = false; return; }
+
+  btn.disabled = true; btn.textContent = 'Saving…';
+
+  const payload = {
+    name,
+    date,
+    time:        document.getElementById('tTime').value || null,
+    description: document.getElementById('tDesc').value.trim() || null,
+    type:        document.getElementById('tType').value,
+    team_size:   parseInt(document.getElementById('tTeamSize').value) || null,
+    max_slots:   parseInt(maxSlots),
+    format:      document.getElementById('tFormat').value.trim() || null,
+    entry_fee:   parseFloat(document.getElementById('tEntryFee').value) || null,
+    status:      document.getElementById('tStatus').value,
+    notes:       document.getElementById('tNotes').value.trim() || null,
+  };
+
+  const { error } = currentEditingTournamentId
+    ? await db.from('tournaments').update(payload).eq('id', currentEditingTournamentId)
+    : await db.from('tournaments').insert(payload);
+
+  btn.disabled = false; btn.textContent = 'Save Tournament';
+
+  if (error) { errEl.textContent = error.message; errEl.hidden = false; return; }
+
+  document.getElementById('tournamentForm').hidden = true;
+  clearTournamentForm();
+  loadTournaments();
+});
+
+function clearTournamentForm() {
+  ['tName','tDate','tTime','tDesc','tTeamSize','tMaxSlots','tFormat','tEntryFee','tNotes'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('tType').value   = 'individual';
+  document.getElementById('tStatus').value = 'open';
+  document.getElementById('tournamentFormError').hidden = true;
+  currentEditingTournamentId = null;
+}
+
+// ── Registrations sub-panel ──
+
+async function loadRegistrations(tournamentId, name) {
+  document.getElementById('tournamentsList').style.display = 'none';
+  document.getElementById('tournamentsEmpty').hidden = true;
+  document.getElementById('addTournamentBtn').style.display = 'none';
+  document.getElementById('tournamentForm').hidden = true;
+  document.getElementById('regPanelTitle').textContent = name;
+  document.getElementById('registrationsPanel').hidden = false;
+
+  const { data, error } = await db
+    .from('tournament_registrations')
+    .select('*')
+    .eq('tournament_id', tournamentId)
+    .order('created_at', { ascending: true });
+
+  if (error) { console.error(error); return; }
+  renderRegistrations(data || [], tournamentId);
+}
+
+function renderRegistrations(rows, tournamentId) {
+  const list  = document.getElementById('registrationsList');
+  const empty = document.getElementById('registrationsEmpty');
+  list.innerHTML = '';
+  if (!rows.length) { empty.hidden = false; return; }
+  empty.hidden = true;
+
+  rows.forEach((r, i) => {
+    const card = document.createElement('div');
+    card.className = 'data-card' + (r.status === 'cancelled' ? ' data-card--muted' : '');
+    card.innerHTML = `
+      <div class="data-card__header">
+        <span class="data-card__title">#${i + 1} ${esc(r.team_name || r.captain_name || '—')}</span>
+        <span class="data-card__badge">${fmtDate(r.created_at)}</span>
+      </div>
+      <div class="data-card__body">
+        ${r.team_name ? `<span><strong>Captain:</strong> ${esc(r.captain_name)}</span>` : ''}
+        <span>${esc(r.phone)}${r.email ? ' · ' + esc(r.email) : ''}</span>
+        ${r.num_players > 1 ? `<span>${r.num_players} players</span>` : ''}
+      </div>
+      ${r.status !== 'cancelled'
+        ? `<button class="btn btn--ghost btn--sm" data-cancel-reg="${r.id}" style="color:#a00;">Cancel</button>`
+        : '<span class="tag tag--cancelled">Cancelled</span>'}
+    `;
+    card.querySelector('[data-cancel-reg]')?.addEventListener('click', async () => {
+      if (!confirm('Cancel this registration?')) return;
+      await db.from('tournament_registrations').update({ status: 'cancelled' }).eq('id', r.id);
+      loadRegistrations(tournamentId, document.getElementById('regPanelTitle').textContent);
+    });
+    list.appendChild(card);
+  });
+}
+
+document.getElementById('closeRegPanel').addEventListener('click', () => {
+  document.getElementById('registrationsPanel').hidden = true;
+  document.getElementById('tournamentsList').style.display = '';
+  document.getElementById('addTournamentBtn').style.display = isStaff() ? '' : 'none';
+  loadTournaments();
+});

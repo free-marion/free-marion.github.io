@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tournaments & Events — Cherrywood Farm & Golf Club</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lora:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* ── Events page layout ── */
+    .events-hero {
+      background: var(--green);
+      padding: 6rem 1.5rem 3rem;
+      text-align: center;
+    }
+    .events-hero__kicker {
+      font-family: var(--body);
+      font-size: 0.75rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--blossom);
+      margin-bottom: 0.75rem;
+    }
+    .events-hero__title {
+      font-family: var(--serif);
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      color: var(--cream);
+      font-weight: 400;
+    }
+
+    .events-container {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 3rem 1.5rem 5rem;
+    }
+
+    /* ── Filter row ── */
+    .events-filter {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 2.5rem;
+      flex-wrap: wrap;
+    }
+    .events-filter__btn {
+      font-family: var(--body);
+      font-size: 0.8rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.45rem 1.1rem;
+      border-radius: 20px;
+      border: 1px solid var(--green);
+      background: transparent;
+      color: var(--green);
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+    .events-filter__btn--active,
+    .events-filter__btn:hover {
+      background: var(--green);
+      color: var(--cream);
+    }
+
+    /* ── Tournament card ── */
+    .event-card {
+      display: grid;
+      grid-template-columns: 80px 1fr;
+      gap: 0;
+      background: var(--off-white);
+      border: 1px solid var(--cream-dark);
+      border-radius: 10px;
+      margin-bottom: 1.25rem;
+      overflow: hidden;
+      transition: box-shadow 0.2s;
+      position: relative;
+    }
+    .event-card:hover { box-shadow: 0 4px 18px rgba(0,67,49,0.10); }
+
+    .event-card__date {
+      background: var(--green);
+      color: var(--cream);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1.25rem 0.5rem;
+      text-align: center;
+      min-width: 80px;
+    }
+    .event-card__month {
+      font-family: var(--body);
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      opacity: 0.8;
+    }
+    .event-card__day {
+      font-family: var(--serif);
+      font-size: 2rem;
+      line-height: 1;
+      font-weight: 600;
+    }
+
+    .event-card__body {
+      padding: 1.1rem 1.25rem;
+    }
+    .event-card__title {
+      font-family: var(--serif);
+      font-size: 1.15rem;
+      color: var(--ink);
+      margin-bottom: 0.3rem;
+    }
+    .event-card__meta {
+      font-size: 0.78rem;
+      color: var(--ink-mid);
+      margin-bottom: 0.6rem;
+    }
+    .event-card__badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-bottom: 0.7rem;
+    }
+    .badge {
+      font-size: 0.7rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.2rem 0.6rem;
+      border-radius: 12px;
+      font-family: var(--body);
+    }
+    .badge--individual { background: #e6f0eb; color: var(--green); }
+    .badge--team       { background: #f0e8d6; color: #6b4a1a; }
+    .badge--format     { background: var(--cream-dark); color: var(--ink-mid); }
+    .badge--fee        { background: #fef9ec; color: #7a5a10; border: 1px solid #e8d48a; }
+
+    .event-card__slots {
+      font-family: var(--body);
+      font-size: 0.82rem;
+      color: var(--ink-mid);
+      margin-bottom: 0.8rem;
+    }
+    .event-card__slots strong { color: var(--green); }
+    .event-card__slots .slots-low { color: #c0392b; }
+
+    .event-card__desc {
+      font-size: 0.83rem;
+      color: var(--ink-mid);
+      line-height: 1.55;
+      margin-bottom: 0.9rem;
+    }
+
+    .event-card__register {
+      font-family: var(--body);
+      font-size: 0.82rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.55rem 1.4rem;
+      background: var(--green);
+      color: var(--cream);
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .event-card__register:hover { background: var(--bark); }
+    .event-card__register:disabled {
+      background: var(--ink-faint);
+      cursor: default;
+    }
+
+    /* ── Past / cancelled modifiers ── */
+    .event-card--past {
+      opacity: 0.55;
+      filter: grayscale(0.3);
+    }
+    .event-card--past .event-card__date { background: var(--ink-faint); }
+
+    /* ── Sold out ribbon ── */
+    .sold-out-ribbon {
+      position: absolute;
+      top: 18px;
+      right: -22px;
+      background: var(--burgundy);
+      color: #fff;
+      font-family: var(--body);
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 0.25rem 2.2rem;
+      transform: rotate(35deg);
+      transform-origin: center;
+      pointer-events: none;
+    }
+    .cancelled-tag {
+      display: inline-block;
+      font-family: var(--body);
+      font-size: 0.7rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      background: #f8e8e8;
+      color: #a00;
+      padding: 0.2rem 0.6rem;
+      border-radius: 12px;
+      margin-bottom: 0.5rem;
+    }
+
+    /* ── Registration form ── */
+    .reg-form-wrap {
+      margin-top: 0.75rem;
+      padding-top: 0.75rem;
+      border-top: 1px solid var(--cream-dark);
+    }
+    .reg-form-wrap h4 {
+      font-family: var(--serif);
+      font-size: 0.95rem;
+      color: var(--ink);
+      margin-bottom: 0.8rem;
+    }
+    .reg-form {
+      display: grid;
+      gap: 0.6rem;
+    }
+    .reg-form input {
+      width: 100%;
+      font-family: var(--body);
+      font-size: 0.85rem;
+      padding: 0.55rem 0.75rem;
+      border: 1px solid var(--cream-dark);
+      border-radius: 5px;
+      background: var(--cream);
+      color: var(--ink);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .reg-form input:focus { border-color: var(--green); }
+    .reg-form__row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
+    .reg-form__error {
+      font-size: 0.8rem;
+      color: #c0392b;
+      display: none;
+    }
+    .reg-form__error--visible { display: block; }
+    .reg-form__success {
+      font-size: 0.85rem;
+      color: var(--green);
+      font-family: var(--body);
+      padding: 0.6rem 0;
+    }
+    .reg-form__actions { display: flex; gap: 0.6rem; align-items: center; margin-top: 0.3rem; }
+    .btn-submit {
+      font-family: var(--body);
+      font-size: 0.8rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.55rem 1.4rem;
+      background: var(--green);
+      color: var(--cream);
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-submit:hover { background: var(--bark); }
+    .btn-submit:disabled { background: var(--ink-faint); cursor: default; }
+    .btn-cancel-reg {
+      font-family: var(--body);
+      font-size: 0.8rem;
+      color: var(--ink-mid);
+      background: none;
+      border: none;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+
+    .events-empty {
+      text-align: center;
+      font-family: var(--body);
+      color: var(--ink-faint);
+      padding: 4rem 0;
+      font-size: 0.95rem;
+    }
+
+    @media (max-width: 520px) {
+      .event-card { grid-template-columns: 64px 1fr; }
+      .event-card__day { font-size: 1.6rem; }
+      .reg-form__row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav id="navbar">
+    <div class="nav-inner">
+      <a href="/index.html" class="nav-logo">
+        <img src="images/crest-badge.png" alt="Cherrywood Farm and Golf Club" class="nav-logo-img">
+      </a>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">&#9776;</button>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="/index.html#about">About</a></li>
+        <li><a href="/index.html#tee-times">Tee Times</a></li>
+        <li><a href="/index.html#farm">The Farm</a></li>
+        <li><a href="/index.html#stay">Stay</a></li>
+        <li><a href="/index.html#course">The Course</a></li>
+        <li><a href="/events.html" class="nav-active">Events</a></li>
+        <li><a href="/index.html#contact">Visit</a></li>
+      </ul>
+      <div id="courseStatusBadge" class="course-status-badge" style="display:none"></div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <header class="events-hero">
+    <p class="events-hero__kicker">Cherrywood Farm & Golf Club</p>
+    <h1 class="events-hero__title">Tournaments & Events</h1>
+  </header>
+
+  <!-- CONTENT -->
+  <div class="events-container">
+    <div class="events-filter">
+      <button class="events-filter__btn events-filter__btn--active" data-filter="upcoming">Upcoming</button>
+      <button class="events-filter__btn" data-filter="all">All Events</button>
+      <button class="events-filter__btn" data-filter="past">Past</button>
+    </div>
+    <div id="tournamentGrid"></div>
+    <p id="eventsEmpty" class="events-empty" hidden>No events to show.</p>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL  = 'https://giwfigekjatujubjknjf.supabase.co';
+    const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdpd2ZpZ2VramF0dWp1YmprbmpmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMDEwMDMsImV4cCI6MjA4OTU3NzAwM30.p3OaPA5qYROqz8d0tNyhytl__n_bzH2l2MOX3olDn3A';
+    const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+    let allTournaments = [];
+    let regCounts = {};
+    let currentFilter = 'upcoming';
+    let openRegFormId = null;
+
+    // ── Load tournaments ──
+    async function loadTournaments() {
+      const { data, error } = await db
+        .from('tournaments')
+        .select('*')
+        .order('date', { ascending: true });
+
+      if (error || !data) { document.getElementById('eventsEmpty').hidden = false; return; }
+      allTournaments = data;
+
+      // Load registration counts for all tournaments
+      const ids = data.map(t => t.id);
+      if (ids.length) {
+        const { data: regs } = await db
+          .from('tournament_registrations')
+          .select('tournament_id')
+          .eq('status', 'confirmed')
+          .in('tournament_id', ids);
+        (regs || []).forEach(r => {
+          regCounts[r.tournament_id] = (regCounts[r.tournament_id] || 0) + 1;
+        });
+      }
+
+      renderTournaments();
+    }
+
+    function renderTournaments() {
+      const grid  = document.getElementById('tournamentGrid');
+      const empty = document.getElementById('eventsEmpty');
+      const today = new Date().toISOString().split('T')[0];
+      grid.innerHTML = '';
+
+      let rows = allTournaments;
+      if (currentFilter === 'upcoming') rows = rows.filter(t => t.date >= today && t.status !== 'cancelled');
+      if (currentFilter === 'past')     rows = rows.filter(t => t.date < today || t.status === 'cancelled');
+
+      if (!rows.length) { empty.hidden = false; return; }
+      empty.hidden = true;
+
+      rows.forEach(t => {
+        const isPast      = t.date < today;
+        const isCancelled = t.status === 'cancelled';
+        const count       = regCounts[t.id] || 0;
+        const remaining   = t.max_slots > 0 ? t.max_slots - count : null;
+        const isSoldOut   = remaining !== null && remaining <= 0;
+        const isOpen      = !isPast && !isCancelled && !isSoldOut && t.status === 'open';
+
+        const d     = new Date(t.date + 'T00:00:00');
+        const month = d.toLocaleDateString('en-US', { month: 'short' }).toUpperCase();
+        const day   = d.getDate();
+
+        let timeStr = '';
+        if (t.time) {
+          const [h, m] = t.time.split(':');
+          const dt = new Date(); dt.setHours(+h, +m);
+          timeStr = ' · ' + dt.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+        }
+        const dateStr = d.toLocaleDateString('en-US', { weekday: 'short', month: 'long', day: 'numeric', year: 'numeric' });
+
+        let slotsHtml = '';
+        if (isCancelled) {
+          slotsHtml = '';
+        } else if (isSoldOut) {
+          slotsHtml = '<span style="color:var(--burgundy);font-weight:600;">Sold Out</span>';
+        } else if (remaining !== null) {
+          const cls = remaining <= 3 ? 'slots-low' : '';
+          slotsHtml = `<strong>${remaining}</strong> <span class="${cls}">of ${t.max_slots} ${t.type === 'team' ? 'team slots' : 'spots'} remaining</span>`;
+        } else {
+          slotsHtml = `<strong>${count}</strong> registered`;
+        }
+
+        const card = document.createElement('div');
+        card.className = 'event-card' + (isPast || isCancelled ? ' event-card--past' : '');
+        card.dataset.id = t.id;
+        card.innerHTML = `
+          ${isSoldOut ? '<div class="sold-out-ribbon">Sold Out</div>' : ''}
+          <div class="event-card__date">
+            <span class="event-card__month">${month}</span>
+            <span class="event-card__day">${day}</span>
+          </div>
+          <div class="event-card__body">
+            ${isCancelled ? '<span class="cancelled-tag">Cancelled</span>' : ''}
+            <h3 class="event-card__title">${esc(t.name)}</h3>
+            <p class="event-card__meta">${dateStr}${timeStr}</p>
+            <div class="event-card__badges">
+              <span class="badge badge--${t.type}">${t.type === 'team' ? '👥 Team' : '🏌️ Individual'}${t.type === 'team' && t.team_size ? ' · ' + t.team_size + ' players' : ''}</span>
+              ${t.format ? `<span class="badge badge--format">${esc(t.format)}</span>` : ''}
+              ${t.entry_fee ? `<span class="badge badge--fee">$${parseFloat(t.entry_fee).toFixed(0)} entry</span>` : ''}
+            </div>
+            ${t.max_slots > 0 || count > 0 ? `<p class="event-card__slots">${slotsHtml}</p>` : ''}
+            ${t.description ? `<p class="event-card__desc">${esc(t.description)}</p>` : ''}
+            ${isOpen ? `<button class="event-card__register" data-id="${t.id}">Register →</button>` : ''}
+            <div class="reg-form-wrap" id="regForm-${t.id}" hidden></div>
+          </div>
+        `;
+
+        card.querySelector('.event-card__register')?.addEventListener('click', () => toggleRegForm(t));
+        grid.appendChild(card);
+      });
+    }
+
+    function toggleRegForm(t) {
+      const wrap = document.getElementById('regForm-' + t.id);
+      if (!wrap.hidden) { wrap.hidden = true; openRegFormId = null; return; }
+
+      // Close any open form
+      if (openRegFormId) {
+        const prev = document.getElementById('regForm-' + openRegFormId);
+        if (prev) prev.hidden = true;
+      }
+      openRegFormId = t.id;
+
+      const isTeam = t.type === 'team';
+      wrap.innerHTML = `
+        <div class="reg-form-wrap">
+          <h4>Register for ${esc(t.name)}</h4>
+          <div class="reg-form" id="regFormInner-${t.id}">
+            ${isTeam ? `<input type="text" id="rf-team-${t.id}" placeholder="Team name *">` : ''}
+            <input type="text"  id="rf-name-${t.id}"  placeholder="${isTeam ? 'Captain name *' : 'Your name *'}">
+            <div class="reg-form__row">
+              <input type="tel"   id="rf-phone-${t.id}" placeholder="Phone *">
+              <input type="email" id="rf-email-${t.id}" placeholder="Email (optional)">
+            </div>
+            <p class="reg-form__error" id="rf-err-${t.id}"></p>
+            <div class="reg-form__actions">
+              <button class="btn-submit" id="rf-submit-${t.id}">Submit Registration</button>
+              <button class="btn-cancel-reg" id="rf-cancel-${t.id}">Cancel</button>
+            </div>
+          </div>
+        </div>
+      `;
+      wrap.hidden = false;
+
+      document.getElementById('rf-submit-' + t.id).addEventListener('click', () => submitReg(t));
+      document.getElementById('rf-cancel-' + t.id).addEventListener('click', () => {
+        wrap.hidden = true; openRegFormId = null;
+      });
+    }
+
+    async function submitReg(t) {
+      const isTeam    = t.type === 'team';
+      const teamName  = isTeam ? document.getElementById('rf-team-' + t.id)?.value.trim() : null;
+      const name      = document.getElementById('rf-name-' + t.id).value.trim();
+      const phone     = document.getElementById('rf-phone-' + t.id).value.trim();
+      const email     = document.getElementById('rf-email-' + t.id).value.trim();
+      const errEl     = document.getElementById('rf-err-' + t.id);
+      const btn       = document.getElementById('rf-submit-' + t.id);
+      errEl.className = 'reg-form__error';
+
+      if (isTeam && !teamName) { showErr(errEl, 'Please enter your team name.'); return; }
+      if (!name)  { showErr(errEl, 'Please enter your name.'); return; }
+      if (!phone) { showErr(errEl, 'Please enter a phone number.'); return; }
+
+      // Re-check slots before submitting
+      const { count } = await db
+        .from('tournament_registrations')
+        .select('*', { count: 'exact', head: true })
+        .eq('tournament_id', t.id)
+        .eq('status', 'confirmed');
+
+      if (t.max_slots > 0 && count >= t.max_slots) {
+        showErr(errEl, 'Sorry — this event just filled up.'); return;
+      }
+
+      btn.disabled = true; btn.textContent = 'Submitting…';
+
+      const { error } = await db.from('tournament_registrations').insert({
+        tournament_id: t.id,
+        team_name:     teamName,
+        captain_name:  name,
+        phone,
+        email:         email || null,
+        num_players:   t.type === 'team' ? (t.team_size || 1) : 1,
+      });
+
+      if (error) {
+        btn.disabled = false; btn.textContent = 'Submit Registration';
+        showErr(errEl, 'Something went wrong. Please try again.'); return;
+      }
+
+      // Update local count and re-render
+      regCounts[t.id] = (regCounts[t.id] || 0) + 1;
+      const wrap = document.getElementById('regForm-' + t.id);
+      wrap.innerHTML = `<p class="reg-form__success">✓ You're registered! We'll see you out there.</p>`;
+      openRegFormId = null;
+
+      // Refresh slot count on the card
+      renderTournaments();
+      // Re-attach the success message since renderTournaments replaces DOM
+      setTimeout(() => {
+        const newWrap = document.getElementById('regForm-' + t.id);
+        if (newWrap) {
+          newWrap.innerHTML = `<p class="reg-form__success">✓ You're registered! We'll see you out there.</p>`;
+          newWrap.hidden = false;
+        }
+      }, 50);
+    }
+
+    function showErr(el, msg) {
+      el.textContent = msg;
+      el.className = 'reg-form__error reg-form__error--visible';
+    }
+
+    function esc(s) {
+      return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    // ── Filter buttons ──
+    document.querySelectorAll('.events-filter__btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.events-filter__btn').forEach(b => b.classList.remove('events-filter__btn--active'));
+        btn.classList.add('events-filter__btn--active');
+        currentFilter = btn.dataset.filter;
+        renderTournaments();
+      });
+    });
+
+    // ── Nav toggle (mobile) ──
+    document.getElementById('navToggle').addEventListener('click', () => {
+      document.getElementById('navLinks').classList.toggle('nav-open');
+    });
+
+    loadTournaments();
+  </script>
+</body>
+</html>

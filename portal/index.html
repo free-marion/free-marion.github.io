@@ -73,6 +73,7 @@
     <button class="tab-btn tab-btn--active" data-tab="vto">V/TO</button>
     <button class="tab-btn" data-tab="bookings">Bookings</button>
     <button class="tab-btn" data-tab="eggs">Egg Orders</button>
+    <button class="tab-btn" data-tab="tournaments">Tournaments</button>
     <button class="tab-btn" data-tab="todos">My To-Dos</button>
     <button class="tab-btn" data-tab="docs">Documents</button>
     <button class="tab-btn" data-tab="users">Users</button>
@@ -128,6 +129,58 @@
     <p id="todosEmpty" class="empty-msg" hidden>No to-dos yet.</p>
   </section>
 
+  <!-- TOURNAMENTS -->
+  <section id="tabTournaments" class="tab-panel" hidden>
+    <div class="panel-header">
+      <h2 class="panel-title">Tournaments</h2>
+      <button id="addTournamentBtn" class="btn btn--primary btn--sm">+ Create Tournament</button>
+    </div>
+
+    <div id="tournamentForm" class="inline-form" hidden>
+      <input type="text" id="tName" placeholder="Tournament name *" maxlength="120">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem">
+        <input type="date" id="tDate">
+        <input type="time" id="tTime">
+      </div>
+      <textarea id="tDesc" placeholder="Description" rows="2" style="font-family:inherit;padding:0.55rem 0.75rem;border:1px solid #d4c8b0;border-radius:5px;resize:vertical;"></textarea>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.6rem">
+        <select id="tType" style="font-family:inherit;padding:0.55rem 0.75rem;border:1px solid #d4c8b0;border-radius:5px;">
+          <option value="individual">Individual</option>
+          <option value="team">Team</option>
+        </select>
+        <input type="number" id="tTeamSize" placeholder="Team size" min="1">
+        <input type="number" id="tMaxSlots" placeholder="Max slots *" min="0">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem">
+        <input type="text"   id="tFormat"   placeholder="Format (e.g. Scramble)">
+        <input type="number" id="tEntryFee" placeholder="Entry fee ($)" step="0.01" min="0">
+      </div>
+      <select id="tStatus" style="font-family:inherit;padding:0.55rem 0.75rem;border:1px solid #d4c8b0;border-radius:5px;">
+        <option value="open">Open</option>
+        <option value="closed">Closed</option>
+        <option value="cancelled">Cancelled</option>
+      </select>
+      <textarea id="tNotes" placeholder="Internal notes (not shown publicly)" rows="2" style="font-family:inherit;padding:0.55rem 0.75rem;border:1px solid #d4c8b0;border-radius:5px;resize:vertical;"></textarea>
+      <p id="tournamentFormError" class="error-msg" hidden></p>
+      <div class="inline-form__actions">
+        <button id="saveTournamentBtn"   class="btn btn--primary btn--sm">Save Tournament</button>
+        <button id="cancelTournamentBtn" class="btn btn--ghost btn--sm">Cancel</button>
+      </div>
+    </div>
+
+    <div id="tournamentsList"></div>
+    <p id="tournamentsEmpty" class="empty-msg" hidden>No tournaments yet. Create one above.</p>
+
+    <div id="registrationsPanel" hidden>
+      <div class="panel-header" style="margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid #e8dfc8;">
+        <h3 id="regPanelTitle" style="font-family:'Playfair Display',serif;font-size:1.05rem;color:#1C3320;"></h3>
+        <button id="closeRegPanel" class="btn btn--ghost btn--sm">← Back</button>
+      </div>
+      <div id="registrationsList"></div>
+      <p id="registrationsEmpty" class="empty-msg" hidden>No registrations yet.</p>
+    </div>
+  </section>
+
   <!-- DOCUMENTS -->
   <section id="tabDocs" class="tab-panel" hidden>
     <div class="panel-header"><h2 class="panel-title">Document Vault</h2></div>
@@ -167,7 +220,7 @@
 </div><!-- /appShell -->
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="app.js?v=11"></script>
+<script src="app.js?v=12"></script>
 <script>
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.getRegistrations().then(regs => regs.forEach(r => r.unregister()));
