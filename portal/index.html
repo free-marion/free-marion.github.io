@@ -18,6 +18,24 @@
 </head>
 <body>
 
+<!-- SET PASSWORD (invite flow) -->
+<div id="setPasswordScreen" class="login-screen" hidden>
+  <div class="login-card">
+    <h1 class="login-title">Cherrywood</h1>
+    <p class="login-sub">Set your password to continue</p>
+    <div class="field">
+      <label>New Password</label>
+      <input type="password" id="setPasswordInput" autocomplete="new-password">
+    </div>
+    <div class="field">
+      <label>Confirm Password</label>
+      <input type="password" id="setPasswordConfirm" autocomplete="new-password">
+    </div>
+    <p id="setPasswordError" class="error-msg" hidden></p>
+    <button id="setPasswordBtn" class="btn btn--primary btn--full">Set Password & Sign In</button>
+  </div>
+</div>
+
 <!-- LOGIN -->
 <div id="loginScreen" class="login-screen">
   <div class="login-card">
@@ -47,6 +65,7 @@
       <button id="courseToggleBtn" class="btn btn--sm course-open">⛳ Course Open</button>
       <span id="userEmail" class="user-email"></span>
       <a href="https://cherrywoodgolf.com" class="btn btn--ghost btn--sm">← Site</a>
+      <button id="changePasswordBtn" class="btn btn--ghost btn--sm">Password</button>
       <button class="btn btn--ghost btn--sm" onclick="(async()=>{ await db.auth.signOut(); window.location.reload(); })()">Sign Out</button>
     </div>
   </header>
@@ -149,7 +168,7 @@
 </div><!-- /appShell -->
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="app.js?v=8"></script>
+<script src="app.js?v=9"></script>
 <script>
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.getRegistrations().then(regs => regs.forEach(r => r.unregister()));

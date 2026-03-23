@@ -23,6 +23,18 @@ function canEdit()  { return currentRole === 'admin' || currentRole === 'staff';
 db.auth.onAuthStateChange(async (event, session) => {
   currentUser = session?.user ?? null;
   if (currentUser) {
+    // Invite flow — user needs to set a password before continuing
+    if (window.location.hash.includes('type=invite') || event === 'USER_UPDATED' && window.location.hash.includes('type=recovery')) {
+      window.location.hash = '';
+      showSetPasswordScreen();
+      return;
+    }
+    if (window.location.hash.includes('type=invite')) {
+      window.location.hash = '';
+      showSetPasswordScreen();
+      return;
+    }
+    document.getElementById('setPasswordScreen').hidden = true;
     document.getElementById('loginScreen').hidden = true;
     document.getElementById('appShell').hidden = false;
     document.getElementById('userEmail').textContent = currentUser.email;
@@ -30,9 +42,65 @@ db.auth.onAuthStateChange(async (event, session) => {
     loadVto();
     loadCourseStatus();
   } else {
+    document.getElementById('setPasswordScreen').hidden = true;
     document.getElementById('loginScreen').hidden = false;
     document.getElementById('appShell').hidden = true;
   }
+});
+
+function showSetPasswordScreen() {
+  document.getElementById('loginScreen').hidden = true;
+  document.getElementById('appShell').hidden = true;
+  document.getElementById('setPasswordScreen').hidden = false;
+  document.getElementById('setPasswordInput').focus();
+}
+
+document.getElementById('setPasswordBtn').addEventListener('click', async () => {
+  const password = document.getElementById('setPasswordInput').value;
+  const confirm  = document.getElementById('setPasswordConfirm').value;
+  const errEl    = document.getElementById('setPasswordError');
+  const btn      = document.getElementById('setPasswordBtn');
+  errEl.hidden   = true;
+
+  if (password.length < 8) {
+    errEl.textContent = 'Password must be at least 8 characters.';
+    errEl.hidden = false;
+    return;
+  }
+  if (password !== confirm) {
+    errEl.textContent = 'Passwords do not match.';
+    errEl.hidden = false;
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Saving…';
+
+  const { error } = await db.auth.updateUser({ password });
+  if (error) {
+    errEl.textContent = error.message;
+    errEl.hidden = false;
+    btn.disabled = false;
+    btn.textContent = 'Set Password & Sign In';
+    return;
+  }
+
+  // Password set — load the app normally
+  document.getElementById('setPasswordScreen').hidden = true;
+  document.getElementById('appShell').hidden = false;
+  document.getElementById('userEmail').textContent = currentUser.email;
+  await loadProfile();
+  loadVto();
+  loadCourseStatus();
+});
+
+document.getElementById('changePasswordBtn').addEventListener('click', async () => {
+  const newPw = prompt('Enter new password (min 8 characters):');
+  if (!newPw) return;
+  if (newPw.length < 8) { alert('Password must be at least 8 characters.'); return; }
+  const { error } = await db.auth.updateUser({ password: newPw });
+  if (error) { alert('Error: ' + error.message); return; }
+  alert('Password updated successfully.');
 });
 
 document.getElementById('loginForm').addEventListener('submit', async e => {
