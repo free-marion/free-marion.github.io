@@ -65,8 +65,7 @@
       <button id="courseToggleBtn" class="btn btn--sm course-open">⛳ Course Open</button>
       <span id="userEmail" class="user-email"></span>
       <a href="https://cherrywoodgolf.com" class="btn btn--ghost btn--sm">← Site</a>
-      <button id="changePasswordBtn" class="btn btn--ghost btn--sm">Password</button>
-      <button class="btn btn--ghost btn--sm" onclick="(async()=>{ await db.auth.signOut(); window.location.reload(); })()">Sign Out</button>
+<button class="btn btn--ghost btn--sm" onclick="(async()=>{ await db.auth.signOut(); window.location.reload(); })()">Sign Out</button>
     </div>
   </header>
 
@@ -168,7 +167,7 @@
 </div><!-- /appShell -->
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="app.js?v=10"></script>
+<script src="app.js?v=11"></script>
 <script>
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.getRegistrations().then(regs => regs.forEach(r => r.unregister()));

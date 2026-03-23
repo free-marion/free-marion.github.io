@@ -90,14 +90,6 @@ document.getElementById('setPasswordBtn').addEventListener('click', async () => 
   loadCourseStatus();
 });
 
-document.getElementById('changePasswordBtn').addEventListener('click', async () => {
-  const newPw = prompt('Enter new password (min 8 characters):');
-  if (!newPw) return;
-  if (newPw.length < 8) { alert('Password must be at least 8 characters.'); return; }
-  const { error } = await db.auth.updateUser({ password: newPw });
-  if (error) { alert('Error: ' + error.message); return; }
-  alert('Password updated successfully.');
-});
 
 document.getElementById('loginForm').addEventListener('submit', async e => {
   e.preventDefault();
