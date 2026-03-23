@@ -465,25 +465,41 @@ document.getElementById('cancelUserBtn').addEventListener('click', () => {
 });
 
 document.getElementById('saveUserBtn').addEventListener('click', async () => {
-  const name     = document.getElementById('newUserName').value.trim();
-  const email    = document.getElementById('newUserEmail').value.trim();
-  const password = document.getElementById('newUserPassword').value;
-  const role     = document.getElementById('newUserRole').value;
-  const errEl    = document.getElementById('userFormError');
-  errEl.hidden   = true;
+  const name  = document.getElementById('newUserName').value.trim();
+  const email = document.getElementById('newUserEmail').value.trim();
+  const role  = document.getElementById('newUserRole').value;
+  const errEl = document.getElementById('userFormError');
+  const btn   = document.getElementById('saveUserBtn');
+  errEl.hidden = true;
 
-  if (!name || !email || !password) {
-    errEl.textContent = 'Name, email, and password are all required.';
+  if (!name || !email) {
+    errEl.textContent = 'Name and email are required.';
     errEl.hidden = false;
     return;
   }
 
-  const { data, error } = await db.auth.signUp({ email, password });
-  if (error) { errEl.textContent = error.message; errEl.hidden = false; return; }
+  btn.disabled = true;
+  btn.textContent = 'Sending invite…';
 
-  const userId = data.user?.id;
-  if (userId) {
-    await db.from('profiles').upsert({ id: userId, email, name, role });
+  const { data: { session } } = await db.auth.getSession();
+  const res = await fetch(`${SUPABASE_URL}/functions/v1/invite-user`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${session.access_token}`,
+      'apikey': SUPABASE_ANON,
+    },
+    body: JSON.stringify({ name, email, role }),
+  });
+
+  const json = await res.json();
+  btn.disabled = false;
+  btn.textContent = 'Send Invite';
+
+  if (!res.ok || json.error) {
+    errEl.textContent = json.error || 'Something went wrong.';
+    errEl.hidden = false;
+    return;
   }
 
   document.getElementById('userForm').hidden = true;
@@ -492,9 +508,8 @@ document.getElementById('saveUserBtn').addEventListener('click', async () => {
 });
 
 function clearUserForm() {
-  document.getElementById('newUserName').value     = '';
-  document.getElementById('newUserEmail').value    = '';
-  document.getElementById('newUserPassword').value = '';
-  document.getElementById('newUserRole').value     = 'viewer';
-  document.getElementById('userFormError').hidden  = true;
+  document.getElementById('newUserName').value    = '';
+  document.getElementById('newUserEmail').value   = '';
+  document.getElementById('newUserRole').value    = 'viewer';
+  document.getElementById('userFormError').hidden = true;
 }
