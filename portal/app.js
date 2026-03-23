@@ -23,13 +23,9 @@ function canEdit()  { return currentRole === 'admin' || currentRole === 'staff';
 db.auth.onAuthStateChange(async (event, session) => {
   currentUser = session?.user ?? null;
   if (currentUser) {
-    // Invite flow — user needs to set a password before continuing
-    if (window.location.hash.includes('type=invite') || event === 'USER_UPDATED' && window.location.hash.includes('type=recovery')) {
-      window.location.hash = '';
-      showSetPasswordScreen();
-      return;
-    }
-    if (window.location.hash.includes('type=invite')) {
+    // Invite or magic link — prompt user to set a permanent password
+    const hash = window.location.hash;
+    if (hash.includes('type=invite') || hash.includes('type=magiclink')) {
       window.location.hash = '';
       showSetPasswordScreen();
       return;
