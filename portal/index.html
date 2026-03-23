@@ -53,6 +53,20 @@
       <p id="loginError" class="error-msg" hidden></p>
       <button type="submit" id="loginBtn" class="btn btn--primary btn--full">Sign In</button>
     </form>
+    <p style="text-align:center;margin-top:1rem;">
+      <button id="showForgotBtn" class="btn btn--ghost btn--sm" style="font-size:0.78rem;">Forgot password?</button>
+    </p>
+
+    <div id="forgotForm" hidden style="margin-top:1rem;border-top:1px solid #e8dfc8;padding-top:1rem;">
+      <p style="font-size:0.82rem;color:#6a5a3a;margin-bottom:0.75rem;">Enter your email and we'll send a reset link.</p>
+      <div class="field">
+        <label>Email</label>
+        <input type="email" id="forgotEmail" autocomplete="email">
+      </div>
+      <p id="forgotError"   class="error-msg" hidden></p>
+      <p id="forgotSuccess" style="font-size:0.82rem;color:#2a5a2a;display:none;">Reset link sent — check your inbox.</p>
+      <button id="sendResetBtn" class="btn btn--primary btn--full">Send Reset Link</button>
+    </div>
   </div>
 </div>
 
@@ -220,7 +234,7 @@
 </div><!-- /appShell -->
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="app.js?v=13"></script>
+<script src="app.js?v=14"></script>
 <script>
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.getRegistrations().then(regs => regs.forEach(r => r.unregister()));

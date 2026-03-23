@@ -26,8 +26,8 @@ function canEdit()  { return currentRole === 'admin' || currentRole === 'staff';
 db.auth.onAuthStateChange(async (event, session) => {
   currentUser = session?.user ?? null;
   if (currentUser) {
-    // Invite or magic link — prompt user to set a permanent password
-    if (_initialHash.includes('type=invite') || _initialHash.includes('type=magiclink')) {
+    // Invite, magic link, or password recovery — prompt user to set a permanent password
+    if (_initialHash.includes('type=invite') || _initialHash.includes('type=magiclink') || _initialHash.includes('type=recovery')) {
       showSetPasswordScreen();
       return;
     }
@@ -109,6 +109,32 @@ document.getElementById('loginForm').addEventListener('submit', async e => {
     btn.disabled = false;
     btn.textContent = 'Sign In';
   }
+});
+
+document.getElementById('showForgotBtn').addEventListener('click', () => {
+  const form = document.getElementById('forgotForm');
+  form.hidden = !form.hidden;
+  if (!form.hidden) document.getElementById('forgotEmail').focus();
+});
+
+document.getElementById('sendResetBtn').addEventListener('click', async () => {
+  const email  = document.getElementById('forgotEmail').value.trim();
+  const errEl  = document.getElementById('forgotError');
+  const okEl   = document.getElementById('forgotSuccess');
+  const btn    = document.getElementById('sendResetBtn');
+  errEl.hidden = true; okEl.style.display = 'none';
+
+  if (!email) { errEl.textContent = 'Please enter your email.'; errEl.hidden = false; return; }
+
+  btn.disabled = true; btn.textContent = 'Sending…';
+  const { error } = await db.auth.resetPasswordForEmail(email, {
+    redirectTo: 'https://free-marion.github.io/portal/'
+  });
+  btn.disabled = false; btn.textContent = 'Send Reset Link';
+
+  if (error) { errEl.textContent = error.message; errEl.hidden = false; return; }
+  okEl.style.display = 'block';
+  document.getElementById('forgotEmail').value = '';
 });
 
 // ============================================
