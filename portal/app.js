@@ -2,6 +2,9 @@
 // CHERRYWOOD PORTAL
 // ============================================
 
+// Capture hash immediately — Supabase clears it before onAuthStateChange fires
+const _initialHash = window.location.hash;
+
 const SUPABASE_URL  = 'https://giwfigekjatujubjknjf.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdpd2ZpZ2VramF0dWp1YmprbmpmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMDEwMDMsImV4cCI6MjA4OTU3NzAwM30.p3OaPA5qYROqz8d0tNyhytl__n_bzH2l2MOX3olDn3A';
 
@@ -24,9 +27,7 @@ db.auth.onAuthStateChange(async (event, session) => {
   currentUser = session?.user ?? null;
   if (currentUser) {
     // Invite or magic link — prompt user to set a permanent password
-    const hash = window.location.hash;
-    if (hash.includes('type=invite') || hash.includes('type=magiclink')) {
-      window.location.hash = '';
+    if (_initialHash.includes('type=invite') || _initialHash.includes('type=magiclink')) {
       showSetPasswordScreen();
       return;
     }
