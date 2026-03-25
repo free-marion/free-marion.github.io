@@ -105,7 +105,8 @@
       <h2 class="panel-title">Tee Time Bookings</h2>
       <div class="filter-row">
         <button class="filter-btn filter-btn--active" data-filter="upcoming">Upcoming</button>
-        <button class="filter-btn" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="all">Past 24 Hours</button>
+        <button class="filter-btn filter-btn--ghost" data-filter="archive">Tee Time Archive</button>
       </div>
     </div>
     <div id="bookingsList"></div>
@@ -233,8 +234,37 @@
 
 </div><!-- /appShell -->
 
+<!-- CANCEL BOOKING MODAL -->
+<div id="cancelModal" class="modal-overlay" hidden>
+  <div class="modal-card">
+    <h3 class="modal-title">Cancel Booking</h3>
+    <p id="cancelModalName" style="font-size:0.88rem;color:#6a5a3a;margin-bottom:1rem;"></p>
+    <div class="field">
+      <label>Reason *</label>
+      <select id="cancelReason" style="font-family:inherit;padding:0.55rem 0.75rem;border:1px solid #d4c8b0;border-radius:5px;width:100%;font-size:0.95rem;">
+        <option value="">Select a reason…</option>
+        <option value="Customer request">Customer request</option>
+        <option value="No show">No show</option>
+        <option value="Weather / course conditions">Weather / course conditions</option>
+        <option value="Double booking / scheduling error">Double booking / scheduling error</option>
+        <option value="Staff error">Staff error</option>
+        <option value="Other">Other</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Notes (optional)</label>
+      <textarea id="cancelNotes" rows="2" placeholder="Any additional details…" style="font-family:inherit;padding:0.55rem 0.75rem;border:1px solid #d4c8b0;border-radius:5px;width:100%;resize:vertical;font-size:0.95rem;"></textarea>
+    </div>
+    <p id="cancelModalError" class="error-msg" hidden></p>
+    <div class="inline-form__actions" style="margin-top:0.5rem;">
+      <button id="confirmCancelBtn" class="btn btn--primary btn--sm" style="background:#a00;border-color:#a00;">Confirm Cancellation</button>
+      <button id="cancelModalClose" class="btn btn--ghost btn--sm">Go Back</button>
+    </div>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="app.js?v=14"></script>
+<script src="app.js?v=16"></script>
 <script>
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.getRegistrations().then(regs => regs.forEach(r => r.unregister()));

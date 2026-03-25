@@ -101,7 +101,7 @@
       grid-template-columns: repeat(7, 1fr);
     }
     .cal-day {
-      min-height: 90px;
+      min-height: 100px;
       border-right: 1px solid var(--cream-dark);
       border-bottom: 1px solid var(--cream-dark);
       padding: 0.4rem;
@@ -134,26 +134,50 @@
       align-items: center;
       justify-content: center;
     }
-    .cal-event-dot {
+    .cal-event-chip {
       display: block;
-      font-size: 0.68rem;
       font-family: var(--body);
-      background: var(--green);
-      color: var(--cream);
-      border-radius: 4px;
-      padding: 0.15rem 0.4rem;
-      margin-bottom: 0.2rem;
+      border-radius: 5px;
+      padding: 0.4rem 0.5rem;
+      margin-top: 0.15rem;
       cursor: pointer;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      transition: background 0.15s;
-      line-height: 1.4;
+      transition: filter 0.15s, transform 0.1s;
+      border-left: 3px solid transparent;
+      width: 100%;
+      box-sizing: border-box;
     }
-    .cal-event-dot:hover { background: var(--bark); }
-    .cal-event-dot--soldout { background: var(--burgundy); }
-    .cal-event-dot--past    { background: var(--ink-faint); }
-    .cal-event-dot--cancelled { background: #ccc; color: #666; text-decoration: line-through; }
+    .cal-event-chip:hover { filter: brightness(1.06); transform: translateY(-1px); }
+    .cal-event-chip__name {
+      font-size: 0.7rem;
+      font-weight: 700;
+      line-height: 1.25;
+      margin-bottom: 0.15rem;
+    }
+    .cal-event-chip__time {
+      font-size: 0.6rem;
+      font-weight: 600;
+      opacity: 0.9;
+      margin-bottom: 0.1rem;
+    }
+    .cal-event-chip__type {
+      font-size: 0.58rem;
+      opacity: 0.75;
+      line-height: 1.3;
+      margin-bottom: 0.1rem;
+    }
+    .cal-event-chip__slots {
+      font-size: 0.6rem;
+      font-weight: 600;
+      margin-top: 0.15rem;
+    }
+
+    /* Urgency colors */
+    .chip--open     { background: #e6f0eb; color: var(--green);    border-left-color: var(--green); }
+    .chip--low      { background: #fff4e0; color: #8a5700;         border-left-color: #d4870a; }
+    .chip--critical { background: #fdecea; color: #a00;            border-left-color: #c0392b; }
+    .chip--soldout  { background: var(--burgundy); color: #fff;    border-left-color: #5a0010; }
+    .chip--past     { background: #f0f0f0; color: var(--ink-faint); border-left-color: #ccc; }
+    .chip--cancelled{ background: #f5f5f5; color: #aaa;            border-left-color: #ddd; text-decoration: line-through; }
 
     /* ── Event detail panel ── */
     .event-detail {
@@ -304,11 +328,128 @@
       text-decoration: underline;
     }
 
+    /* ── Upcoming event cards ── */
+    .upcoming-section {
+      margin-top: 1rem;
+    }
+    .upcoming-section__title {
+      font-family: var(--serif);
+      font-size: 1.35rem;
+      color: var(--ink);
+      font-weight: 400;
+      margin-bottom: 1.25rem;
+      padding-bottom: 0.6rem;
+      border-bottom: 1px solid var(--cream-dark);
+    }
+    .event-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.25rem;
+    }
+    .event-card {
+      background: var(--off-white);
+      border: 1px solid var(--cream-dark);
+      border-radius: 10px;
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      cursor: pointer;
+      transition: box-shadow 0.2s, transform 0.15s;
+      border-top: 4px solid var(--green);
+    }
+    .event-card:hover { box-shadow: 0 4px 18px rgba(0,40,20,0.1); transform: translateY(-2px); }
+    .event-card--low      { border-top-color: #d4870a; }
+    .event-card--critical { border-top-color: #c0392b; }
+    .event-card--soldout  { border-top-color: var(--burgundy); opacity: 0.85; }
+    .event-card--past     { border-top-color: #bbb; opacity: 0.7; }
+    .event-card__date {
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--green);
+      font-family: var(--body);
+    }
+    .event-card--low .event-card__date      { color: #8a5700; }
+    .event-card--critical .event-card__date { color: #a00; }
+    .event-card--soldout .event-card__date  { color: var(--burgundy); }
+    .event-card--past .event-card__date     { color: var(--ink-faint); }
+    .event-card__name {
+      font-family: var(--serif);
+      font-size: 1.1rem;
+      color: var(--ink);
+      line-height: 1.25;
+    }
+    .event-card__badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+    }
+    .event-card__slots {
+      font-size: 0.82rem;
+      font-family: var(--body);
+      margin-top: 0.1rem;
+    }
+    .event-card__slots-bar {
+      height: 5px;
+      background: var(--cream-dark);
+      border-radius: 3px;
+      overflow: hidden;
+      margin-top: 0.3rem;
+    }
+    .event-card__slots-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 0.4s ease;
+    }
+    .fill--open     { background: var(--green); }
+    .fill--low      { background: #d4870a; }
+    .fill--critical { background: #c0392b; }
+    .fill--soldout  { background: var(--burgundy); }
+    .event-card__slots-label { color: var(--ink-mid); }
+    .event-card__slots-label--low      { color: #8a5700; font-weight: 600; }
+    .event-card__slots-label--critical { color: #a00;    font-weight: 700; }
+    .event-card__slots-label--soldout  { color: var(--burgundy); font-weight: 700; }
+    .event-card__desc {
+      font-size: 0.82rem;
+      color: var(--ink-mid);
+      line-height: 1.55;
+      flex: 1;
+    }
+    .event-card__cta {
+      margin-top: auto;
+      font-family: var(--body);
+      font-size: 0.78rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.5rem 1rem;
+      background: var(--green);
+      color: var(--cream);
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.2s;
+      width: 100%;
+    }
+    .event-card__cta:hover { background: var(--bark); }
+    .event-card__cta--soldout { background: var(--burgundy); cursor: default; }
+    .event-card__cta--disabled { background: var(--ink-faint); cursor: default; }
+    .no-upcoming {
+      font-style: italic;
+      color: var(--ink-faint);
+      font-size: 0.9rem;
+    }
+
     @media (max-width: 600px) {
-      .cal-day { min-height: 60px; }
-      .cal-event-dot { font-size: 0.6rem; padding: 0.1rem 0.3rem; }
+      .cal-day { min-height: 70px; }
+      .cal-event-chip { padding: 0.3rem 0.35rem; }
+      .cal-event-chip__name { font-size: 0.58rem; }
+      .cal-event-chip__time { display: none; }
+      .cal-event-chip__type { display: none; }
+      .cal-event-chip__slots { display: none; }
       .reg-form__row { grid-template-columns: 1fr; }
       .cal-weekday { font-size: 0.6rem; }
+      .event-cards-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -370,6 +511,12 @@
       <div class="cal-days" id="calDays"></div>
     </div>
 
+    <!-- Upcoming event cards -->
+    <div class="upcoming-section">
+      <h3 class="upcoming-section__title">Upcoming Events</h3>
+      <div class="event-cards-grid" id="eventCardsGrid"></div>
+    </div>
+
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -379,7 +526,6 @@
     const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
     let allTournaments = [];
-    let regCounts      = {};
     let viewYear       = new Date().getFullYear();
     let viewMonth      = new Date().getMonth(); // 0-based
     let selectedEvent  = null;
@@ -390,17 +536,22 @@
     async function loadTournaments() {
       const { data } = await db.from('tournaments').select('*').order('date', { ascending: true });
       allTournaments = data || [];
-
-      const ids = allTournaments.map(t => t.id);
-      if (ids.length) {
-        const { data: regs } = await db
-          .from('tournament_registrations')
-          .select('tournament_id')
-          .eq('status', 'confirmed')
-          .in('tournament_id', ids);
-        (regs || []).forEach(r => { regCounts[r.tournament_id] = (regCounts[r.tournament_id] || 0) + 1; });
-      }
       renderCalendar();
+    }
+
+    // Live updates: when any tournament row changes (e.g. registered_count ticked by trigger),
+    // patch allTournaments in place and re-render — no full reload needed.
+    function subscribeToTournamentUpdates() {
+      db.channel('public:tournaments')
+        .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'tournaments' }, payload => {
+          const updated = payload.new;
+          const idx = allTournaments.findIndex(t => t.id === updated.id);
+          if (idx !== -1) {
+            allTournaments[idx] = { ...allTournaments[idx], ...updated };
+            renderCalendar();
+          }
+        })
+        .subscribe();
     }
 
     function renderCalendar() {
@@ -446,24 +597,145 @@
         numEl.textContent = d;
         cell.appendChild(numEl);
 
-        // Add event dots
+        // Add event chips
         (byDate[dateStr] || []).forEach(t => {
-          const count     = regCounts[t.id] || 0;
-          const isSoldOut = t.max_slots > 0 && count >= t.max_slots;
-          const isCancelled = t.status === 'cancelled';
-
-          const dot = document.createElement('span');
-          dot.className = 'cal-event-dot' +
-            (isCancelled ? ' cal-event-dot--cancelled' : '') +
-            (isSoldOut && !isCancelled ? ' cal-event-dot--soldout' : '') +
-            (isPast && !isCancelled ? ' cal-event-dot--past' : '');
-          dot.textContent = t.name;
-          dot.addEventListener('click', () => showEventDetail(t));
-          cell.appendChild(dot);
+          const chip = buildCalChip(t, isPast);
+          chip.addEventListener('click', () => {
+            showEventDetail(t);
+            document.getElementById('eventDetail').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          });
+          cell.appendChild(chip);
         });
 
         grid.appendChild(cell);
       }
+      renderEventCards();
+    }
+
+    function urgencyClass(t, isPast) {
+      if (t.status === 'cancelled')                        return 'cancelled';
+      if (isPast)                                          return 'past';
+      const count     = t.registered_count || 0;
+      const remaining = t.max_slots > 0 ? t.max_slots - count : null;
+      if (remaining !== null && remaining <= 0)            return 'soldout';
+      if (remaining !== null && remaining <= 2)            return 'critical';
+      if (remaining !== null && remaining <= 5)            return 'low';
+      return 'open';
+    }
+
+    function slotsLabel(t, urgency) {
+      const count     = t.registered_count || 0;
+      const remaining = t.max_slots > 0 ? t.max_slots - count : null;
+      if (urgency === 'soldout')  return 'Sold Out';
+      if (urgency === 'cancelled') return 'Cancelled';
+      if (remaining === null)     return `${count} registered`;
+      if (urgency === 'critical') return `🔴 Only ${remaining} left!`;
+      if (urgency === 'low')      return `⚠️ ${remaining} spots left`;
+      return `${remaining} of ${t.max_slots} spots open`;
+    }
+
+    function buildCalChip(t, isPast) {
+      const urgency = urgencyClass(t, isPast);
+
+      let timeStr = '';
+      if (t.time) {
+        const [h, m] = t.time.split(':');
+        const dt = new Date(); dt.setHours(+h, +m);
+        timeStr = dt.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+      }
+
+      const typeLabel = t.type === 'team'
+        ? `👥 Team${t.team_size ? ' · ' + t.team_size + 'p' : ''}`
+        : '🏌️ Indiv.';
+      const infoStr = t.format ? `${typeLabel} · ${esc(t.format)}` : typeLabel;
+
+      const chip = document.createElement('span');
+      chip.className = `cal-event-chip chip--${urgency}`;
+      chip.innerHTML = `
+        <div class="cal-event-chip__name">${esc(t.name)}</div>
+        ${timeStr ? `<div class="cal-event-chip__time">${timeStr}</div>` : ''}
+        <div class="cal-event-chip__type">${infoStr}</div>
+        <div class="cal-event-chip__slots">${slotsLabel(t, urgency)}</div>
+      `;
+      return chip;
+    }
+
+    function renderEventCards() {
+      const grid  = document.getElementById('eventCardsGrid');
+      const today = new Date().toISOString().split('T')[0];
+      const upcoming = allTournaments.filter(t => t.date >= today && t.status !== 'cancelled');
+
+      if (!upcoming.length) {
+        grid.innerHTML = '<p class="no-upcoming">No upcoming events scheduled. Check back soon.</p>';
+        return;
+      }
+
+      grid.innerHTML = '';
+      upcoming.forEach(t => {
+        const urgency   = urgencyClass(t, false);
+        const count     = t.registered_count || 0;
+        const remaining = t.max_slots > 0 ? t.max_slots - count : null;
+        const pct       = (t.max_slots > 0 && remaining !== null) ? Math.round((count / t.max_slots) * 100) : 0;
+        const isOpen    = t.status === 'open' && urgency !== 'soldout';
+
+        const d = new Date(t.date + 'T00:00:00');
+        const dateStr = d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+        let timeStr = '';
+        if (t.time) {
+          const [h, m] = t.time.split(':');
+          const dt = new Date(); dt.setHours(+h, +m);
+          timeStr = ' · ' + dt.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+        }
+
+        let slotsHtml = '';
+        if (t.max_slots > 0 && remaining !== null) {
+          const labelClass = urgency === 'soldout' ? 'soldout' : urgency === 'critical' ? 'critical' : urgency === 'low' ? 'low' : '';
+          slotsHtml = `
+            <div class="event-card__slots">
+              <span class="event-card__slots-label event-card__slots-label--${labelClass}">${slotsLabel(t, urgency)}</span>
+              <div class="event-card__slots-bar">
+                <div class="event-card__slots-fill fill--${urgency}" style="width:${pct}%"></div>
+              </div>
+            </div>`;
+        } else if (count > 0) {
+          slotsHtml = `<div class="event-card__slots"><span class="event-card__slots-label">${count} registered</span></div>`;
+        }
+
+        const ctaClass = urgency === 'soldout' ? 'event-card__cta--soldout' : !isOpen ? 'event-card__cta--disabled' : '';
+        const ctaText  = urgency === 'soldout' ? 'Sold Out' : !isOpen ? t.status.charAt(0).toUpperCase() + t.status.slice(1) : 'Register Now →';
+
+        const card = document.createElement('div');
+        card.className = `event-card event-card--${urgency}`;
+        card.innerHTML = `
+          <div class="event-card__date">${esc(dateStr)}${timeStr}</div>
+          <div class="event-card__name">${esc(t.name)}</div>
+          <div class="event-card__badges">
+            <span class="badge badge--${t.type}">${t.type === 'team' ? '👥 Team' : '🏌️ Individual'}${t.type === 'team' && t.team_size ? ' · ' + t.team_size + 'p' : ''}</span>
+            ${t.format    ? `<span class="badge badge--format">${esc(t.format)}</span>` : ''}
+            ${t.entry_fee ? `<span class="badge badge--fee">$${parseFloat(t.entry_fee).toFixed(0)} entry</span>` : ''}
+          </div>
+          ${slotsHtml}
+          ${t.description ? `<p class="event-card__desc">${esc(t.description)}</p>` : ''}
+          <button class="event-card__cta ${ctaClass}" data-id="${t.id}" ${!isOpen ? 'disabled' : ''}>${ctaText}</button>
+        `;
+
+        if (isOpen) {
+          card.querySelector('.event-card__cta').addEventListener('click', e => {
+            e.stopPropagation();
+            showEventDetail(t);
+            setTimeout(() => {
+              document.getElementById('openRegBtn')?.click();
+              document.getElementById('eventDetail').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 80);
+          });
+        }
+        card.addEventListener('click', () => {
+          showEventDetail(t);
+          document.getElementById('eventDetail').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        });
+
+        grid.appendChild(card);
+      });
     }
 
     function showEventDetail(t) {
@@ -472,7 +744,7 @@
       const today     = new Date().toISOString().split('T')[0];
       const isPast    = t.date < today;
       const isCancelled = t.status === 'cancelled';
-      const count     = regCounts[t.id] || 0;
+      const count     = t.registered_count || 0;
       const remaining = t.max_slots > 0 ? t.max_slots - count : null;
       const isSoldOut = remaining !== null && remaining <= 0;
       const isOpen    = !isPast && !isCancelled && !isSoldOut && t.status === 'open';
@@ -569,25 +841,43 @@
 
       btn.disabled = true; btn.textContent = 'Submitting…';
 
-      const { error } = await db.from('tournament_registrations').insert({
+      const { data: inserted, error } = await db.from('tournament_registrations').insert({
         tournament_id: t.id,
         team_name:     teamName,
         captain_name:  name,
         phone,
         email:         email || null,
         num_players:   t.type === 'team' ? (t.team_size || 1) : 1,
-      });
+        status:        'confirmed',
+      }).select('id').single();
 
       if (error) {
         btn.disabled = false; btn.textContent = 'Submit Registration';
         showErr(errEl, 'Something went wrong. Please try again.'); return;
       }
 
-      regCounts[t.id] = (regCounts[t.id] || 0) + 1;
+      // Fire confirmation email (non-blocking — don't fail registration if email fails)
+      let confNo = '';
+      if (email && inserted?.id) {
+        try {
+          const cfRes = await fetch(`${SUPABASE_URL}/functions/v1/send-registration-confirmation`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_ANON },
+            body: JSON.stringify({ registration_id: inserted.id }),
+          });
+          const cfData = await cfRes.json();
+          if (cfData.confirmation_no) confNo = cfData.confirmation_no;
+        } catch (e) { /* email failed silently — registration still succeeded */ }
+      }
+
+      const emailNote = email
+        ? (confNo ? ` A confirmation email is on its way to ${email}.` : ` (Confirmation email will arrive shortly.)`)
+        : '';
       document.getElementById('regFormArea').innerHTML =
-        `<p class="reg-form__success">✓ You're registered! We'll see you out there.</p>`;
+        `<p class="reg-form__success">✓ You're registered!${confNo ? ' <strong>Confirmation #' + confNo + '</strong>' : ''}${emailNote}</p>`;
       document.getElementById('openRegBtn').style.display = 'none';
       renderCalendar();
+      renderEventCards();
     }
 
     function showErr(el, msg) {
@@ -634,6 +924,7 @@
     });
 
     loadTournaments();
+    subscribeToTournamentUpdates();
   </script>
 </body>
 </html>

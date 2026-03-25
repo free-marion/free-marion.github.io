@@ -275,12 +275,42 @@ function renderVto(v) {
 // ============================================
 
 let bookingsFilter = 'upcoming';
+let _cancelBookingId = null;
+let _cancelSlotTime  = null;
+
+async function archiveOldBookings() {
+  const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+  await db.from('bookings')
+    .update({ archived_at: new Date().toISOString() })
+    .lt('slot_time', cutoff)
+    .is('archived_at', null);
+}
 
 async function loadBookings() {
-  let q = db.from('bookings').select('*').order('slot_time', { ascending: true });
-  if (bookingsFilter === 'upcoming') {
-    q = q.gte('slot_time', new Date().toISOString()).neq('status', 'cancelled');
+  await archiveOldBookings();
+
+  let q;
+  if (bookingsFilter === 'archive') {
+    q = db.from('bookings').select('*')
+      .not('archived_at', 'is', null)
+      .order('slot_time', { ascending: false });
+  } else if (bookingsFilter === 'upcoming') {
+    const startOfToday = new Date();
+    startOfToday.setHours(0, 0, 0, 0);
+    q = db.from('bookings').select('*')
+      .is('archived_at', null)
+      .gte('slot_time', startOfToday.toISOString())
+      .neq('status', 'cancelled')
+      .order('slot_time', { ascending: true });
+  } else {
+    // past 24 hours
+    const cutoff24 = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+    q = db.from('bookings').select('*')
+      .gte('slot_time', cutoff24)
+      .lte('slot_time', new Date().toISOString())
+      .order('slot_time', { ascending: false });
   }
+
   const { data, error } = await q;
   if (error) { console.error(error); return; }
   renderBookings(data || []);
@@ -292,29 +322,122 @@ function renderBookings(rows) {
   list.innerHTML = '';
   if (!rows.length) { empty.hidden = false; return; }
   empty.hidden = true;
-  rows.forEach(b => {
-    const card = document.createElement('div');
-    card.className = 'data-card' + (b.status === 'cancelled' ? ' data-card--muted' : '');
-    card.innerHTML = `
-      <div class="data-card__header">
-        <span class="data-card__title">${fmtDateTime(b.slot_time)}</span>
-        <span class="data-card__badge">${esc(b.confirmation_no)}</span>
-      </div>
-      <div class="data-card__body">
-        <span><strong>${esc(b.name)}</strong> &bull; ${esc(b.phone)}${b.email ? ' &bull; ' + esc(b.email) : ''}</span>
-        <span>${b.num_players} player${b.num_players !== 1 ? 's' : ''} &bull; ${b.holes} holes${b.num_carts > 0 ? ' &bull; ' + b.num_carts + ' cart' + (b.num_carts !== 1 ? 's' : '') : ''}</span>
-        ${b.notes ? `<span class="data-card__notes">${esc(b.notes)}</span>` : ''}
-      </div>
-      ${b.status !== 'cancelled' ? `<button class="btn btn--ghost btn--sm" data-cancel="${b.id}">Cancel</button>` : '<span class="tag tag--cancelled">Cancelled</span>'}
-    `;
-    card.querySelector('[data-cancel]')?.addEventListener('click', async () => {
-      if (!confirm('Cancel this booking?')) return;
-      await db.from('bookings').update({ status: 'cancelled' }).eq('id', b.id);
-      loadBookings();
-    });
-    list.appendChild(card);
-  });
+
+  const now = new Date();
+
+  if (bookingsFilter === 'upcoming') {
+    const pastToday = rows.filter(b => new Date(b.slot_time) < now);
+    const upcoming  = rows.filter(b => new Date(b.slot_time) >= now);
+
+    if (pastToday.length) {
+      list.appendChild(makeDivider('Earlier Today'));
+      pastToday.forEach(b => list.appendChild(buildBookingCard(b)));
+    }
+    if (upcoming.length) {
+      if (pastToday.length) list.appendChild(makeDivider('Upcoming'));
+      upcoming.forEach(b => list.appendChild(buildBookingCard(b)));
+    }
+  } else {
+    rows.forEach(b => list.appendChild(buildBookingCard(b)));
+  }
 }
+
+function makeDivider(label) {
+  const d = document.createElement('div');
+  d.className = 'bookings-divider';
+  d.textContent = label;
+  return d;
+}
+
+function buildBookingCard(b) {
+  const now     = new Date();
+  const isPast  = new Date(b.slot_time) < now;
+  const isCancelled = b.status === 'cancelled';
+
+  const card = document.createElement('div');
+  card.className = 'data-card' + (isCancelled ? ' data-card--muted' : '') + (isPast && !isCancelled ? ' data-card--past' : '');
+
+  let actionHtml = '';
+  if (isCancelled) {
+    actionHtml = `
+      <div style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;">
+        <span class="tag tag--cancelled">Cancelled</span>
+        ${b.cancel_reason ? `<span style="font-size:0.78rem;color:#888;">${esc(b.cancel_reason)}${b.cancel_notes ? ' — ' + esc(b.cancel_notes) : ''}${b.cancelled_by ? ' · by ' + esc(b.cancelled_by) : ''}</span>` : ''}
+      </div>`;
+  } else if (isPast) {
+    actionHtml = `<span class="tag" style="background:#f0f0f0;color:#999;font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;">Completed</span>`;
+  } else if (isStaff()) {
+    actionHtml = `<button class="btn btn--ghost btn--sm" data-cancel="${b.id}" style="color:#a00;">Cancel Booking</button>`;
+  }
+
+  card.innerHTML = `
+    <div class="data-card__header">
+      <span class="data-card__title">${fmtDateTime(b.slot_time)}</span>
+      <span class="data-card__badge">${esc(b.confirmation_no)}</span>
+    </div>
+    <div class="data-card__body">
+      <span><strong>${esc(b.name)}</strong> &bull; ${esc(b.phone)}${b.email ? ' &bull; ' + esc(b.email) : ''}</span>
+      <span>${b.num_players} player${b.num_players !== 1 ? 's' : ''} &bull; ${b.holes} holes${b.num_carts > 0 ? ' &bull; ' + b.num_carts + ' cart' + (b.num_carts !== 1 ? 's' : '') : ''}</span>
+      ${b.notes ? `<span class="data-card__notes">${esc(b.notes)}</span>` : ''}
+    </div>
+    ${actionHtml}
+  `;
+
+  card.querySelector('[data-cancel]')?.addEventListener('click', () => {
+    openCancelModal(b.id, b.name, b.slot_time);
+  });
+
+  return card;
+}
+
+function openCancelModal(bookingId, name, slotTime) {
+  if (new Date(slotTime) <= new Date()) return; // past tee times cannot be cancelled
+  _cancelBookingId = bookingId;
+  _cancelSlotTime  = slotTime;
+  document.getElementById('cancelModalName').textContent = `${name} — ${fmtDateTime(slotTime)}`;
+  document.getElementById('cancelReason').value = '';
+  document.getElementById('cancelNotes').value = '';
+  document.getElementById('cancelModalError').hidden = true;
+  document.getElementById('cancelModal').hidden = false;
+}
+
+document.getElementById('cancelModalClose').addEventListener('click', () => {
+  document.getElementById('cancelModal').hidden = true;
+  _cancelBookingId = null;
+  _cancelSlotTime  = null;
+});
+
+document.getElementById('confirmCancelBtn').addEventListener('click', async () => {
+  const reason = document.getElementById('cancelReason').value;
+  const notes  = document.getElementById('cancelNotes').value.trim();
+  const errEl  = document.getElementById('cancelModalError');
+  const btn    = document.getElementById('confirmCancelBtn');
+
+  if (!reason) { errEl.textContent = 'Please select a reason.'; errEl.hidden = false; return; }
+
+  btn.disabled = true; btn.textContent = 'Cancelling…';
+
+  const { data: updated, error } = await db.from('bookings').update({
+    status: 'cancelled',
+    cancelled_by: currentUser.email,
+    cancel_reason: reason,
+    cancel_notes: notes || null,
+  }).eq('id', _cancelBookingId).gt('slot_time', new Date().toISOString()).select('id');
+
+  btn.disabled = false; btn.textContent = 'Confirm Cancellation';
+
+  if (error) { errEl.textContent = error.message; errEl.hidden = false; return; }
+  if (!updated || updated.length === 0) {
+    errEl.textContent = 'This tee time has already passed and cannot be cancelled.';
+    errEl.hidden = false;
+    return;
+  }
+
+  document.getElementById('cancelModal').hidden = true;
+  _cancelBookingId = null;
+  _cancelSlotTime  = null;
+  loadBookings();
+});
 
 document.querySelectorAll('#tabBookings .filter-btn').forEach(btn => {
   btn.addEventListener('click', () => {

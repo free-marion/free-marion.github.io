@@ -121,6 +121,8 @@ body {
   cursor: pointer;
 }
 .filter-btn--active { background: var(--green); color: #fff; border-color: var(--green); }
+.filter-btn--ghost { font-size: 0.72rem; opacity: 0.5; border-style: dashed; margin-left: auto; }
+.filter-btn--ghost.filter-btn--active { opacity: 1; background: #666; border-color: #666; border-style: solid; }
 
 .data-card {
   background: var(--surface);
@@ -133,6 +135,44 @@ body {
   gap: 0.5rem;
 }
 .data-card--muted { opacity: 0.5; }
+.data-card--past  { opacity: 0.7; border-left: 3px solid #c8b896; }
+
+.bookings-divider {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  padding: 0.5rem 0 0.25rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+.modal-card {
+  background: #fff;
+  border-radius: 10px;
+  padding: 1.5rem;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+}
+.modal-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.1rem;
+  color: #1C3320;
+  margin-bottom: 0.5rem;
+}
 .data-card__header { display: flex; justify-content: space-between; align-items: flex-start; gap: 0.5rem; flex-wrap: wrap; }
 .data-card__title  { font-weight: 600; font-size: 0.95rem; }
 .data-card__badge  { font-size: 0.75rem; font-family: monospace; color: var(--text-muted); }
