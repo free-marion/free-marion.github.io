@@ -12,8 +12,9 @@ const { createClient } = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_ANON, {
   auth: { persistSession: false }  // never cache sessions — always require fresh login
 });
-let currentUser = null;
-let currentRole  = 'viewer'; // admin | staff | viewer
+let currentUser    = null;
+let currentSession = null;
+let currentRole    = 'viewer'; // admin | staff | viewer
 
 function isAdmin()  { return currentRole === 'admin'; }
 function isStaff()  { return currentRole === 'admin' || currentRole === 'staff'; }
@@ -24,7 +25,8 @@ function canEdit()  { return currentRole === 'admin' || currentRole === 'staff';
 // ============================================
 
 db.auth.onAuthStateChange(async (event, session) => {
-  currentUser = session?.user ?? null;
+  currentUser    = session?.user ?? null;
+  currentSession = session ?? null;
   if (currentUser) {
     // Invite, magic link, or password recovery — prompt user to set a permanent password
     if (_initialHash.includes('type=invite') || _initialHash.includes('type=magiclink') || _initialHash.includes('type=recovery')) {
@@ -688,12 +690,11 @@ document.getElementById('saveUserBtn').addEventListener('click', async () => {
   btn.disabled = true;
   btn.textContent = 'Sending invite…';
 
-  const { data: { session } } = await db.auth.getSession();
   const res = await fetch(`${SUPABASE_URL}/functions/v1/invite-user`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${session.access_token}`,
+      'Authorization': `Bearer ${currentSession.access_token}`,
       'apikey': SUPABASE_ANON,
     },
     body: JSON.stringify({ name, email, role }),
