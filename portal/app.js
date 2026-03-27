@@ -182,6 +182,7 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
     if (btn.dataset.tab === 'users')       loadUsers();
     if (btn.dataset.tab === 'tournaments') loadTournaments();
     if (btn.dataset.tab === 'docs')        loadDocs();
+    if (btn.dataset.tab === 'members')     loadMembers();
   });
 });
 
@@ -534,6 +535,60 @@ document.querySelectorAll('#tabEggs .filter-btn').forEach(btn => {
     btn.classList.add('filter-btn--active');
     eggsFilter = btn.dataset.filter;
     loadEggs();
+  });
+});
+
+// ============================================
+// MEMBERSHIP APPLICATIONS
+// ============================================
+
+let membersFilter = 'new';
+
+async function loadMembers() {
+  let q = db.from('membership_applications').select('*').order('created_at', { ascending: false });
+  if (membersFilter === 'new') q = q.eq('status', 'new');
+  const { data, error } = await q;
+  if (error) { console.error(error); return; }
+  renderMembers(data || []);
+}
+
+function renderMembers(rows) {
+  const list  = document.getElementById('membersList');
+  const empty = document.getElementById('membersEmpty');
+  list.innerHTML = '';
+  if (!rows.length) { empty.hidden = false; return; }
+  empty.hidden = true;
+  rows.forEach(r => {
+    const card = document.createElement('div');
+    card.className = 'data-card';
+    card.innerHTML = `
+      <div class="data-card__header">
+        <span class="data-card__title">${esc(r.name)}</span>
+        <span class="data-card__badge">${fmtDate(r.created_at)}</span>
+      </div>
+      <div class="data-card__body">
+        <span>${esc(r.phone)}${r.email ? ' · ' + esc(r.email) : ''}</span>
+        ${r.membership_type ? `<span>Interest: ${esc(r.membership_type)}</span>` : ''}
+        ${r.notes ? `<span class="data-card__notes">${esc(r.notes)}</span>` : ''}
+      </div>
+      <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+        ${r.status === 'new' ? `<button class="btn btn--primary btn--sm" data-contact="${r.id}">Mark Contacted</button>` : `<span class="tag" style="color:#2e7d32;font-size:0.78rem;font-weight:600;text-transform:uppercase;">Contacted</span>`}
+      </div>
+    `;
+    card.querySelector('[data-contact]')?.addEventListener('click', async () => {
+      await db.from('membership_applications').update({ status: 'contacted' }).eq('id', r.id);
+      loadMembers();
+    });
+    list.appendChild(card);
+  });
+}
+
+document.querySelectorAll('#tabMembers .filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#tabMembers .filter-btn').forEach(b => b.classList.remove('filter-btn--active'));
+    btn.classList.add('filter-btn--active');
+    membersFilter = btn.dataset.filter;
+    loadMembers();
   });
 });
 
