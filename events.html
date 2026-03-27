@@ -775,7 +775,7 @@
         <div class="event-detail__badges">
           <span class="badge badge--${t.type}">${t.type === 'team' ? '👥 Team' : '🏌️ Individual'}${t.type === 'team' && t.team_size ? ' · ' + t.team_size + ' players' : ''}</span>
           ${t.format   ? `<span class="badge badge--format">${esc(t.format)}</span>` : ''}
-          ${t.entry_fee ? `<span class="badge badge--fee">$${parseFloat(t.entry_fee).toFixed(0)} entry</span>` : ''}
+          ${t.entry_fee ? `<span class="badge badge--fee">$${parseFloat(t.entry_fee).toFixed(0)} entry — collected at the Clubhouse</span>` : ''}
         </div>
         ${slotsHtml}
         ${t.description ? `<p class="event-detail__desc">${esc(t.description)}</p>` : ''}
