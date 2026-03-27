@@ -343,6 +343,8 @@ function buildBookingCard(b) {
   const card = document.createElement('div');
   card.className = 'data-card' + (isCancelled ? ' data-card--muted' : '') + (isPast && !isCancelled ? ' data-card--past' : '');
 
+  const isPaid = b.payment_status === 'paid';
+
   let actionHtml = '';
   if (isCancelled) {
     actionHtml = `
@@ -350,10 +352,16 @@ function buildBookingCard(b) {
         <span class="tag tag--cancelled">Cancelled</span>
         ${b.cancel_reason ? `<span style="font-size:0.78rem;color:#888;">${esc(b.cancel_reason)}${b.cancel_notes ? ' — ' + esc(b.cancel_notes) : ''}${b.cancelled_by ? ' · by ' + esc(b.cancelled_by) : ''}</span>` : ''}
       </div>`;
-  } else if (isPast) {
-    actionHtml = `<span class="tag" style="background:#f0f0f0;color:#999;font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;">Completed</span>`;
+  } else if (isPaid) {
+    actionHtml = `<span class="tag" style="background:#d4edda;color:#1a6630;font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;">Paid · ${esc(b.payment_method)}</span>`;
   } else if (isStaff()) {
-    actionHtml = `<button class="btn btn--ghost btn--sm" data-cancel="${b.id}" style="color:#a00;">Cancel Booking</button>`;
+    actionHtml = `
+      <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+        <button class="btn btn--primary btn--sm" data-pay="${b.id}">Mark Paid</button>
+        <button class="btn btn--ghost btn--sm" data-cancel="${b.id}" style="color:#a00;">Cancel</button>
+      </div>`;
+  } else {
+    actionHtml = isPast ? `<span class="tag" style="background:#f0f0f0;color:#999;font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;">Completed</span>` : '';
   }
 
   card.innerHTML = `
@@ -373,8 +381,52 @@ function buildBookingCard(b) {
     openCancelModal(b.id, b.name, b.slot_time);
   });
 
+  card.querySelector('[data-pay]')?.addEventListener('click', () => {
+    openPayModal(b.id, b.name, b.slot_time);
+  });
+
   return card;
 }
+
+let _payBookingId = null;
+
+function openPayModal(bookingId, name, slotTime) {
+  _payBookingId = bookingId;
+  document.getElementById('payModalName').textContent = `${name} — ${fmtDateTime(slotTime)}`;
+  document.getElementById('payMethod').value = '';
+  document.getElementById('payModalError').hidden = true;
+  document.getElementById('payModal').hidden = false;
+}
+
+document.getElementById('payModalClose').addEventListener('click', () => {
+  document.getElementById('payModal').hidden = true;
+  _payBookingId = null;
+});
+
+document.getElementById('confirmPayBtn').addEventListener('click', async () => {
+  const method = document.getElementById('payMethod').value;
+  const errEl  = document.getElementById('payModalError');
+  const btn    = document.getElementById('confirmPayBtn');
+
+  if (!method) { errEl.textContent = 'Please select a payment method.'; errEl.hidden = false; return; }
+
+  btn.disabled = true; btn.textContent = 'Saving…';
+
+  const { error } = await db.from('bookings').update({
+    payment_status: 'paid',
+    payment_method: method,
+    paid_by: currentUser.email,
+    paid_at: new Date().toISOString(),
+  }).eq('id', _payBookingId);
+
+  btn.disabled = false; btn.textContent = 'Confirm Payment';
+
+  if (error) { errEl.textContent = error.message; errEl.hidden = false; return; }
+
+  document.getElementById('payModal').hidden = true;
+  _payBookingId = null;
+  loadBookings();
+});
 
 function openCancelModal(bookingId, name, slotTime) {
   _cancelBookingId = bookingId;

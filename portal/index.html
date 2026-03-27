@@ -244,8 +244,30 @@
   </div>
 </div>
 
+<!-- PAY BOOKING MODAL -->
+<div id="payModal" class="modal-overlay" hidden>
+  <div class="modal-card">
+    <h3 class="modal-title">Mark as Paid</h3>
+    <p id="payModalName" style="font-size:0.88rem;color:#6a5a3a;margin-bottom:1rem;"></p>
+    <div class="field">
+      <label>Payment Method *</label>
+      <select id="payMethod" style="font-family:inherit;padding:0.55rem 0.75rem;border:1px solid #d4c8b0;border-radius:5px;width:100%;font-size:0.95rem;">
+        <option value="">Select…</option>
+        <option value="Cash">Cash</option>
+        <option value="Card">Card</option>
+        <option value="Tab">Tab</option>
+      </select>
+    </div>
+    <p id="payModalError" class="error-msg" hidden></p>
+    <div class="inline-form__actions" style="margin-top:0.5rem;">
+      <button id="confirmPayBtn" class="btn btn--primary btn--sm">Confirm Payment</button>
+      <button id="payModalClose" class="btn btn--ghost btn--sm">Go Back</button>
+    </div>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="app.js?v=24"></script>
+<script src="app.js?v=25"></script>
 <script>
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.getRegistrations().then(regs => regs.forEach(r => r.unregister()));
