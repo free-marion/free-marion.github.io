@@ -691,6 +691,7 @@ document.getElementById('saveUserBtn').addEventListener('click', async () => {
   btn.disabled = true;
   btn.textContent = 'Sending invite…';
 
+  console.log('currentSession token:', currentSession?.access_token?.slice(0, 30));
   const res = await fetch(`${SUPABASE_URL}/functions/v1/invite-user`, {
     method: 'POST',
     headers: {
