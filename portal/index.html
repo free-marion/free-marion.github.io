@@ -14,7 +14,7 @@
   <meta name="theme-color" content="#1C3320">
   <title>Cherrywood Portal</title>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Lora:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=5">
+  <link rel="stylesheet" href="style.css?v=6">
 </head>
 <body>
 
@@ -83,14 +83,16 @@
     </div>
   </header>
 
-  <nav class="tab-nav">
+  <div class="app-body">
+  <nav class="sidebar">
     <button class="tab-btn tab-btn--active" data-tab="vto">V/TO</button>
     <button class="tab-btn" data-tab="bookings">Bookings</button>
     <button class="tab-btn" data-tab="eggs">Egg Orders</button>
     <button class="tab-btn" data-tab="tournaments">Tournaments</button>
-    <button class="tab-btn" data-tab="docs">Documents</button>
+    <button class="tab-btn" data-tab="docs">Process Library</button>
     <button class="tab-btn" data-tab="users">Users</button>
   </nav>
+  <div class="content-area">
 
   <!-- V/TO -->
   <section id="tabVto" class="tab-panel tab-panel--active">
@@ -177,16 +179,78 @@
     </div>
   </section>
 
-  <!-- DOCUMENTS -->
+  <!-- PROCESS LIBRARY -->
   <section id="tabDocs" class="tab-panel" hidden>
-    <div class="panel-header"><h2 class="panel-title">Document Vault</h2></div>
-    <div class="docs-card">
-      <div class="docs-icon">📁</div>
-      <h3>Cherrywood Shared Drive</h3>
-      <p>All company documents, forms, and resources.</p>
+    <div class="panel-header"><h2 class="panel-title">Process Library</h2></div>
+
+    <div class="drive-banner">
+      <div>
+        <h3>📁 Cherrywood Shared Drive</h3>
+        <p>Contracts, forms, photos, and all company files in one place.</p>
+      </div>
       <a href="https://drive.google.com/drive/folders/1dEpiEXbIOwgCCM1ZdUCACBpZyg_jLpz3?usp=drive_link"
-         target="_blank" class="btn btn--primary">Open Google Drive →</a>
+         target="_blank" class="btn">Open Google Drive →</a>
     </div>
+
+    <h3 class="lib-heading">Standard Operating Procedures</h3>
+
+    <div class="lib-category">
+      <div class="lib-category__title">🌿 Greens &amp; Course Care</div>
+      <div class="lib-item"><span class="lib-badge lib-badge--doc">DOC</span>Morning Course Setup Checklist<span class="lib-coming">Coming soon</span></div>
+      <div class="lib-item"><span class="lib-badge lib-badge--doc">DOC</span>Mowing Heights &amp; Seasonal Schedule<span class="lib-coming">Coming soon</span></div>
+      <div class="lib-item"><span class="lib-badge lib-badge--video">▶ Video</span>Irrigation System: Daily Operation<span class="lib-coming">Coming soon</span></div>
+      <div class="lib-item"><span class="lib-badge lib-badge--doc">DOC</span>Bunker Raking &amp; Sand Maintenance<span class="lib-coming">Coming soon</span></div>
+      <div class="lib-item"><span class="lib-badge lib-badge--video">▶ Video</span>Equipment Cleaning &amp; End-of-Day Storage<span class="lib-coming">Coming soon</span></div>
+      <div class="lib-item"><span class="lib-badge lib-badge--doc">DOC</span>Fertilization &amp; Pest Management Log<span class="lib-coming">Coming soon</span></div>
+    </div>
+
+    <div class="lib-category">
+      <div class="lib-category__title">🏌️ Pro Shop &amp; Tee Times</div>
+      <div class="lib-item"><span class="lib-badge lib-badge--doc">DOC</span>Opening Procedures: Pro Shop<span class="lib-coming">Coming soon</span></div>
+      <div class="lib-item"><span class="lib-badge lib-badge--doc">DOC</span>Tee Time Booking &amp; Cancellation Policy<span class="lib-coming">Coming soon</span></div>
+      <div class="lib-item"><span class="lib-badge lib-badge--video">▶ Video</span>Golf Cart Pre-Ride Inspection<span class="lib-coming">Coming soon</span></div>
+      <div class="lib-item"><span class="lib-badge lib-badge--doc">DOC</span>Cart Barn End-of-Day Procedures<span class="lib-coming">Coming soon</span></div>
+      <div class="lib-item"><span class="lib-badge lib-badge--doc">DOC</span>Rental Club Inventory &amp; Checkout<span class="lib-coming">Coming soon</span></div>
+    </div>
+
+    <div class="lib-category">
+      <div class="lib-category__title">🍽️ Clubhouse &amp; Food Service</div>
+      <div class="lib-item"><span class="lib-badge lib-badge--doc">DOC</span>Clubhouse Opening &amp; Closing Checklist<span class="lib-coming">Coming soon</span></div>
+      <div class="lib-item"><span class="lib-badge lib-badge--video">▶ Video</span>Food Handler Safety &amp; Sanitation<span class="lib-coming">Coming soon</span></div>
+      <div class="lib-item"><span class="lib-badge lib-badge--doc">DOC</span>Egg Order: Pick, Pack &amp; Pickup Flow<span class="lib-coming">Coming soon</span></div>
+      <div class="lib-item"><span class="lib-badge lib-badge--doc">DOC</span>Beverage Cart Stocking &amp; End-of-Day<span class="lib-coming">Coming soon</span></div>
+      <div class="lib-item"><span class="lib-badge lib-badge--doc">DOC</span>Cooler &amp; Refrigeration Temperature Log<span class="lib-coming">Coming soon</span></div>
+    </div>
+
+    <div class="lib-category">
+      <div class="lib-category__title">💰 Finance &amp; Admin</div>
+      <div class="lib-item"><span class="lib-badge lib-badge--video">▶ Video</span>Daily Cash Drawer Reconciliation<span class="lib-coming">Coming soon</span></div>
+      <div class="lib-item"><span class="lib-badge lib-badge--doc">DOC</span>End-of-Day Closeout &amp; Bank Deposit<span class="lib-coming">Coming soon</span></div>
+      <div class="lib-item"><span class="lib-badge lib-badge--doc">DOC</span>Refund &amp; Cancellation Policy<span class="lib-coming">Coming soon</span></div>
+      <div class="lib-item"><span class="lib-badge lib-badge--doc">DOC</span>Vendor Invoice Processing<span class="lib-coming">Coming soon</span></div>
+      <div class="lib-item"><span class="lib-badge lib-badge--doc">DOC</span>Monthly Inventory Count Sheet<span class="lib-coming">Coming soon</span></div>
+    </div>
+
+    <div class="lib-category">
+      <div class="lib-category__title">🤝 Guest Experience</div>
+      <div class="lib-item"><span class="lib-badge lib-badge--video">▶ Video</span>Welcoming Guests: First Impressions<span class="lib-coming">Coming soon</span></div>
+      <div class="lib-item"><span class="lib-badge lib-badge--doc">DOC</span>Handling Guest Complaints<span class="lib-coming">Coming soon</span></div>
+      <div class="lib-item"><span class="lib-badge lib-badge--doc">DOC</span>Pace of Play Management<span class="lib-coming">Coming soon</span></div>
+      <div class="lib-item"><span class="lib-badge lib-badge--doc">DOC</span>Tournament Day Guest Flow<span class="lib-coming">Coming soon</span></div>
+    </div>
+
+    <div class="lib-category">
+      <div class="lib-category__title">👥 HR &amp; Staff</div>
+      <div class="lib-item"><span class="lib-badge lib-badge--doc">DOC</span>New Staff Onboarding Checklist<span class="lib-coming">Coming soon</span></div>
+      <div class="lib-item"><span class="lib-badge lib-badge--doc">DOC</span>Scheduling &amp; Time-Off Requests<span class="lib-coming">Coming soon</span></div>
+      <div class="lib-item"><span class="lib-badge lib-badge--doc">DOC</span>Incident &amp; Injury Reporting<span class="lib-coming">Coming soon</span></div>
+      <div class="lib-item"><span class="lib-badge lib-badge--doc">DOC</span>Dress Code &amp; Conduct Standards<span class="lib-coming">Coming soon</span></div>
+      <div class="lib-item"><span class="lib-badge lib-badge--video">▶ Video</span>Performance Review: How It Works<span class="lib-coming">Coming soon</span></div>
+    </div>
+
+    <h3 class="lib-heading" style="margin-top:2.5rem;">Team Training Tracks</h3>
+    <p style="font-size:0.88rem;color:var(--text-muted);margin-bottom:1.1rem;">Each team member's assigned learning track. Full build-out coming — click to preview.</p>
+    <div id="trainingList"></div>
   </section>
 
   <!-- USERS -->
@@ -213,6 +277,8 @@
     <p id="usersEmpty" class="empty-msg" hidden>No users found.</p>
   </section>
 
+  </div><!-- /content-area -->
+  </div><!-- /app-body -->
 </div><!-- /appShell -->
 
 <!-- CANCEL BOOKING MODAL -->
@@ -267,7 +333,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="app.js?v=25"></script>
+<script src="app.js?v=26"></script>
 <script>
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.getRegistrations().then(regs => regs.forEach(r => r.unregister()));

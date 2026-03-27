@@ -181,6 +181,7 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
     if (btn.dataset.tab === 'eggs')     loadEggs();
     if (btn.dataset.tab === 'users')       loadUsers();
     if (btn.dataset.tab === 'tournaments') loadTournaments();
+    if (btn.dataset.tab === 'docs')        loadDocs();
   });
 });
 
@@ -538,6 +539,35 @@ document.querySelectorAll('#tabEggs .filter-btn').forEach(btn => {
     loadEggs();
   });
 });
+
+// ============================================
+// PROCESS LIBRARY
+// ============================================
+
+const TRACK_MAP = {
+  admin:  { name: 'Full Certification Track',  modules: 6 },
+  staff:  { name: 'Staff Operations Track',    modules: 4 },
+  viewer: { name: 'Guest Services Track',       modules: 2 },
+};
+
+async function loadDocs() {
+  const { data } = await db.from('profiles').select('id, name, email, role').order('name');
+  const list = document.getElementById('trainingList');
+  if (!list) return;
+  const users = data || [];
+  if (!users.length) { list.innerHTML = '<p class="empty-msg">No team members found.</p>'; return; }
+  list.innerHTML = users.map(u => {
+    const track = TRACK_MAP[u.role] || { name: 'General Track', modules: 1 };
+    return `
+      <div class="training-card">
+        <div class="training-card__info">
+          <span class="training-card__name">${esc(u.name || u.email)}</span>
+          <span class="training-card__track">${track.name} · ${track.modules} modules</span>
+        </div>
+        <button class="btn btn--ghost btn--sm training-card__prog" style="cursor:default;opacity:0.5;" disabled>View Track →</button>
+      </div>`;
+  }).join('');
+}
 
 // ============================================
 // COURSE STATUS
