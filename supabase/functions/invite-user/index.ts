@@ -42,7 +42,9 @@ Deno.serve(async (req) => {
       Deno.env.get('SERVICE_ROLE_KEY')!
     );
 
-    const { data: inviteData, error: inviteError } = await adminClient.auth.admin.inviteUserByEmail(email);
+    const { data: inviteData, error: inviteError } = await adminClient.auth.admin.inviteUserByEmail(email, {
+      redirectTo: 'https://free-marion.github.io/portal/',
+    });
     if (inviteError) throw inviteError;
 
     const userId = inviteData.user.id;

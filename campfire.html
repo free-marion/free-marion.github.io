@@ -1,0 +1,1208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Campfire | Cherrywood Farm & Golf Club</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+  <style>
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --green:    #004331;
+      --bark:     #002a1f;
+      --gold:     #d7aa2b;
+      --gold-dim: #a07820;
+      --ember:    #c0521a;
+      --cream:    #F6F1E7;
+      --ink:      #1a1008;
+      --serif:    'Playfair Display', Georgia, serif;
+      --body:     'Lora', Georgia, serif;
+    }
+
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--body); color: var(--ink); background: #0a0a08; overflow-x: hidden; }
+
+    /* =====================
+       LOCK SCREEN
+       ===================== */
+
+    #lockScreen {
+      position: fixed; inset: 0; z-index: 9999;
+      background: #070705;
+      display: flex; align-items: center; justify-content: center;
+      flex-direction: column;
+      transition: opacity 0.6s ease;
+    }
+
+    /* Stars background */
+    #lockScreen::before {
+      content: '';
+      position: absolute; inset: 0;
+      background-image:
+        radial-gradient(1px 1px at 10% 15%, rgba(255,255,220,0.7) 0%, transparent 100%),
+        radial-gradient(1px 1px at 25% 40%, rgba(255,255,220,0.5) 0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 40% 8%, rgba(255,255,220,0.8) 0%, transparent 100%),
+        radial-gradient(1px 1px at 55% 30%, rgba(255,255,220,0.4) 0%, transparent 100%),
+        radial-gradient(1px 1px at 70% 18%, rgba(255,255,220,0.6) 0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 82% 45%, rgba(255,255,220,0.5) 0%, transparent 100%),
+        radial-gradient(1px 1px at 91% 12%, rgba(255,255,220,0.7) 0%, transparent 100%),
+        radial-gradient(1px 1px at 15% 65%, rgba(255,255,220,0.4) 0%, transparent 100%),
+        radial-gradient(1px 1px at 60% 70%, rgba(255,255,220,0.5) 0%, transparent 100%),
+        radial-gradient(1px 1px at 35% 82%, rgba(255,255,220,0.3) 0%, transparent 100%),
+        radial-gradient(1px 1px at 78% 78%, rgba(255,255,220,0.6) 0%, transparent 100%),
+        radial-gradient(1px 1px at 48% 55%, rgba(255,255,220,0.4) 0%, transparent 100%),
+        radial-gradient(1px 1px at 5% 88%, rgba(255,255,220,0.5) 0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 93% 90%, rgba(255,255,220,0.6) 0%, transparent 100%);
+    }
+
+    /* Ground glow from fire */
+    #lockScreen::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 50%; transform: translateX(-50%);
+      width: 500px; height: 300px;
+      background: radial-gradient(ellipse at bottom, rgba(180,70,10,0.25) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .lock-content {
+      position: relative; z-index: 2;
+      text-align: center;
+      padding: 2rem;
+      max-width: 380px;
+      width: 100%;
+    }
+
+    /* CSS Flame */
+    .flame-wrap {
+      position: relative;
+      width: 60px; height: 80px;
+      margin: 0 auto 1.5rem;
+    }
+
+    .flame {
+      position: absolute;
+      bottom: 0; left: 50%; transform: translateX(-50%);
+      width: 28px; height: 55px;
+      background: linear-gradient(to top, #f5a623, #e05c00, #c0391a);
+      border-radius: 50% 50% 20% 20% / 60% 60% 20% 20%;
+      animation: flicker 1.8s ease-in-out infinite;
+      filter: blur(1px);
+      opacity: 0.95;
+    }
+    .flame--2 {
+      width: 18px; height: 40px;
+      left: 30%; bottom: 4px;
+      background: linear-gradient(to top, #ffd06e, #f5a623, #e06020);
+      animation: flicker 1.3s ease-in-out infinite 0.2s;
+      filter: blur(0.5px);
+    }
+    .flame--3 {
+      width: 14px; height: 30px;
+      left: 58%; bottom: 2px;
+      background: linear-gradient(to top, #fff0aa, #ffd06e, #f5a623);
+      animation: flicker 1.6s ease-in-out infinite 0.5s;
+      filter: blur(0.5px);
+    }
+
+    @keyframes flicker {
+      0%, 100% { transform: translateX(-50%) scaleX(1) scaleY(1) rotate(-1deg); }
+      20%       { transform: translateX(-50%) scaleX(0.95) scaleY(1.04) rotate(1deg); }
+      40%       { transform: translateX(-50%) scaleX(1.03) scaleY(0.97) rotate(-2deg); }
+      60%       { transform: translateX(-50%) scaleX(0.97) scaleY(1.02) rotate(1deg); }
+      80%       { transform: translateX(-50%) scaleX(1.01) scaleY(0.99) rotate(-1deg); }
+    }
+
+    .lock-eyebrow {
+      font-family: var(--body);
+      font-size: 0.72rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(215,170,43,0.6);
+      margin-bottom: 0.5rem;
+    }
+
+    .lock-title {
+      font-family: var(--serif);
+      font-size: clamp(2.4rem, 8vw, 3.2rem);
+      color: var(--cream);
+      font-weight: 400;
+      line-height: 1.05;
+      margin-bottom: 0.75rem;
+      letter-spacing: 0.02em;
+    }
+
+    .lock-coming {
+      font-family: var(--body);
+      font-style: italic;
+      color: rgba(246,241,231,0.5);
+      font-size: 0.95rem;
+      margin-bottom: 2rem;
+    }
+
+    .lock-form {
+      display: flex;
+      gap: 0;
+      border: 1px solid rgba(215,170,43,0.3);
+      border-radius: 6px;
+      overflow: hidden;
+      background: rgba(255,255,255,0.04);
+    }
+
+    #lockInput {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      padding: 0.75rem 1rem;
+      color: var(--cream);
+      font-family: var(--body);
+      font-size: 0.95rem;
+    }
+    #lockInput::placeholder { color: rgba(246,241,231,0.3); }
+
+    #lockBtn {
+      background: rgba(215,170,43,0.15);
+      border: none;
+      border-left: 1px solid rgba(215,170,43,0.3);
+      color: var(--gold);
+      font-family: var(--serif);
+      font-size: 0.88rem;
+      padding: 0.75rem 1.2rem;
+      cursor: pointer;
+      transition: background 0.2s;
+      letter-spacing: 0.05em;
+    }
+    #lockBtn:hover { background: rgba(215,170,43,0.28); }
+
+    .lock-error {
+      color: #e07060;
+      font-size: 0.82rem;
+      margin-top: 0.75rem;
+      min-height: 1.2em;
+      font-family: var(--body);
+    }
+
+    /* =====================
+       MAIN CONTENT
+       ===================== */
+
+    #mainContent {
+      background: var(--cream);
+      opacity: 0;
+      transition: opacity 0.6s ease;
+    }
+
+    /* NAV */
+    .cf-nav {
+      position: fixed; top: 0; left: 0; right: 0;
+      z-index: 500;
+      background: rgba(0,27,18,0.88);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid rgba(215,170,43,0.15);
+    }
+    .cf-nav-inner {
+      max-width: 1100px; margin: 0 auto;
+      padding: 0 1.5rem;
+      height: 58px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .cf-nav-back {
+      color: rgba(246,241,231,0.55);
+      font-size: 0.82rem;
+      text-decoration: none;
+      font-family: var(--body);
+      letter-spacing: 0.02em;
+      transition: color 0.2s;
+    }
+    .cf-nav-back:hover { color: var(--cream); }
+    .cf-nav-title {
+      font-family: var(--serif);
+      color: var(--cream);
+      font-size: 1.15rem;
+      letter-spacing: 0.05em;
+    }
+    .cf-nav-cta {
+      background: rgba(215,170,43,0.15);
+      border: 1px solid rgba(215,170,43,0.4);
+      color: var(--gold);
+      padding: 0.4rem 1rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      font-family: var(--body);
+      text-decoration: none;
+      letter-spacing: 0.04em;
+      transition: background 0.2s;
+    }
+    .cf-nav-cta:hover { background: rgba(215,170,43,0.28); }
+
+    /* HERO */
+    .cf-hero {
+      position: relative;
+      height: 100vh; min-height: 580px;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+    }
+    .cf-hero-bg {
+      position: absolute; inset: 0;
+      background:
+        url('https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=1600&q=80')
+        center center / cover no-repeat;
+    }
+    .cf-hero-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(
+        to bottom,
+        rgba(2,12,7,0.55) 0%,
+        rgba(2,12,7,0.35) 40%,
+        rgba(2,12,7,0.72) 100%
+      );
+    }
+    .cf-hero-content {
+      position: relative; z-index: 2;
+      text-align: center;
+      padding: 0 1.5rem;
+      max-width: 700px;
+    }
+    .cf-eyebrow {
+      font-family: var(--body);
+      font-size: 0.72rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1rem;
+      display: block;
+    }
+    .cf-hero-title {
+      font-family: var(--serif);
+      font-size: clamp(3.2rem, 10vw, 6rem);
+      color: var(--cream);
+      font-weight: 400;
+      line-height: 1;
+      margin-bottom: 1rem;
+      letter-spacing: 0.02em;
+      text-shadow: 0 2px 20px rgba(0,0,0,0.4);
+    }
+    .cf-hero-sub {
+      font-family: var(--body);
+      font-style: italic;
+      color: rgba(246,241,231,0.8);
+      font-size: clamp(1rem, 2.5vw, 1.25rem);
+      margin-bottom: 2rem;
+      line-height: 1.5;
+    }
+    .cf-hero-scroll {
+      position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%);
+      color: rgba(246,241,231,0.4);
+      font-size: 1.5rem;
+      animation: bounce 2s ease-in-out infinite;
+    }
+    @keyframes bounce {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50%       { transform: translateX(-50%) translateY(6px); }
+    }
+
+    /* BUTTONS */
+    .cf-btn {
+      display: inline-block;
+      padding: 0.8rem 2rem;
+      border-radius: 4px;
+      font-family: var(--body);
+      font-size: 0.88rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+    }
+    .cf-btn--primary {
+      background: var(--green);
+      color: var(--cream);
+    }
+    .cf-btn--primary:hover { background: #005540; }
+    .cf-btn--outline {
+      background: transparent;
+      border: 1px solid rgba(246,241,231,0.5);
+      color: var(--cream);
+    }
+    .cf-btn--outline:hover { border-color: var(--cream); background: rgba(246,241,231,0.08); }
+    .cf-btn--gold {
+      background: var(--gold);
+      color: var(--bark);
+      font-weight: 600;
+    }
+    .cf-btn--gold:hover { background: #c09820; }
+    .cf-btn--sm { padding: 0.55rem 1.2rem; font-size: 0.8rem; }
+
+    /* CONTAINER */
+    .cf-container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+
+    /* LABEL */
+    .cf-label {
+      display: block;
+      font-size: 0.7rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--gold-dim);
+      margin-bottom: 0.5rem;
+      font-family: var(--body);
+    }
+
+    /* SECTION HEADINGS */
+    .cf-intro h2, .cf-experience h2, .cf-features h2,
+    .cf-screenings h2, .cf-host h2 {
+      font-family: var(--serif);
+      font-size: clamp(1.8rem, 4vw, 2.6rem);
+      color: var(--bark);
+      font-weight: 400;
+      margin-bottom: 1.5rem;
+      line-height: 1.15;
+    }
+
+    /* INTRO */
+    .cf-intro {
+      background: var(--cream);
+      padding: 6rem 0;
+    }
+    .cf-intro-grid {
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 4rem;
+      align-items: center;
+    }
+    .cf-intro-text p {
+      font-size: 1.05rem;
+      line-height: 1.8;
+      color: #3a2a1a;
+      margin-bottom: 1rem;
+    }
+    .cf-intro-text p:last-of-type { margin-bottom: 0; }
+    .cf-intro-sig {
+      font-style: italic;
+      color: var(--gold-dim) !important;
+      font-size: 0.9rem !important;
+      margin-top: 1.5rem !important;
+    }
+    .cf-quote-card {
+      background: var(--bark);
+      border-radius: 10px;
+      padding: 2.5rem 2rem;
+      text-align: center;
+      position: relative;
+    }
+    .cf-quote-card blockquote {
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: 1.35rem;
+      color: var(--cream);
+      line-height: 1.5;
+    }
+    .cf-quote-fire {
+      font-size: 2rem;
+      margin-top: 1.5rem;
+    }
+
+    /* EXPERIENCE */
+    .cf-experience {
+      background: #0f1a12;
+      padding: 6rem 0;
+    }
+    .cf-experience .cf-label { color: rgba(215,170,43,0.6); }
+    .cf-experience h2 { color: var(--cream); }
+
+    .cf-tabs {
+      display: flex;
+      gap: 0;
+      border: 1px solid rgba(215,170,43,0.2);
+      border-radius: 6px;
+      overflow: hidden;
+      margin-bottom: 2rem;
+      width: fit-content;
+    }
+    .cf-tab {
+      background: transparent;
+      border: none;
+      border-right: 1px solid rgba(215,170,43,0.2);
+      color: rgba(246,241,231,0.5);
+      font-family: var(--serif);
+      font-size: 0.95rem;
+      padding: 0.65rem 1.5rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      letter-spacing: 0.04em;
+    }
+    .cf-tab:last-child { border-right: none; }
+    .cf-tab:hover { color: var(--cream); background: rgba(255,255,255,0.05); }
+    .cf-tab--active { background: rgba(215,170,43,0.15); color: var(--gold); }
+
+    .cf-panel {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      border-radius: 10px;
+      overflow: hidden;
+      min-height: 380px;
+    }
+    .cf-panel-img {
+      background-size: cover;
+      background-position: center;
+      min-height: 280px;
+    }
+    .lawn-img    { background-image: url('https://images.unsplash.com/photo-1501854140801-50d01698950b?auto=format&fit=crop&w=800&q=80'); }
+    .drivein-img { background-image: url('https://images.unsplash.com/photo-1454944338482-a69bb95894af?auto=format&fit=crop&w=800&q=80'); }
+    .fire-img    { background-image: url('https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&w=800&q=80'); }
+
+    .cf-panel-body {
+      background: #1a2a1e;
+      padding: 2.5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .cf-panel-body h3 {
+      font-family: var(--serif);
+      font-size: 1.8rem;
+      color: var(--cream);
+      font-weight: 400;
+      margin-bottom: 1rem;
+    }
+    .cf-panel-body p {
+      color: rgba(246,241,231,0.75);
+      line-height: 1.75;
+      font-size: 0.95rem;
+      margin-bottom: 1.25rem;
+    }
+    .cf-panel-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .cf-panel-list li {
+      font-size: 0.88rem;
+      color: rgba(246,241,231,0.6);
+      padding-left: 1.25rem;
+      position: relative;
+    }
+    .cf-panel-list li::before {
+      content: '—';
+      position: absolute;
+      left: 0;
+      color: var(--gold);
+    }
+
+    /* SLIDESHOW */
+    .cf-slideshow {
+      position: relative;
+      height: 520px;
+      overflow: hidden;
+    }
+    .cf-slide {
+      position: absolute; inset: 0;
+      background-size: cover;
+      background-position: center;
+      opacity: 0;
+      transition: opacity 0.9s ease;
+    }
+    .cf-slide.active { opacity: 1; }
+    .cf-slide-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.1) 50%, transparent 100%);
+    }
+    .cf-slide-caption {
+      position: absolute;
+      bottom: 4rem; left: 4rem;
+      color: var(--cream);
+    }
+    .cf-slide-caption h3 {
+      font-family: var(--serif);
+      font-size: 2rem;
+      font-weight: 400;
+      margin-bottom: 0.4rem;
+    }
+    .cf-slide-caption p {
+      font-style: italic;
+      color: rgba(246,241,231,0.7);
+      font-size: 0.95rem;
+    }
+    .cf-slide-prev, .cf-slide-next {
+      position: absolute;
+      top: 50%; transform: translateY(-50%);
+      background: rgba(0,0,0,0.35);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: rgba(255,255,255,0.8);
+      font-size: 2rem;
+      width: 50px; height: 50px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s;
+      z-index: 10;
+    }
+    .cf-slide-prev { left: 1.5rem; }
+    .cf-slide-next { right: 1.5rem; }
+    .cf-slide-prev:hover, .cf-slide-next:hover {
+      background: rgba(0,0,0,0.6);
+      color: #fff;
+    }
+    .cf-slide-dots {
+      position: absolute;
+      bottom: 1.5rem; left: 50%; transform: translateX(-50%);
+      display: flex; gap: 0.5rem;
+      z-index: 10;
+    }
+    .cf-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.35);
+      border: none; cursor: pointer;
+      transition: all 0.2s;
+      padding: 0;
+    }
+    .cf-dot--active { background: var(--gold); transform: scale(1.2); }
+
+    /* FEATURES */
+    .cf-features {
+      background: var(--cream);
+      padding: 6rem 0;
+    }
+    .cf-features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+    }
+    .cf-feature-card {
+      background: #fff;
+      border: 1px solid #e8dfc8;
+      border-radius: 8px;
+      padding: 1.75rem;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .cf-feature-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(0,27,18,0.1);
+    }
+    .cf-feature-icon {
+      font-size: 1.75rem;
+      margin-bottom: 0.75rem;
+    }
+    .cf-feature-card h4 {
+      font-family: var(--serif);
+      font-size: 1.1rem;
+      color: var(--bark);
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+    .cf-feature-card p {
+      font-size: 0.88rem;
+      line-height: 1.7;
+      color: #5a4a3a;
+    }
+
+    /* SCREENINGS */
+    .cf-screenings {
+      background: #0f1a12;
+      padding: 6rem 0;
+    }
+    .cf-screenings .cf-label { color: rgba(215,170,43,0.6); }
+    .cf-screenings h2 { color: var(--cream); }
+    .cf-screenings-sub {
+      color: rgba(246,241,231,0.55);
+      font-style: italic;
+      margin-bottom: 2.5rem;
+      font-size: 0.95rem;
+    }
+    .cf-screening-cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.25rem;
+      margin-bottom: 3rem;
+    }
+    .cf-screening-card {
+      border: 1px solid rgba(215,170,43,0.2);
+      border-radius: 8px;
+      overflow: hidden;
+      display: flex;
+    }
+    .cf-sc-date {
+      background: rgba(215,170,43,0.12);
+      padding: 1.25rem 1rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-width: 72px;
+      border-right: 1px solid rgba(215,170,43,0.2);
+    }
+    .cf-sc-month {
+      font-size: 0.68rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-family: var(--body);
+    }
+    .cf-sc-day {
+      font-family: var(--serif);
+      font-size: 1.8rem;
+      color: var(--cream);
+      line-height: 1;
+    }
+    .cf-sc-body {
+      padding: 1.25rem;
+    }
+    .cf-sc-body h4 {
+      font-family: var(--serif);
+      font-size: 1rem;
+      color: var(--cream);
+      font-weight: 400;
+      margin-bottom: 0.4rem;
+    }
+    .cf-sc-body p {
+      font-size: 0.82rem;
+      color: rgba(246,241,231,0.55);
+      line-height: 1.55;
+      margin-bottom: 0.6rem;
+    }
+    .cf-sc-tag {
+      font-size: 0.68rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      background: rgba(215,170,43,0.12);
+      color: var(--gold);
+      padding: 0.2rem 0.6rem;
+      border-radius: 3px;
+      font-family: var(--body);
+      border: 1px solid rgba(215,170,43,0.25);
+    }
+    .cf-notify-form {
+      text-align: center;
+      padding-top: 1rem;
+    }
+    .cf-notify-form > p {
+      color: rgba(246,241,231,0.5);
+      font-size: 0.9rem;
+      margin-bottom: 0.75rem;
+      font-style: italic;
+    }
+    .cf-notify-input-row {
+      display: flex;
+      gap: 0;
+      max-width: 380px;
+      margin: 0 auto;
+      border: 1px solid rgba(215,170,43,0.3);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    .cf-notify-input-row input {
+      flex: 1;
+      background: rgba(255,255,255,0.05);
+      border: none;
+      outline: none;
+      padding: 0.75rem 1rem;
+      color: var(--cream);
+      font-family: var(--body);
+      font-size: 0.9rem;
+    }
+    .cf-notify-input-row input::placeholder { color: rgba(246,241,231,0.3); }
+    .cf-notify-input-row button {
+      border-radius: 0;
+      border-left: 1px solid rgba(215,170,43,0.3);
+    }
+
+    /* ABOUT HOST */
+    .cf-host {
+      background: var(--cream);
+      padding: 6rem 0;
+    }
+    .cf-host-grid {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: 4rem;
+      align-items: center;
+    }
+    .cf-host-portrait {
+      aspect-ratio: 1;
+      border-radius: 8px;
+      overflow: hidden;
+      background: var(--bark);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .cf-host-portrait-inner { text-align: center; }
+    .cf-host-text p {
+      font-size: 1rem;
+      line-height: 1.8;
+      color: #3a2a1a;
+      margin-bottom: 1rem;
+    }
+
+    /* CTA / RESERVE */
+    .cf-reserve {
+      position: relative;
+      padding: 7rem 2rem;
+      text-align: center;
+      background:
+        url('https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?auto=format&fit=crop&w=1400&q=80')
+        center center / cover no-repeat;
+    }
+    .cf-reserve-overlay {
+      position: absolute; inset: 0;
+      background: rgba(0,20,10,0.72);
+    }
+    .cf-reserve .cf-container { position: relative; z-index: 2; }
+    .cf-reserve h2 {
+      font-family: var(--serif);
+      font-size: clamp(2rem, 5vw, 3rem);
+      color: var(--cream);
+      font-weight: 400;
+      margin-bottom: 0.75rem;
+    }
+    .cf-reserve p {
+      font-style: italic;
+      color: rgba(246,241,231,0.65);
+      font-size: 1.1rem;
+      margin-bottom: 2rem;
+    }
+
+    /* FOOTER */
+    .cf-footer {
+      background: var(--bark);
+      text-align: center;
+      padding: 2rem;
+      font-size: 0.82rem;
+      color: rgba(246,241,231,0.4);
+      font-family: var(--body);
+    }
+    .cf-footer a { color: rgba(246,241,231,0.55); text-decoration: none; }
+    .cf-footer a:hover { color: var(--cream); }
+
+    /* ANIMATIONS on scroll */
+    .fade-up {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .fade-up.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 900px) {
+      .cf-intro-grid { grid-template-columns: 1fr; }
+      .cf-quote-card { display: none; }
+      .cf-panel { grid-template-columns: 1fr; }
+      .cf-panel-img { min-height: 220px; }
+      .cf-features-grid { grid-template-columns: 1fr 1fr; }
+      .cf-screening-cards { grid-template-columns: 1fr; }
+      .cf-host-grid { grid-template-columns: 1fr; }
+      .cf-host-portrait { max-width: 200px; }
+    }
+    @media (max-width: 600px) {
+      .cf-features-grid { grid-template-columns: 1fr; }
+      .cf-tabs { flex-direction: column; width: 100%; }
+      .cf-tab { border-right: none; border-bottom: 1px solid rgba(215,170,43,0.2); }
+      .cf-tab:last-child { border-bottom: none; }
+      .cf-slide-caption { left: 1.5rem; bottom: 3.5rem; }
+      .cf-nav-back { display: none; }
+    }
+
+  </style>
+</head>
+<body>
+
+<!-- ========================
+     LOCK SCREEN
+     ======================== -->
+<div id="lockScreen">
+  <div class="lock-content">
+    <div class="flame-wrap">
+      <div class="flame"></div>
+      <div class="flame flame--2"></div>
+      <div class="flame flame--3"></div>
+    </div>
+    <p class="lock-eyebrow">Cherrywood Farm &amp; Golf Club</p>
+    <h1 class="lock-title">The Campfire</h1>
+    <p class="lock-coming">Something is coming to Cherrywood.</p>
+    <div class="lock-form">
+      <input type="password" id="lockInput" placeholder="Enter access code" autocomplete="off">
+      <button id="lockBtn">Enter</button>
+    </div>
+    <p id="lockError" class="lock-error"></p>
+  </div>
+</div>
+
+<!-- ========================
+     MAIN CONTENT
+     ======================== -->
+<div id="mainContent">
+
+  <!-- NAV -->
+  <nav class="cf-nav">
+    <div class="cf-nav-inner">
+      <a href="/" class="cf-nav-back">← Cherrywood</a>
+      <span class="cf-nav-title">The Campfire</span>
+      <a href="#reserve" class="cf-nav-cta">Reserve Your Spot</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="cf-hero">
+    <div class="cf-hero-bg"></div>
+    <div class="cf-hero-overlay"></div>
+    <div class="cf-hero-content">
+      <span class="cf-eyebrow">A New Experience at Cherrywood</span>
+      <h1 class="cf-hero-title">The Campfire</h1>
+      <p class="cf-hero-sub">Outdoor Cinema. Open Air. Under the Ozark Stars.</p>
+      <a href="#experience" class="cf-btn cf-btn--outline">Discover the Experience</a>
+    </div>
+    <div class="cf-hero-scroll">↓</div>
+  </section>
+
+  <!-- INTRO / VISION -->
+  <section class="cf-intro">
+    <div class="cf-container">
+      <div class="cf-intro-grid fade-up">
+        <div class="cf-intro-text">
+          <span class="cf-label">The Vision</span>
+          <h2>Film Belongs Outside.</h2>
+          <p>I've been watching movies my whole life. In living rooms, in theatres, on laptops. And I've been convinced for just as long that the best place to watch a great film isn't inside a building — it's out here. Under a wide open sky, with the smell of a fire in the air and the sound of nature between scenes.</p>
+          <p>The Campfire is that idea made real. A curated outdoor cinema experience at Cherrywood Farm &amp; Golf Club — where the screen is big, the sound is right, and the setting does most of the work. Come for the film. Stay for everything else.</p>
+          <p>This isn't just a movie night. It's a reason to gather. A reason to be outside. A reason to remember what it feels like to watch something that matters, with people you care about, under a sky full of stars.</p>
+          <p class="cf-intro-sig">— Preston Watts, Curator</p>
+        </div>
+        <div class="cf-intro-visual">
+          <div class="cf-quote-card">
+            <blockquote>"The best stories deserve the best setting."</blockquote>
+            <div class="cf-quote-fire">🔥</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EXPERIENCE TABS -->
+  <section class="cf-experience" id="experience">
+    <div class="cf-container">
+      <span class="cf-label">How You'll Watch</span>
+      <h2>Three Ways to Experience It</h2>
+      <div class="cf-tabs">
+        <button class="cf-tab cf-tab--active" data-tab="lawn">The Lawn</button>
+        <button class="cf-tab" data-tab="drivein">The Drive-In</button>
+        <button class="cf-tab" data-tab="fire">The Fire</button>
+      </div>
+      <div class="cf-tab-panels">
+
+        <div class="cf-panel cf-panel--active" data-panel="lawn">
+          <div class="cf-panel-img lawn-img"></div>
+          <div class="cf-panel-body">
+            <h3>The Lawn</h3>
+            <p>Spread a blanket. Set up a camp chair. Watch the Missouri sky turn from sunset gold to deep black while the screen fills with something worth seeing. This is how cinema was always meant to feel — unhurried, open, alive.</p>
+            <ul class="cf-panel-list">
+              <li>BYO blankets &amp; low-back chairs</li>
+              <li>Premium reserved lawn seating available</li>
+              <li>Concessions served on-site</li>
+              <li>Fire pits accessible between showings</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="cf-panel" data-panel="drivein" hidden>
+          <div class="cf-panel-img drivein-img"></div>
+          <div class="cf-panel-body">
+            <h3>The Drive-In</h3>
+            <p>Pull in. Roll down the windows. Tune to the FM frequency. Some nights call for the classic American experience — a windshield, a warm car, and a great film playing big across the field. The Campfire has you covered from behind the glass, too.</p>
+            <ul class="cf-panel-list">
+              <li>Dedicated drive-in parking lanes</li>
+              <li>FM audio broadcast to your car radio</li>
+              <li>Concession car service</li>
+              <li>Fully accessible for all mobility needs</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="cf-panel" data-panel="fire" hidden>
+          <div class="cf-panel-img fire-img"></div>
+          <div class="cf-panel-body">
+            <h3>The Fire</h3>
+            <p>The credits roll. The fire stays lit. Pull up a log and let the conversation go where it goes. Some of the best film discussions happen after the movie ends — and the Cherrywood night is long enough for all of them.</p>
+            <ul class="cf-panel-list">
+              <li>Communal fire pits open post-screening</li>
+              <li>Curated discussion prompts from Preston</li>
+              <li>S'mores &amp; warm drink service</li>
+              <li>Open until the embers say otherwise</li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDESHOW -->
+  <section class="cf-slideshow">
+    <div class="cf-slide active" style="background-image:url('https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=1600&q=80')">
+      <div class="cf-slide-overlay"></div>
+      <div class="cf-slide-caption">
+        <h3>The Screen</h3>
+        <p>30-foot inflatable cinema screen. Big enough to mean it.</p>
+      </div>
+    </div>
+    <div class="cf-slide" style="background-image:url('https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1600&q=80')">
+      <div class="cf-slide-overlay"></div>
+      <div class="cf-slide-caption">
+        <h3>The Crowd</h3>
+        <p>Intimate by design. The whole community, together under one sky.</p>
+      </div>
+    </div>
+    <div class="cf-slide" style="background-image:url('https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&w=1600&q=80')">
+      <div class="cf-slide-overlay"></div>
+      <div class="cf-slide-caption">
+        <h3>The Fire</h3>
+        <p>After the credits. Before you go. The night isn't over.</p>
+      </div>
+    </div>
+    <div class="cf-slide" style="background-image:url('https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?auto=format&fit=crop&w=1600&q=80')">
+      <div class="cf-slide-overlay"></div>
+      <div class="cf-slide-caption">
+        <h3>The Sky</h3>
+        <p>Fredericktown dark skies. Stars you forgot existed.</p>
+      </div>
+    </div>
+    <div class="cf-slide" style="background-image:url('https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1600&q=80')">
+      <div class="cf-slide-overlay"></div>
+      <div class="cf-slide-caption">
+        <h3>The Setting</h3>
+        <p>Rolling Ozark foothills. A backdrop money can't build.</p>
+      </div>
+    </div>
+    <button class="cf-slide-prev">&#8249;</button>
+    <button class="cf-slide-next">&#8250;</button>
+    <div class="cf-slide-dots"></div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="cf-features">
+    <div class="cf-container">
+      <span class="cf-label fade-up">What to Expect</span>
+      <h2 class="fade-up">Built for the Experience</h2>
+      <div class="cf-features-grid">
+        <div class="cf-feature-card fade-up">
+          <div class="cf-feature-icon">🎬</div>
+          <h4>Curated Film Selection</h4>
+          <p>Every film chosen for a reason. Classics, contemporary, and the occasional deep cut. Preston's picks — not an algorithm's.</p>
+        </div>
+        <div class="cf-feature-card fade-up">
+          <div class="cf-feature-icon">🔊</div>
+          <h4>Professional Audio</h4>
+          <p>Cinema-grade outdoor sound system plus FM broadcast for drive-in guests. You won't miss a line.</p>
+        </div>
+        <div class="cf-feature-card fade-up">
+          <div class="cf-feature-icon">🌿</div>
+          <h4>The Cherrywood Setting</h4>
+          <p>Set among the fields and trees of a working Ozark farm. No parking garages, no concrete. Just land, air, and sky.</p>
+        </div>
+        <div class="cf-feature-card fade-up">
+          <div class="cf-feature-icon">🚗</div>
+          <h4>Drive-In Lanes</h4>
+          <p>Dedicated drive-in rows with FM audio. Accessibility built in. Classic American evening, Cherrywood style.</p>
+        </div>
+        <div class="cf-feature-card fade-up">
+          <div class="cf-feature-icon">🔥</div>
+          <h4>Post-Show Fire Pits</h4>
+          <p>The night doesn't end at credits. The fire's already going — stick around as long as you want.</p>
+        </div>
+        <div class="cf-feature-card fade-up">
+          <div class="cf-feature-icon">🌽</div>
+          <h4>Farm Concessions</h4>
+          <p>Fresh popcorn, warm drinks, local goods. Everything from Cherrywood's own land where possible.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- UPCOMING SCREENINGS -->
+  <section class="cf-screenings" id="screenings">
+    <div class="cf-container">
+      <span class="cf-label">On the Schedule</span>
+      <h2>Upcoming Screenings</h2>
+      <p class="cf-screenings-sub">Opening season dates coming soon. Get on the list to be first to know.</p>
+      <div class="cf-screening-cards">
+        <div class="cf-screening-card fade-up">
+          <div class="cf-sc-date">
+            <span class="cf-sc-month">TBD</span>
+            <span class="cf-sc-day">—</span>
+          </div>
+          <div class="cf-sc-body">
+            <h4>Opening Night</h4>
+            <p>A film worthy of a first impression. The one that sets the tone for everything that follows.</p>
+            <span class="cf-sc-tag">All Ages</span>
+          </div>
+        </div>
+        <div class="cf-screening-card fade-up">
+          <div class="cf-sc-date">
+            <span class="cf-sc-month">TBD</span>
+            <span class="cf-sc-day">—</span>
+          </div>
+          <div class="cf-sc-body">
+            <h4>Family Night</h4>
+            <p>Bring the whole crew. Blankets, chairs, and something everyone can agree on for once.</p>
+            <span class="cf-sc-tag">Family</span>
+          </div>
+        </div>
+        <div class="cf-screening-card fade-up">
+          <div class="cf-sc-date">
+            <span class="cf-sc-month">TBD</span>
+            <span class="cf-sc-day">—</span>
+          </div>
+          <div class="cf-sc-body">
+            <h4>The Late Show</h4>
+            <p>One of Preston's personal favorites. An evening worth staying up for. Fire pits open after.</p>
+            <span class="cf-sc-tag">18+</span>
+          </div>
+        </div>
+      </div>
+      <div class="cf-notify-form">
+        <p>Get notified when dates are announced:</p>
+        <div class="cf-notify-input-row">
+          <input type="email" placeholder="your@email.com">
+          <button class="cf-btn cf-btn--gold">Notify Me</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT HOST -->
+  <section class="cf-host">
+    <div class="cf-container">
+      <div class="cf-host-grid fade-up">
+        <div class="cf-host-portrait">
+          <div class="cf-host-portrait-inner">
+            <span style="font-size:3.5rem;">🎥</span>
+            <p style="font-size:0.78rem;color:rgba(215,170,43,0.6);margin-top:0.75rem;font-family:var(--body);">Photo coming soon</p>
+          </div>
+        </div>
+        <div class="cf-host-text">
+          <span class="cf-label">Your Curator</span>
+          <h2>Preston Watts</h2>
+          <p>Preston has spent years thinking seriously about film — not just what's on screen, but why it matters, what it says, and what it does to the people watching. He brings that lens to The Campfire.</p>
+          <p>His philosophy is simple: a great film, in the right setting, watched with the right people, can change the way you see the world. The Campfire is his attempt to prove that, one screening at a time.</p>
+          <a href="https://www.youtube.com/@pswatts" target="_blank" class="cf-btn cf-btn--outline cf-btn--sm" style="margin-top:0.5rem;">Watch His Reviews →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RESERVE CTA -->
+  <section class="cf-reserve" id="reserve">
+    <div class="cf-reserve-overlay"></div>
+    <div class="cf-container">
+      <h2>Reserve Your Spot Under the Stars</h2>
+      <p>Seating is limited. The sky is not.</p>
+      <a href="#screenings" class="cf-btn cf-btn--gold">View Upcoming Screenings</a>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="cf-footer">
+    <p>The Campfire is part of <a href="/">Cherrywood Farm &amp; Golf Club</a> — Fredericktown, Missouri</p>
+  </footer>
+
+</div><!-- /mainContent -->
+
+<script>
+  // ── Lock Screen ──
+  const PASSWORD = 'Arabia';
+
+  document.getElementById('lockBtn').addEventListener('click', tryUnlock);
+  document.getElementById('lockInput').addEventListener('keydown', e => { if (e.key === 'Enter') tryUnlock(); });
+
+  function tryUnlock() {
+    if (document.getElementById('lockInput').value === PASSWORD) {
+      const ls = document.getElementById('lockScreen');
+      ls.style.transition = 'opacity 0.6s ease';
+      ls.style.opacity = '0';
+      setTimeout(() => {
+        ls.style.display = 'none';
+        const mc = document.getElementById('mainContent');
+        mc.style.display = 'block';
+        requestAnimationFrame(() => requestAnimationFrame(() => mc.style.opacity = '1'));
+        initObserver();
+      }, 600);
+    } else {
+      const err = document.getElementById('lockError');
+      err.textContent = 'Incorrect access code.';
+      document.getElementById('lockInput').value = '';
+      document.getElementById('lockInput').classList.add('shake');
+      setTimeout(() => { err.textContent = ''; document.getElementById('lockInput').classList.remove('shake'); }, 3000);
+    }
+  }
+
+  // ── Tabs ──
+  document.querySelectorAll('.cf-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.cf-tab').forEach(t => t.classList.remove('cf-tab--active'));
+      document.querySelectorAll('.cf-panel').forEach(p => { p.hidden = true; p.classList.remove('cf-panel--active'); });
+      tab.classList.add('cf-tab--active');
+      const panel = document.querySelector(`[data-panel="${tab.dataset.tab}"]`);
+      panel.hidden = false;
+      panel.classList.add('cf-panel--active');
+    });
+  });
+
+  // ── Slideshow ──
+  let currentSlide = 0;
+  const slides = document.querySelectorAll('.cf-slide');
+  const dotsWrap = document.querySelector('.cf-slide-dots');
+  let autoTimer;
+
+  slides.forEach((_, i) => {
+    const dot = document.createElement('button');
+    dot.className = 'cf-dot' + (i === 0 ? ' cf-dot--active' : '');
+    dot.addEventListener('click', () => goTo(i));
+    dotsWrap.appendChild(dot);
+  });
+
+  function goTo(n) {
+    slides[currentSlide].classList.remove('active');
+    dotsWrap.children[currentSlide].classList.remove('cf-dot--active');
+    currentSlide = (n + slides.length) % slides.length;
+    slides[currentSlide].classList.add('active');
+    dotsWrap.children[currentSlide].classList.add('cf-dot--active');
+  }
+
+  function startAuto() { autoTimer = setInterval(() => goTo(currentSlide + 1), 5000); }
+  function stopAuto()  { clearInterval(autoTimer); }
+
+  document.querySelector('.cf-slide-prev').addEventListener('click', () => { stopAuto(); goTo(currentSlide - 1); startAuto(); });
+  document.querySelector('.cf-slide-next').addEventListener('click', () => { stopAuto(); goTo(currentSlide + 1); startAuto(); });
+  document.querySelector('.cf-slideshow').addEventListener('mouseenter', stopAuto);
+  document.querySelector('.cf-slideshow').addEventListener('mouseleave', startAuto);
+  startAuto();
+
+  // ── Scroll fade-in ──
+  function initObserver() {
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } });
+    }, { threshold: 0.12 });
+    document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+  }
+
+  // ── Notify form ──
+  document.querySelector('.cf-notify-form button').addEventListener('click', () => {
+    const input = document.querySelector('.cf-notify-form input');
+    if (input.value.includes('@')) {
+      document.querySelector('.cf-notify-form').innerHTML =
+        '<p style="color:var(--gold);font-family:var(--serif);font-size:1.05rem;">✓ You\'re on the list. We\'ll be in touch before the first screening.</p>';
+    }
+  });
+</script>
+
+</body>
+</html>

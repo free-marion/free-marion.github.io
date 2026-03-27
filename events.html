@@ -800,6 +800,10 @@
             <input type="tel"   id="rf-phone" placeholder="Phone *">
             <input type="email" id="rf-email" placeholder="Email (optional)">
           </div>
+          <label style="display:flex;align-items:center;gap:0.6rem;font-family:inherit;font-size:0.95rem;cursor:pointer;">
+            <input type="checkbox" id="rf-cart" style="width:16px;height:16px;accent-color:#004331;">
+            I'll need a cart
+          </label>
           <p class="reg-form__error" id="rf-err"></p>
           <div class="reg-form__actions">
             <button class="btn-reg-submit" id="rf-submit">Submit Registration</button>
@@ -821,6 +825,7 @@
       const name     = document.getElementById('rf-name').value.trim();
       const phone    = document.getElementById('rf-phone').value.trim();
       const email    = document.getElementById('rf-email').value.trim();
+      const cart     = document.getElementById('rf-cart').checked;
       const errEl    = document.getElementById('rf-err');
       const btn      = document.getElementById('rf-submit');
       errEl.className = 'reg-form__error';
@@ -848,6 +853,7 @@
         phone,
         email:         email || null,
         num_players:   t.type === 'team' ? (t.team_size || 1) : 1,
+        cart,
         status:        'confirmed',
       }).select('id').single();
 

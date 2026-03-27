@@ -282,11 +282,8 @@ async function loadBookings() {
       .lt('slot_time', new Date().toISOString())
       .order('slot_time', { ascending: false });
   } else if (bookingsFilter === 'upcoming') {
-    const startOfToday = new Date();
-    startOfToday.setHours(0, 0, 0, 0);
     q = db.from('bookings').select('*')
-      .is('archived_at', null)
-      .gte('slot_time', startOfToday.toISOString())
+      .gte('slot_time', new Date().toISOString())
       .neq('status', 'cancelled')
       .order('slot_time', { ascending: true });
   } else {
@@ -927,6 +924,7 @@ function renderRegistrations(rows, tournamentId) {
         ${r.team_name ? `<span><strong>Captain:</strong> ${esc(r.captain_name)}</span>` : ''}
         <span>${esc(r.phone)}${r.email ? ' · ' + esc(r.email) : ''}</span>
         ${r.num_players > 1 ? `<span>${r.num_players} players</span>` : ''}
+        <span>${r.cart ? '🛒 Cart requested' : 'Walking'}</span>
       </div>
       ${r.status !== 'cancelled'
         ? `<button class="btn btn--ghost btn--sm" data-cancel-reg="${r.id}" style="color:#a00;">Cancel</button>`
