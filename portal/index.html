@@ -14,7 +14,7 @@
   <meta name="theme-color" content="#1C3320">
   <title>Cherrywood Portal</title>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Lora:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=4">
+  <link rel="stylesheet" href="style.css?v=5">
 </head>
 <body>
 
@@ -88,7 +88,6 @@
     <button class="tab-btn" data-tab="bookings">Bookings</button>
     <button class="tab-btn" data-tab="eggs">Egg Orders</button>
     <button class="tab-btn" data-tab="tournaments">Tournaments</button>
-    <button class="tab-btn" data-tab="todos">My To-Dos</button>
     <button class="tab-btn" data-tab="docs">Documents</button>
     <button class="tab-btn" data-tab="users">Users</button>
   </nav>
@@ -124,24 +123,6 @@
     </div>
     <div id="eggsList"></div>
     <p id="eggsEmpty" class="empty-msg" hidden>No egg orders found.</p>
-  </section>
-
-  <!-- TO-DOS -->
-  <section id="tabTodos" class="tab-panel" hidden>
-    <div class="panel-header">
-      <h2 class="panel-title">My To-Dos</h2>
-      <button id="addTodoBtn" class="btn btn--primary btn--sm">+ Add</button>
-    </div>
-    <div id="todoForm" class="inline-form" hidden>
-      <input type="text" id="todoTitle" placeholder="What needs to be done?" maxlength="200">
-      <input type="date" id="todoDue">
-      <div class="inline-form__actions">
-        <button id="saveTodoBtn" class="btn btn--primary btn--sm">Save</button>
-        <button id="cancelTodoBtn" class="btn btn--ghost btn--sm">Cancel</button>
-      </div>
-    </div>
-    <div id="todosList"></div>
-    <p id="todosEmpty" class="empty-msg" hidden>No to-dos yet.</p>
   </section>
 
   <!-- TOURNAMENTS -->
@@ -264,7 +245,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="app.js?v=21"></script>
+<script src="app.js?v=22"></script>
 <script>
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.getRegistrations().then(regs => regs.forEach(r => r.unregister()));

@@ -154,30 +154,14 @@ function applyPermissions() {
   // Course toggle — admin only
   document.getElementById('courseToggleBtn').style.display = isAdmin() ? '' : 'none';
 
-  // Add to-do button — staff/admin only
-  document.getElementById('addTodoBtn').style.display = canEdit() ? '' : 'none';
-
-  // Tabs hidden from viewer
-  const staffOnlyTabs = ['vto', 'todos', 'docs', 'tournaments'];
-  staffOnlyTabs.forEach(tabName => {
-    const btn = document.querySelector(`.tab-btn[data-tab="${tabName}"]`);
-    if (btn) btn.style.display = isStaff() ? '' : 'none';
-  });
-
   // Users tab — admin only
   const usersTabBtn = document.querySelector('.tab-btn[data-tab="users"]');
   if (usersTabBtn) usersTabBtn.style.display = isAdmin() ? '' : 'none';
 
-  // Redirect away from restricted tabs
+  // Redirect away from users tab if not admin
   const active = document.querySelector('.tab-btn--active');
-  if (active) {
-    const onStaffTab = staffOnlyTabs.includes(active.dataset.tab);
-    const onUsersTab = active.dataset.tab === 'users';
-    if (!isStaff() && (onStaffTab || onUsersTab)) {
-      document.querySelector('.tab-btn[data-tab="bookings"]').click();
-    } else if (isStaff() && !isAdmin() && onUsersTab) {
-      document.querySelector('.tab-btn[data-tab="vto"]').click();
-    }
+  if (active && active.dataset.tab === 'users' && !isAdmin()) {
+    document.querySelector('.tab-btn[data-tab="vto"]').click();
   }
 }
 
@@ -295,7 +279,7 @@ async function loadBookings() {
   let q;
   if (bookingsFilter === 'archive') {
     q = db.from('bookings').select('*')
-      .not('archived_at', 'is', null)
+      .lt('slot_time', new Date().toISOString())
       .order('slot_time', { ascending: false });
   } else if (bookingsFilter === 'upcoming') {
     const startOfToday = new Date();
@@ -485,7 +469,7 @@ function renderEggs(rows) {
         ${o.notes ? `<span class="data-card__notes">${esc(o.notes)}</span>` : ''}
       </div>
       ${o.status !== 'complete'
-        ? `<button class="btn btn--primary btn--sm" data-complete="${o.id}">Mark Picked Up</button>`
+        ? (canEdit() ? `<button class="btn btn--primary btn--sm" data-complete="${o.id}">Mark Picked Up</button>` : '')
         : '<span class="tag tag--complete">Picked Up</span>'}
     `;
     card.querySelector('[data-complete]')?.addEventListener('click', async () => {
