@@ -9,9 +9,7 @@ const SUPABASE_URL  = 'https://giwfigekjatujubjknjf.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdpd2ZpZ2VramF0dWp1YmprbmpmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMDEwMDMsImV4cCI6MjA4OTU3NzAwM30.p3OaPA5qYROqz8d0tNyhytl__n_bzH2l2MOX3olDn3A';
 
 const { createClient } = supabase;
-const db = createClient(SUPABASE_URL, SUPABASE_ANON, {
-  auth: { persistSession: false }  // never cache sessions — always require fresh login
-});
+const db = createClient(SUPABASE_URL, SUPABASE_ANON);
 let currentUser    = null;
 let currentSession = null;
 let currentRole    = 'viewer'; // admin | staff | viewer
@@ -691,7 +689,6 @@ document.getElementById('saveUserBtn').addEventListener('click', async () => {
   btn.disabled = true;
   btn.textContent = 'Sending invite…';
 
-  console.log('currentSession token:', currentSession?.access_token?.slice(0, 30));
   const res = await fetch(`${SUPABASE_URL}/functions/v1/invite-user`, {
     method: 'POST',
     headers: {
