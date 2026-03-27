@@ -378,7 +378,6 @@ function buildBookingCard(b) {
 }
 
 function openCancelModal(bookingId, name, slotTime) {
-  if (new Date(slotTime) <= new Date()) return; // past tee times cannot be cancelled
   _cancelBookingId = bookingId;
   _cancelSlotTime  = slotTime;
   document.getElementById('cancelModalName').textContent = `${name} — ${fmtDateTime(slotTime)}`;
@@ -409,7 +408,7 @@ document.getElementById('confirmCancelBtn').addEventListener('click', async () =
     cancelled_by: currentUser.email,
     cancel_reason: reason,
     cancel_notes: notes || null,
-  }).eq('id', _cancelBookingId).gt('slot_time', new Date().toISOString()).select('id');
+  }).eq('id', _cancelBookingId).select('id');
 
   btn.disabled = false; btn.textContent = 'Confirm Cancellation';
 
