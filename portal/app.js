@@ -101,10 +101,11 @@ document.getElementById('loginForm').addEventListener('submit', async e => {
   btn.disabled = true;
   btn.textContent = 'Signing in…';
   err.hidden = true;
-  const { error } = await db.auth.signInWithPassword({
+  const { data: signInData, error } = await db.auth.signInWithPassword({
     email: document.getElementById('loginEmail').value.trim(),
     password: document.getElementById('loginPassword').value
   });
+  if (signInData?.session) currentSession = signInData.session;
   if (error) {
     err.textContent = error.message;
     err.hidden = false;
