@@ -179,7 +179,6 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
     panel.classList.add('tab-panel--active');
     if (btn.dataset.tab === 'bookings') loadBookings();
     if (btn.dataset.tab === 'eggs')     loadEggs();
-    if (btn.dataset.tab === 'todos')    loadTodos();
     if (btn.dataset.tab === 'users')       loadUsers();
     if (btn.dataset.tab === 'tournaments') loadTournaments();
   });
@@ -486,73 +485,6 @@ document.querySelectorAll('#tabEggs .filter-btn').forEach(btn => {
     eggsFilter = btn.dataset.filter;
     loadEggs();
   });
-});
-
-// ============================================
-// TO-DOS
-// ============================================
-
-async function loadTodos() {
-  const { data, error } = await db.from('todos')
-    .select('*')
-    .eq('owner_id', currentUser.id)
-    .order('created_at', { ascending: true });
-  if (error) { console.error(error); return; }
-  renderTodos(data || []);
-}
-
-function renderTodos(rows) {
-  const list  = document.getElementById('todosList');
-  const empty = document.getElementById('todosEmpty');
-  list.innerHTML = '';
-  if (!rows.length) { empty.hidden = false; return; }
-  empty.hidden = true;
-  rows.forEach(t => {
-    const item = document.createElement('div');
-    item.className = 'todo-item' + (t.done ? ' todo-item--done' : '');
-    item.innerHTML = `
-      <input type="checkbox" class="todo-check" ${t.done ? 'checked' : ''} data-id="${t.id}" data-done="${t.done}">
-      <span class="todo-title">${esc(t.title)}</span>
-      ${t.due_date ? `<span class="todo-due">${fmtDate(t.due_date)}</span>` : ''}
-      <button class="todo-delete btn btn--ghost btn--sm" data-id="${t.id}">✕</button>
-    `;
-    item.querySelector('.todo-check').addEventListener('change', async e => {
-      await db.from('todos').update({ done: e.target.checked }).eq('id', t.id);
-      loadTodos();
-    });
-    item.querySelector('.todo-delete').addEventListener('click', async () => {
-      await db.from('todos').delete().eq('id', t.id);
-      loadTodos();
-    });
-    list.appendChild(item);
-  });
-}
-
-document.getElementById('addTodoBtn').addEventListener('click', () => {
-  document.getElementById('todoForm').hidden = false;
-  document.getElementById('todoTitle').focus();
-});
-
-document.getElementById('cancelTodoBtn').addEventListener('click', () => {
-  document.getElementById('todoForm').hidden = true;
-  document.getElementById('todoTitle').value = '';
-  document.getElementById('todoDue').value = '';
-});
-
-document.getElementById('saveTodoBtn').addEventListener('click', async () => {
-  const title = document.getElementById('todoTitle').value.trim();
-  const due   = document.getElementById('todoDue').value || null;
-  if (!title) { alert('Please enter a task.'); return; }
-  await db.from('todos').insert({
-    title, due_date: due,
-    owner_id: currentUser.id,
-    owner_name: currentUser.email,
-    week_created: new Date().toISOString().split('T')[0]
-  });
-  document.getElementById('todoForm').hidden = true;
-  document.getElementById('todoTitle').value = '';
-  document.getElementById('todoDue').value = '';
-  loadTodos();
 });
 
 // ============================================
