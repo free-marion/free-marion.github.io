@@ -624,9 +624,8 @@ document.querySelectorAll('#tabMembers .filter-btn').forEach(btn => {
 // ============================================
 
 const TRACK_MAP = {
-  admin:  { name: 'Full Certification Track',  modules: 6 },
-  staff:  { name: 'Staff Operations Track',    modules: 4 },
-  viewer: { name: 'Guest Services Track',       modules: 2 },
+  admin: { name: 'Full Certification Track', modules: 6 },
+  staff: { name: 'Staff Operations Track',   modules: 4 },
 };
 
 async function loadDocs() {

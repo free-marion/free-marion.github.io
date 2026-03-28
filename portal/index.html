@@ -283,9 +283,8 @@
       <input type="text"  id="newUserName"  placeholder="Full name" maxlength="100">
       <input type="email" id="newUserEmail" placeholder="Email address">
       <select id="newUserRole">
-        <option value="viewer">Viewer — Bookings &amp; Eggs only</option>
-        <option value="staff">Staff — + VTO, Vault, To-Dos</option>
-        <option value="admin">Admin — God Mode</option>
+        <option value="staff">Team Member</option>
+        <option value="admin">Admin — Full Access</option>
       </select>
       <p id="userFormError" class="error-msg" hidden></p>
       <div class="inline-form__actions">
@@ -353,7 +352,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="app.js?v=30"></script>
+<script src="app.js?v=31"></script>
 <script>
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.getRegistrations().then(regs => regs.forEach(r => r.unregister()));
