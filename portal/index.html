@@ -74,7 +74,12 @@
 <div id="appShell" hidden>
 
   <header class="portal-header">
-    <span class="portal-header__title">Cherrywood</span>
+    <div style="display:flex;align-items:center;gap:0.75rem;">
+      <button class="hamburger" id="hamburgerBtn" aria-label="Open menu">
+        <span></span><span></span><span></span>
+      </button>
+      <span class="portal-header__title">Cherrywood</span>
+    </div>
     <div class="portal-header__right">
       <button id="courseToggleBtn" class="btn btn--sm course-open">⛳ Course Open</button>
       <span id="userEmail" class="user-email"></span>
@@ -83,8 +88,9 @@
     </div>
   </header>
 
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
   <div class="app-body">
-  <nav class="sidebar">
+  <nav class="sidebar" id="sidebar">
     <button class="tab-btn tab-btn--active" data-tab="vto">V/TO</button>
     <button class="tab-btn" data-tab="bookings">Bookings</button>
     <button class="tab-btn" data-tab="eggs">Egg Orders</button>
@@ -347,7 +353,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="app.js?v=28"></script>
+<script src="app.js?v=29"></script>
 <script>
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.getRegistrations().then(regs => regs.forEach(r => r.unregister()));

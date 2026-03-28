@@ -169,8 +169,20 @@ function applyPermissions() {
 // TAB ROUTING
 // ============================================
 
+// Mobile sidebar toggle
+const _sidebar  = document.getElementById('sidebar');
+const _overlay  = document.getElementById('sidebarOverlay');
+const _hamburger = document.getElementById('hamburgerBtn');
+
+function openSidebar()  { _sidebar.classList.add('sidebar--open');  _overlay.classList.add('sidebar-overlay--visible'); }
+function closeSidebar() { _sidebar.classList.remove('sidebar--open'); _overlay.classList.remove('sidebar-overlay--visible'); }
+
+_hamburger.addEventListener('click', () => _sidebar.classList.contains('sidebar--open') ? closeSidebar() : openSidebar());
+_overlay.addEventListener('click', closeSidebar);
+
 document.querySelectorAll('.tab-btn').forEach(btn => {
   btn.addEventListener('click', () => {
+    closeSidebar();
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('tab-btn--active'));
     document.querySelectorAll('.tab-panel').forEach(p => { p.hidden = true; p.classList.remove('tab-panel--active'); });
     btn.classList.add('tab-btn--active');
