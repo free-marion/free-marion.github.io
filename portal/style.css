@@ -354,6 +354,55 @@ body {
   border-radius: 999px;
 }
 
+/* ── PERMISSION TOGGLES ── */
+.perm-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  margin-top: 0.4rem;
+}
+.perm-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.45rem 0;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  gap: 1rem;
+}
+.perm-row:last-child { border-bottom: none; }
+.perm-row__label { font-size: 0.88rem; color: var(--text); }
+
+.perm-toggle {
+  position: relative;
+  width: 40px;
+  height: 22px;
+  flex-shrink: 0;
+}
+.perm-toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
+.perm-slider {
+  position: absolute;
+  inset: 0;
+  background: #ccc;
+  border-radius: 999px;
+  transition: background 0.2s;
+  cursor: pointer;
+}
+.perm-slider::after {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  background: #fff;
+  border-radius: 50%;
+  top: 3px;
+  left: 3px;
+  transition: transform 0.2s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+.perm-toggle input:checked + .perm-slider { background: var(--green); }
+.perm-toggle input:checked + .perm-slider::after { transform: translateX(18px); }
+
 /* ── ROLE SELECT ── */
 .role-select {
   font-family: inherit;

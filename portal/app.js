@@ -14,11 +14,11 @@ const db = createClient(SUPABASE_URL, SUPABASE_ANON, {
 });
 let currentUser    = null;
 let currentSession = null;
-let currentRole    = 'viewer'; // admin | staff | viewer
+let currentRole    = 'viewer';
+let currentPerms   = {};
 
-function isAdmin()  { return currentRole === 'admin'; }
-function isStaff()  { return currentRole === 'admin' || currentRole === 'staff'; }
-function canEdit()  { return currentRole === 'admin' || currentRole === 'staff'; }
+function isAdmin() { return currentRole === 'admin'; }
+function can(perm) { return isAdmin() || currentPerms[perm] === true; }
 
 // ============================================
 // AUTH
@@ -144,24 +144,39 @@ document.getElementById('sendResetBtn').addEventListener('click', async () => {
 // PROFILE & PERMISSIONS
 // ============================================
 
+const PERM_TABS = {
+  vto:         'perm_view_vto',
+  docs:        'perm_view_docs',
+  members:     'perm_view_members',
+  tournaments: 'perm_manage_tournaments',
+};
+
 async function loadProfile() {
-  const { data } = await db.from('profiles').select('role').eq('id', currentUser.id).single();
-  currentRole = data?.role ?? 'viewer';
+  const { data } = await db.from('profiles')
+    .select('role, perm_cancel_bookings, perm_mark_eggs, perm_manage_tournaments, perm_view_members, perm_view_vto, perm_view_docs')
+    .eq('id', currentUser.id).single();
+  currentRole  = data?.role ?? 'viewer';
+  currentPerms = data ?? {};
   applyPermissions();
 }
 
 function applyPermissions() {
-  // Course toggle — admin only
   document.getElementById('courseToggleBtn').style.display = isAdmin() ? '' : 'none';
 
-  // Users tab — admin only
-  const usersTabBtn = document.querySelector('.tab-btn[data-tab="users"]');
-  if (usersTabBtn) usersTabBtn.style.display = isAdmin() ? '' : 'none';
+  Object.entries(PERM_TABS).forEach(([tab, perm]) => {
+    const btn = document.querySelector(`.tab-btn[data-tab="${tab}"]`);
+    if (btn) btn.style.display = can(perm) ? '' : 'none';
+  });
 
-  // Redirect away from users tab if not admin
+  const usersBtn = document.querySelector('.tab-btn[data-tab="users"]');
+  if (usersBtn) usersBtn.style.display = isAdmin() ? '' : 'none';
+
   const active = document.querySelector('.tab-btn--active');
-  if (active && active.dataset.tab === 'users' && !isAdmin()) {
-    document.querySelector('.tab-btn[data-tab="vto"]').click();
+  if (active) {
+    const perm = PERM_TABS[active.dataset.tab];
+    if ((perm && !can(perm)) || (active.dataset.tab === 'users' && !isAdmin())) {
+      document.querySelector('.tab-btn[data-tab="bookings"]').click();
+    }
   }
 }
 
@@ -365,7 +380,7 @@ function buildBookingCard(b) {
       </div>`;
   } else if (isPaid) {
     actionHtml = `<span class="tag" style="background:#d4edda;color:#1a6630;font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;">Paid · ${esc(b.payment_method)}</span>`;
-  } else if (isStaff()) {
+  } else if (can('perm_cancel_bookings')) {
     actionHtml = `
       <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
         <button class="btn btn--primary btn--sm" data-pay="${b.id}">Mark Paid</button>
@@ -530,7 +545,7 @@ function renderEggs(rows) {
         ${o.notes ? `<span class="data-card__notes">${esc(o.notes)}</span>` : ''}
       </div>
       ${o.status !== 'complete'
-        ? (canEdit() ? `<button class="btn btn--primary btn--sm" data-complete="${o.id}">Mark Picked Up</button>` : '')
+        ? (can('perm_mark_eggs') ? `<button class="btn btn--primary btn--sm" data-complete="${o.id}">Mark Picked Up</button>` : '')
         : '<span class="tag tag--complete">Picked Up</span>'}
     `;
     card.querySelector('[data-complete]')?.addEventListener('click', async () => {
@@ -685,8 +700,18 @@ document.getElementById('courseToggleBtn').addEventListener('click', async () =>
 // USERS (admin only)
 // ============================================
 
+const PERM_LABELS = [
+  { key: 'perm_view_vto',              label: 'View V/TO' },
+  { key: 'perm_view_docs',             label: 'Process Library' },
+  { key: 'perm_view_members',          label: 'View Members' },
+  { key: 'perm_cancel_bookings',       label: 'Cancel Bookings' },
+  { key: 'perm_mark_eggs',             label: 'Mark Eggs Complete' },
+  { key: 'perm_manage_tournaments',    label: 'Manage Tournaments' },
+];
+
 async function loadUsers() {
-  const { data, error } = await db.from('profiles').select('id, email, name, role').order('name');
+  const cols = 'id, email, name, role, ' + PERM_LABELS.map(p => p.key).join(', ');
+  const { data, error } = await db.from('profiles').select(cols).order('name');
   if (error) { console.error(error); return; }
   renderUsers(data || []);
 }
@@ -697,30 +722,45 @@ function renderUsers(rows) {
   list.innerHTML = '';
   if (!rows.length) { empty.hidden = false; return; }
   empty.hidden = true;
+
   rows.forEach(u => {
     const card = document.createElement('div');
     card.className = 'data-card';
+
+    const isAdminUser = u.role === 'admin';
+
     card.innerHTML = `
       <div class="data-card__header">
         <span class="data-card__title">${esc(u.name || '—')}</span>
         <span class="data-card__badge">${esc(u.email || '')}</span>
       </div>
-      <div class="data-card__body">
-        <label style="display:flex;align-items:center;gap:8px;">Role:
-          <select class="role-select" data-id="${u.id}">
-            <option value="viewer" ${u.role === 'viewer' ? 'selected' : ''}>Viewer</option>
-            <option value="staff"  ${u.role === 'staff'  ? 'selected' : ''}>Staff</option>
-            <option value="admin"  ${u.role === 'admin'  ? 'selected' : ''}>Admin</option>
-          </select>
-        </label>
-      </div>
+      ${isAdminUser
+        ? `<span class="tag" style="color:#2e7d32;font-size:0.78rem;font-weight:600;text-transform:uppercase;">Admin — Full Access</span>`
+        : `<div class="perm-grid">
+            ${PERM_LABELS.map(p => `
+              <label class="perm-row">
+                <span class="perm-row__label">${p.label}</span>
+                <span class="perm-toggle">
+                  <input type="checkbox" class="perm-check" data-perm="${p.key}" ${u[p.key] ? 'checked' : ''}>
+                  <span class="perm-slider"></span>
+                </span>
+              </label>`).join('')}
+           </div>`
+      }
     `;
-    card.querySelector('.role-select').addEventListener('change', async e => {
-      const newRole = e.target.value;
-      const { error } = await db.from('profiles').update({ role: newRole }).eq('id', u.id);
-      if (error) { alert('Failed to update role: ' + error.message); e.target.value = u.role; return; }
-      u.role = newRole;
-    });
+
+    if (!isAdminUser) {
+      card.querySelectorAll('.perm-check').forEach(chk => {
+        chk.addEventListener('change', async e => {
+          const perm = e.target.dataset.perm;
+          const val  = e.target.checked;
+          const { error } = await db.from('profiles').update({ [perm]: val }).eq('id', u.id);
+          if (error) { alert('Failed to save: ' + error.message); e.target.checked = !val; }
+          else u[perm] = val;
+        });
+      });
+    }
+
     list.appendChild(card);
   });
 }
@@ -1009,6 +1049,6 @@ function renderRegistrations(rows, tournamentId) {
 document.getElementById('closeRegPanel').addEventListener('click', () => {
   document.getElementById('registrationsPanel').hidden = true;
   document.getElementById('tournamentsList').style.display = '';
-  document.getElementById('addTournamentBtn').style.display = isStaff() ? '' : 'none';
+  document.getElementById('addTournamentBtn').style.display = can('perm_manage_tournaments') ? '' : 'none';
   loadTournaments();
 });
