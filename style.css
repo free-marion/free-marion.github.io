@@ -1181,6 +1181,23 @@ address {
   color: rgba(255,255,255,0.2);
 }
 
+.footer-powered {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1rem;
+  font-family: var(--body);
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.18);
+}
+.footer-powered strong {
+  color: rgba(255,255,255,0.28);
+  font-weight: 600;
+  letter-spacing: 0.15em;
+}
+
 /* =====================
    TEE TIME BOOKING
    ===================== */
