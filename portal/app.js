@@ -55,12 +55,17 @@ function can(perm) { return isAdmin() || currentPerms[perm] === true; }
 db.auth.onAuthStateChange(async (event, session) => {
   currentUser    = session?.user ?? null;
   currentSession = session ?? null;
+
   if (currentUser) {
+    // Token refresh — just update the session reference, don't reload profile
+    if (event === 'TOKEN_REFRESHED') return;
+
     // Invite, magic link, or password recovery — prompt user to set a permanent password
     if (_initialHash.includes('type=invite') || _initialHash.includes('type=magiclink') || _initialHash.includes('type=recovery')) {
       showSetPasswordScreen();
       return;
     }
+
     document.getElementById('setPasswordScreen').hidden = true;
     document.getElementById('loginScreen').hidden = true;
     document.getElementById('appShell').hidden = false;
@@ -71,6 +76,8 @@ db.auth.onAuthStateChange(async (event, session) => {
     startInactivityTimer();
   } else {
     stopInactivityTimer();
+    currentRole  = 'viewer';
+    currentPerms = {};
     document.getElementById('setPasswordScreen').hidden = true;
     document.getElementById('loginScreen').hidden = false;
     document.getElementById('appShell').hidden = true;
