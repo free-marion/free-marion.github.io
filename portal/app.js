@@ -263,6 +263,11 @@ function esc(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
+function dbErr(table, error) {
+  const msg = error ? `${error.message} (code: ${error.code})` : 'no data returned';
+  return `<p style="color:#c00;padding:1rem;font-family:monospace;font-size:0.85rem;">DB error on <strong>${table}</strong>: ${msg}</p>`;
+}
+
 function fmtDate(iso) {
   if (!iso) return '—';
   const d = new Date(iso + (iso.length === 10 ? 'T00:00:00' : ''));
@@ -281,7 +286,10 @@ function fmtDateTime(iso) {
 
 async function loadVto() {
   const { data, error } = await db.from('vto').select('*').eq('id', 1).single();
-  if (error || !data) { console.error('loadVto failed:', error); return; }
+  if (error || !data) {
+    document.getElementById('vtoContent').innerHTML = dbErr('vto', error);
+    return;
+  }
   renderVto(data);
 }
 
@@ -337,7 +345,7 @@ function renderVto(v) {
 
 async function loadAccountability() {
   const { data, error } = await db.from('accountability_nodes').select('*').order('sort_order');
-  if (error) { console.error(error); return; }
+  if (error) { document.getElementById('accountabilityList').innerHTML = dbErr('accountability_nodes', error); return; }
   renderAccountability(data || []);
 }
 
@@ -429,7 +437,7 @@ async function loadBookings() {
   }
 
   const { data, error } = await q;
-  if (error) { console.error(error); return; }
+  if (error) { document.getElementById('bookingsList').innerHTML = dbErr('bookings', error); return; }
   renderBookings(data || []);
 }
 
@@ -626,7 +634,7 @@ async function loadEggs() {
   let q = db.from('egg_orders').select('*').order('created_at', { ascending: false });
   if (eggsFilter === 'pending') q = q.eq('status', 'pending');
   const { data, error } = await q;
-  if (error) { console.error(error); return; }
+  if (error) { document.getElementById('eggsList').innerHTML = dbErr('egg_orders', error); return; }
   renderEggs(data || []);
 }
 
@@ -680,7 +688,7 @@ async function loadMembers() {
   let q = db.from('membership_applications').select('*').order('created_at', { ascending: false });
   if (membersFilter === 'new') q = q.eq('status', 'new');
   const { data, error } = await q;
-  if (error) { console.error(error); return; }
+  if (error) { document.getElementById('membersList').innerHTML = dbErr('membership_applications', error); return; }
   renderMembers(data || []);
 }
 
@@ -735,7 +743,7 @@ const TRACK_MAP = {
 
 async function loadDocs() {
   const { data, error } = await db.from('profiles').select('id, name, email, role').order('name');
-  if (error) { console.error('loadDocs failed:', error); return; }
+  if (error) { document.getElementById('trainingList').innerHTML = dbErr('profiles/docs', error); return; }
   const list = document.getElementById('trainingList');
   if (!list) return;
   const users = data || [];
@@ -820,7 +828,7 @@ const PERM_LABELS = [
 async function loadUsers() {
   const cols = 'id, email, name, role, ' + PERM_LABELS.map(p => p.key).join(', ');
   const { data, error } = await db.from('profiles').select(cols).order('name');
-  if (error) { console.error(error); return; }
+  if (error) { document.getElementById('usersList').innerHTML = dbErr('profiles', error); return; }
   renderUsers(data || []);
 }
 
