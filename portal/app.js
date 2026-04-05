@@ -145,15 +145,15 @@ document.getElementById('sendResetBtn').addEventListener('click', async () => {
 // ============================================
 
 const PERM_TABS = {
-  vto:         'perm_view_vto',
-  docs:        'perm_view_docs',
-  members:     'perm_view_members',
+  bookings:    'perm_cancel_bookings',
+  eggs:        'perm_mark_eggs',
   tournaments: 'perm_manage_tournaments',
+  members:     'perm_view_members',
 };
 
 async function loadProfile() {
   const { data } = await db.from('profiles')
-    .select('role, perm_cancel_bookings, perm_mark_eggs, perm_manage_tournaments, perm_view_members, perm_view_vto, perm_view_docs')
+    .select('role, perm_cancel_bookings, perm_mark_eggs, perm_manage_tournaments, perm_view_members, perm_toggle_course')
     .eq('id', currentUser.id).single();
   currentRole  = data?.role ?? 'viewer';
   currentPerms = data ?? {};
@@ -161,7 +161,7 @@ async function loadProfile() {
 }
 
 function applyPermissions() {
-  document.getElementById('courseToggleBtn').style.display = isAdmin() ? '' : 'none';
+  document.getElementById('courseToggleBtn').style.display = (isAdmin() || can('perm_toggle_course')) ? '' : 'none';
 
   Object.entries(PERM_TABS).forEach(([tab, perm]) => {
     const btn = document.querySelector(`.tab-btn[data-tab="${tab}"]`);
@@ -208,8 +208,9 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
     if (btn.dataset.tab === 'eggs')     loadEggs();
     if (btn.dataset.tab === 'users')       loadUsers();
     if (btn.dataset.tab === 'tournaments') loadTournaments();
-    if (btn.dataset.tab === 'docs')        loadDocs();
-    if (btn.dataset.tab === 'members')     loadMembers();
+    if (btn.dataset.tab === 'docs')             loadDocs();
+    if (btn.dataset.tab === 'members')          loadMembers();
+    if (btn.dataset.tab === 'accountability')   loadAccountability();
   });
 });
 
@@ -283,6 +284,65 @@ function renderVto(v) {
       </div>
     </div>
   `;
+}
+
+// ============================================
+// ACCOUNTABILITY CHART
+// ============================================
+
+async function loadAccountability() {
+  const { data, error } = await db.from('accountability_nodes').select('*').order('sort_order');
+  if (error) { console.error(error); return; }
+  renderAccountability(data || []);
+}
+
+function renderAccountability(rows) {
+  const list  = document.getElementById('accountabilityList');
+  const empty = document.getElementById('accountabilityEmpty');
+  list.innerHTML = '';
+  if (!rows.length) { empty.hidden = false; return; }
+  empty.hidden = true;
+
+  rows.forEach(r => {
+    const card = document.createElement('div');
+    card.className = 'data-card';
+    card.innerHTML = `
+      <div class="data-card__header">
+        <span class="data-card__title">${esc(r.role_name)}</span>
+        ${isAdmin() ? `<button class="btn btn--ghost btn--sm" data-edit="${r.id}">Edit</button>` : ''}
+      </div>
+      <div class="data-card__body">
+        <span class="acct-person" id="acct-person-${r.id}" style="font-weight:600;color:var(--text);">
+          ${r.person_name ? esc(r.person_name) : '<em style="color:var(--text-muted);">Vacant</em>'}
+        </span>
+      </div>
+    `;
+
+    card.querySelector('[data-edit]')?.addEventListener('click', () => {
+      const personEl = document.getElementById(`acct-person-${r.id}`);
+      personEl.innerHTML = `
+        <div style="display:flex;gap:0.5rem;align-items:center;">
+          <input type="text" value="${esc(r.person_name || '')}" placeholder="Name…"
+            style="padding:0.3rem 0.6rem;border:1px solid var(--border);border-radius:5px;font-family:inherit;font-size:0.9rem;flex:1;"
+            id="acct-input-${r.id}">
+          <button class="btn btn--primary btn--sm" data-save="${r.id}">Save</button>
+          <button class="btn btn--ghost btn--sm" data-cancel-edit="${r.id}">✕</button>
+        </div>`;
+      document.getElementById(`acct-input-${r.id}`).focus();
+
+      card.querySelector('[data-save]').addEventListener('click', async () => {
+        const val = document.getElementById(`acct-input-${r.id}`).value.trim();
+        const { error } = await db.from('accountability_nodes').update({ person_name: val || null }).eq('id', r.id);
+        if (error) { alert('Failed to save'); return; }
+        r.person_name = val || null;
+        loadAccountability();
+      });
+
+      card.querySelector('[data-cancel-edit]').addEventListener('click', () => loadAccountability());
+    });
+
+    list.appendChild(card);
+  });
 }
 
 // ============================================
@@ -686,9 +746,13 @@ document.getElementById('courseToggleBtn').addEventListener('click', async () =>
   if (!newStatus && msg === null) return; // cancelled
   const label = newStatus ? 'reopen' : 'close';
   if (!confirm(`${label.charAt(0).toUpperCase() + label.slice(1)} the course?`)) return;
+  // closed_on records the CT date of closure so tee-time bookings are blocked for that day only;
+  // setting it to null on reopen, and it naturally expires at midnight when the date rolls over.
+  const todayCT = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Chicago' });
   await db.from('course_status').update({
     is_open: newStatus,
     message: msg || 'Course is closed due to weather conditions. Check back soon.',
+    closed_on: newStatus ? null : todayCT,
     updated_at: new Date().toISOString()
   }).eq('id', 1);
   courseIsOpen = newStatus;
@@ -700,12 +764,11 @@ document.getElementById('courseToggleBtn').addEventListener('click', async () =>
 // ============================================
 
 const PERM_LABELS = [
-  { key: 'perm_view_vto',              label: 'View V/TO' },
-  { key: 'perm_view_docs',             label: 'Process Library' },
-  { key: 'perm_view_members',          label: 'View Members' },
-  { key: 'perm_cancel_bookings',       label: 'Cancel Bookings' },
-  { key: 'perm_mark_eggs',             label: 'Mark Eggs Complete' },
-  { key: 'perm_manage_tournaments',    label: 'Manage Tournaments' },
+  { key: 'perm_cancel_bookings',    label: 'Bookings' },
+  { key: 'perm_mark_eggs',          label: 'Egg Orders' },
+  { key: 'perm_manage_tournaments', label: 'Tournaments' },
+  { key: 'perm_view_members',       label: 'Members' },
+  { key: 'perm_toggle_course',      label: 'Course Toggle' },
 ];
 
 async function loadUsers() {

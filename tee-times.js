@@ -144,6 +144,20 @@
   async function fetchAvailability(dateStr, holes) {
     const { start, end } = localDateToISO(dateStr);
 
+    // Fetch course status to check for weather closure
+    const { data: courseData } = await supabase
+      .from('course_status')
+      .select('is_open, closed_on')
+      .eq('id', 1)
+      .single();
+
+    // Course is weather-closed if is_open=false and closed_on matches today in CT.
+    // Using closed_on (a date) means the block expires naturally at midnight — no cron needed.
+    const todayCT = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Chicago' });
+    const weatherClosedToday = !!courseData && !courseData.is_open && courseData.closed_on === todayCT;
+    // Only block same-day bookings; future dates remain open for advance booking.
+    const isWeatherClosed = weatherClosedToday && dateStr === todayCT;
+
     // Fetch bookings for the day
     const { data: bookingsData, error: bookingsError } = await supabase
       .from('bookings')
@@ -176,7 +190,17 @@
     // Build availability array
     return allSlots.map(slotISO => {
       const slotMs = slotToLocalKey(slotISO);
-      const slotTime = new Date(slotISO);
+
+      if (isWeatherClosed) {
+        return {
+          time: slotISO,
+          booked_players: bookedMap[slotMs] || 0,
+          available_players: 0,
+          is_blocked: true,
+          is_weather_closed: true,
+          is_full: false
+        };
+      }
 
       // Check blocks
       const isBlocked = (blocksData || []).some(block => {
@@ -193,6 +217,7 @@
         booked_players: bookedPlayers,
         available_players: availablePlayers,
         is_blocked: isBlocked,
+        is_weather_closed: false,
         is_full: availablePlayers === 0
       };
     });
@@ -271,12 +296,18 @@
     slotsGrid.innerHTML = '';
     slotsLoading.style.display = 'none';
 
-    const available = availability.filter(s => !s.is_blocked && !s.is_full);
-
     if (availability.length === 0) {
       slotsGrid.innerHTML = '<p class="tee-no-slots">No tee times available for this date.</p>';
       return;
     }
+
+    // Weather closure — all slots blocked for today
+    if (availability[0].is_weather_closed) {
+      slotsGrid.innerHTML = '<p class="tee-no-slots">The course is currently closed due to weather conditions. Please call to confirm availability or check back later.</p>';
+      return;
+    }
+
+    const available = availability.filter(s => !s.is_blocked && !s.is_full);
 
     if (available.length === 0) {
       slotsGrid.innerHTML = '<p class="tee-no-slots">All tee times are fully booked for this date.</p>';
@@ -434,6 +465,9 @@
 
       if (!slotCheck) {
         throw new Error('Selected time slot is no longer valid. Please go back and choose another.');
+      }
+      if (slotCheck.is_weather_closed) {
+        throw new Error('The course has been closed due to weather. Please go back and try again later.');
       }
       if (slotCheck.is_blocked) {
         throw new Error('This time slot has been blocked. Please go back and choose another time.');
