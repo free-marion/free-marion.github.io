@@ -10,12 +10,40 @@ const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFz
 
 const { createClient } = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_ANON, {
-  auth: { persistSession: false, autoRefreshToken: false }
+  auth: { persistSession: true, autoRefreshToken: true }
 });
 let currentUser    = null;
 let currentSession = null;
 let currentRole    = 'viewer';
 let currentPerms   = {};
+
+// ============================================
+// INACTIVITY LOGOUT — 10 minutes
+// ============================================
+const INACTIVITY_MS = 10 * 60 * 1000;
+let _inactivityTimer = null;
+
+function resetInactivityTimer() {
+  clearTimeout(_inactivityTimer);
+  _inactivityTimer = setTimeout(async () => {
+    await db.auth.signOut();
+    window.location.reload();
+  }, INACTIVITY_MS);
+}
+
+function startInactivityTimer() {
+  ['mousemove', 'keydown', 'click', 'touchstart', 'scroll'].forEach(evt =>
+    document.addEventListener(evt, resetInactivityTimer, { passive: true })
+  );
+  resetInactivityTimer();
+}
+
+function stopInactivityTimer() {
+  clearTimeout(_inactivityTimer);
+  ['mousemove', 'keydown', 'click', 'touchstart', 'scroll'].forEach(evt =>
+    document.removeEventListener(evt, resetInactivityTimer)
+  );
+}
 
 function isAdmin() { return currentRole === 'admin'; }
 function can(perm) { return isAdmin() || currentPerms[perm] === true; }
@@ -40,7 +68,9 @@ db.auth.onAuthStateChange(async (event, session) => {
     await loadProfile();
     loadVto();
     loadCourseStatus();
+    startInactivityTimer();
   } else {
+    stopInactivityTimer();
     document.getElementById('setPasswordScreen').hidden = true;
     document.getElementById('loginScreen').hidden = false;
     document.getElementById('appShell').hidden = true;
