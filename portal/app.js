@@ -57,8 +57,13 @@ db.auth.onAuthStateChange(async (event, session) => {
   currentSession = session ?? null;
 
   if (currentUser) {
-    // Token refresh — just update the session reference, don't reload profile
-    if (event === 'TOKEN_REFRESHED') return;
+    // Token refresh — don't reload profile/UI, but retry data loads that may
+    // have failed when INITIAL_SESSION fired with an expired access token
+    if (event === 'TOKEN_REFRESHED') {
+      loadVto();
+      loadCourseStatus();
+      return;
+    }
 
     // Invite, magic link, or password recovery — prompt user to set a permanent password
     if (_initialHash.includes('type=invite') || _initialHash.includes('type=magiclink') || _initialHash.includes('type=recovery')) {
@@ -241,13 +246,14 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
     const panel = document.getElementById('tab' + btn.dataset.tab.charAt(0).toUpperCase() + btn.dataset.tab.slice(1));
     panel.hidden = false;
     panel.classList.add('tab-panel--active');
-    if (btn.dataset.tab === 'bookings') loadBookings();
-    if (btn.dataset.tab === 'eggs')     loadEggs();
+    if (btn.dataset.tab === 'vto')         loadVto();
+    if (btn.dataset.tab === 'bookings')    loadBookings();
+    if (btn.dataset.tab === 'eggs')        loadEggs();
     if (btn.dataset.tab === 'users')       loadUsers();
     if (btn.dataset.tab === 'tournaments') loadTournaments();
-    if (btn.dataset.tab === 'docs')             loadDocs();
-    if (btn.dataset.tab === 'members')          loadMembers();
-    if (btn.dataset.tab === 'accountability')   loadAccountability();
+    if (btn.dataset.tab === 'docs')        loadDocs();
+    if (btn.dataset.tab === 'members')     loadMembers();
+    if (btn.dataset.tab === 'accountability') loadAccountability();
   });
 });
 
@@ -273,7 +279,7 @@ function fmtDateTime(iso) {
 
 async function loadVto() {
   const { data, error } = await db.from('vto').select('*').eq('id', 1).single();
-  if (error || !data) return;
+  if (error || !data) { console.error('loadVto failed:', error); return; }
   renderVto(data);
 }
 
@@ -726,7 +732,8 @@ const TRACK_MAP = {
 };
 
 async function loadDocs() {
-  const { data } = await db.from('profiles').select('id, name, email, role').order('name');
+  const { data, error } = await db.from('profiles').select('id, name, email, role').order('name');
+  if (error) { console.error('loadDocs failed:', error); return; }
   const list = document.getElementById('trainingList');
   if (!list) return;
   const users = data || [];
