@@ -57,9 +57,11 @@ db.auth.onAuthStateChange(async (event, session) => {
   currentSession = session ?? null;
 
   if (currentUser) {
-    // Token refresh — don't reload profile/UI, but retry data loads that may
-    // have failed when INITIAL_SESSION fired with an expired access token
+    // Token refresh — don't touch login/app UI, but re-run profile + data loads
+    // because INITIAL_SESSION can fire before the token is refreshed, causing
+    // loadProfile() and loadVto() to fail with a stale/expired access token
     if (event === 'TOKEN_REFRESHED') {
+      await loadProfile();
       loadVto();
       loadCourseStatus();
       return;
