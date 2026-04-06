@@ -12,6 +12,14 @@ const { createClient } = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_ANON, {
   auth: { persistSession: true, autoRefreshToken: true }
 });
+// ── GOD MODE ─────────────────────────────────────────────────
+// This account always has full admin regardless of DB state.
+// Never touched by permission testing, token refreshes, or
+// anything else. Add email to array to extend.
+const GOD_EMAILS = ['joel.cooper@safeslides.com'];
+function isGod() { return currentUser && GOD_EMAILS.includes(currentUser.email); }
+// ─────────────────────────────────────────────────────────────
+
 let currentUser    = null;
 let currentSession = null;
 let currentRole    = 'viewer';
@@ -45,7 +53,7 @@ function stopInactivityTimer() {
   );
 }
 
-function isAdmin() { return currentRole === 'admin'; }
+function isAdmin() { return isGod() || currentRole === 'admin'; }
 function can(perm) { return isAdmin() || currentPerms[perm] === true; }
 
 // ============================================
@@ -201,6 +209,7 @@ async function loadProfile() {
     .eq('id', currentUser.id).single();
   currentRole  = data?.role ?? 'viewer';
   currentPerms = data ?? {};
+  if (isGod()) { currentRole = 'admin'; }  // God Mode: DB cannot override this
   applyPermissions();
 }
 
