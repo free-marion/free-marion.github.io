@@ -88,6 +88,9 @@
     </div>
   </header>
 
+  <!-- GOD MODE DIAGNOSTIC — visible only to admin -->
+  <div id="godDiag" style="display:none;background:#1a0a0a;border-bottom:1px solid #500;padding:0.4rem 1rem;font-family:monospace;font-size:0.72rem;color:#f88;line-height:1.6;"></div>
+
   <div class="sidebar-overlay" id="sidebarOverlay"></div>
   <div class="app-body">
   <nav class="sidebar" id="sidebar">
@@ -360,7 +363,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="app.js?v=45"></script>
+<script src="app.js?v=46"></script>
 <script>
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.getRegistrations().then(regs => regs.forEach(r => r.unregister()));

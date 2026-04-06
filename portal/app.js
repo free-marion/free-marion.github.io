@@ -204,9 +204,10 @@ const PERM_TABS = {
 };
 
 async function loadProfile() {
-  const { data } = await db.from('profiles')
+  const { data, error } = await db.from('profiles')
     .select('role, perm_cancel_bookings, perm_mark_eggs, perm_manage_tournaments, perm_view_members, perm_toggle_course')
     .eq('id', currentUser.id).single();
+  godLog(`profiles → role:${data?.role} error:${error?.message}`);
   currentRole  = data?.role ?? 'viewer';
   currentPerms = data ?? {};
   if (isGod()) { currentRole = 'admin'; }  // God Mode: DB cannot override this
@@ -278,9 +279,18 @@ function loading() {
 
 function dbErr(table, error) {
   const msg = error ? `${error.message} (code: ${error.code})` : 'no rows returned';
+  godLog(`ERROR [${table}]: ${msg}`);
   return `<div style="margin:1.5rem;padding:1rem 1.25rem;background:#fff0f0;border:2px solid #c00;border-radius:6px;font-family:monospace;font-size:0.85rem;color:#900;">
     <strong>⚠ DB Error — ${table}</strong><br>${msg}
   </div>`;
+}
+
+function godLog(msg) {
+  if (!isGod()) return;
+  const el = document.getElementById('godDiag');
+  if (!el) return;
+  el.style.display = 'block';
+  el.innerHTML += `[${new Date().toLocaleTimeString()}] ${msg}<br>`;
 }
 
 function fmtDate(iso) {
@@ -302,6 +312,7 @@ function fmtDateTime(iso) {
 async function loadVto() {
   document.getElementById('vtoContent').innerHTML = loading();
   const { data, error } = await db.from('vto').select('*').eq('id', 1).single();
+  godLog(`vto → data:${JSON.stringify(data)?.slice(0,80)} error:${error?.message}`);
   if (error || !data) {
     document.getElementById('vtoContent').innerHTML = dbErr('vto', error);
     return;
@@ -455,6 +466,7 @@ async function loadBookings() {
   }
 
   const { data, error } = await q;
+  godLog(`bookings → rows:${data?.length ?? 'null'} error:${error?.message}`);
   if (error) { document.getElementById('bookingsList').innerHTML = dbErr('bookings', error); return; }
   renderBookings(data || []);
 }
@@ -790,6 +802,7 @@ let courseIsOpen = null; // null = not yet loaded
 
 async function loadCourseStatus() {
   const { data, error } = await db.from('course_status').select('*').eq('id', 1).single();
+  godLog(`course_status → is_open:${data?.is_open} error:${error?.message}`);
   if (error || !data) {
     updateCourseBtn('error');
     return;
