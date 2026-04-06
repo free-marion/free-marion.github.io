@@ -272,9 +272,15 @@ function esc(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
+function loading() {
+  return `<p style="padding:1.5rem;color:#888;font-style:italic;">Loading…</p>`;
+}
+
 function dbErr(table, error) {
-  const msg = error ? `${error.message} (code: ${error.code})` : 'no data returned';
-  return `<p style="color:#c00;padding:1rem;font-family:monospace;font-size:0.85rem;">DB error on <strong>${table}</strong>: ${msg}</p>`;
+  const msg = error ? `${error.message} (code: ${error.code})` : 'no rows returned';
+  return `<div style="margin:1.5rem;padding:1rem 1.25rem;background:#fff0f0;border:2px solid #c00;border-radius:6px;font-family:monospace;font-size:0.85rem;color:#900;">
+    <strong>⚠ DB Error — ${table}</strong><br>${msg}
+  </div>`;
 }
 
 function fmtDate(iso) {
@@ -294,6 +300,7 @@ function fmtDateTime(iso) {
 // ============================================
 
 async function loadVto() {
+  document.getElementById('vtoContent').innerHTML = loading();
   const { data, error } = await db.from('vto').select('*').eq('id', 1).single();
   if (error || !data) {
     document.getElementById('vtoContent').innerHTML = dbErr('vto', error);
@@ -353,6 +360,7 @@ function renderVto(v) {
 // ============================================
 
 async function loadAccountability() {
+  document.getElementById('accountabilityList').innerHTML = loading();
   const { data, error } = await db.from('accountability_nodes').select('*').order('sort_order');
   if (error) { document.getElementById('accountabilityList').innerHTML = dbErr('accountability_nodes', error); return; }
   renderAccountability(data || []);
@@ -424,6 +432,7 @@ async function archiveOldBookings() {
 }
 
 async function loadBookings() {
+  document.getElementById('bookingsList').innerHTML = loading();
   await archiveOldBookings();
 
   let q;
@@ -640,6 +649,7 @@ document.querySelectorAll('#tabBookings .filter-btn').forEach(btn => {
 let eggsFilter = 'pending';
 
 async function loadEggs() {
+  document.getElementById('eggsList').innerHTML = loading();
   let q = db.from('egg_orders').select('*').order('created_at', { ascending: false });
   if (eggsFilter === 'pending') q = q.eq('status', 'pending');
   const { data, error } = await q;
@@ -694,6 +704,7 @@ document.querySelectorAll('#tabEggs .filter-btn').forEach(btn => {
 let membersFilter = 'new';
 
 async function loadMembers() {
+  document.getElementById('membersList').innerHTML = loading();
   let q = db.from('membership_applications').select('*').order('created_at', { ascending: false });
   if (membersFilter === 'new') q = q.eq('status', 'new');
   const { data, error } = await q;
@@ -751,6 +762,7 @@ const TRACK_MAP = {
 };
 
 async function loadDocs() {
+  document.getElementById('trainingList').innerHTML = loading();
   const { data, error } = await db.from('profiles').select('id, name, email, role').order('name');
   if (error) { document.getElementById('trainingList').innerHTML = dbErr('profiles/docs', error); return; }
   const list = document.getElementById('trainingList');
@@ -774,14 +786,16 @@ async function loadDocs() {
 // COURSE STATUS
 // ============================================
 
-let courseIsOpen = true;
+let courseIsOpen = null; // null = not yet loaded
 
 async function loadCourseStatus() {
-  const { data } = await db.from('course_status').select('*').eq('id', 1).single();
-  if (data) {
-    courseIsOpen = data.is_open;
-    updateCourseBtn();
+  const { data, error } = await db.from('course_status').select('*').eq('id', 1).single();
+  if (error || !data) {
+    updateCourseBtn('error');
+    return;
   }
+  courseIsOpen = data.is_open;
+  updateCourseBtn();
 }
 
 function withinHours() {
@@ -791,11 +805,16 @@ function withinHours() {
   return h >= 8 && h < 19;
 }
 
-function updateCourseBtn() {
+function updateCourseBtn(state) {
   const btn = document.getElementById('courseToggleBtn');
-  const effectivelyOpen = courseIsOpen && withinHours();
-  if (effectivelyOpen) {
-    btn.textContent = '⛳ Course Open';
+  if (state === 'error' || courseIsOpen === null) {
+    btn.textContent = '⚠ Status Unknown';
+    btn.className = 'btn btn--sm course-closed';
+    return;
+  }
+  // Portal shows the DB state directly. Outside-hours is noted but doesn't fake the state.
+  if (courseIsOpen) {
+    btn.textContent = withinHours() ? '⛳ Course Open' : '⛳ Open (outside hrs)';
     btn.className = 'btn btn--sm course-open';
   } else {
     btn.textContent = '⛔ Course Closed';
@@ -804,20 +823,20 @@ function updateCourseBtn() {
 }
 
 document.getElementById('courseToggleBtn').addEventListener('click', async () => {
+  if (courseIsOpen === null) { alert('Course status not loaded — try refreshing.'); return; }
   const newStatus = !courseIsOpen;
   const msg = newStatus ? '' : prompt('Closure message (shown on website):', 'Course is closed due to weather conditions. Check back soon.');
   if (!newStatus && msg === null) return; // cancelled
   const label = newStatus ? 'reopen' : 'close';
   if (!confirm(`${label.charAt(0).toUpperCase() + label.slice(1)} the course?`)) return;
-  // closed_on records the CT date of closure so tee-time bookings are blocked for that day only;
-  // setting it to null on reopen, and it naturally expires at midnight when the date rolls over.
   const todayCT = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Chicago' });
-  await db.from('course_status').update({
+  const { error } = await db.from('course_status').update({
     is_open: newStatus,
     message: msg || 'Course is closed due to weather conditions. Check back soon.',
     closed_on: newStatus ? null : todayCT,
     updated_at: new Date().toISOString()
   }).eq('id', 1);
+  if (error) { alert('Failed to update course status: ' + error.message); return; }
   courseIsOpen = newStatus;
   updateCourseBtn();
 });
@@ -835,6 +854,7 @@ const PERM_LABELS = [
 ];
 
 async function loadUsers() {
+  document.getElementById('usersList').innerHTML = loading();
   const cols = 'id, email, name, role, ' + PERM_LABELS.map(p => p.key).join(', ');
   const { data, error } = await db.from('profiles').select(cols).order('name');
   if (error) { document.getElementById('usersList').innerHTML = dbErr('profiles', error); return; }
@@ -960,8 +980,9 @@ async function loadTournaments() {
   document.getElementById('tournamentsList').style.display = '';
   document.getElementById('tournamentsEmpty').hidden = true;
 
+  document.getElementById('tournamentsList').innerHTML = loading();
   const { data, error } = await db.from('tournaments').select('*').order('date', { ascending: false });
-  if (error) { console.error(error); return; }
+  if (error) { document.getElementById('tournamentsList').innerHTML = dbErr('tournaments', error); return; }
 
   // Fetch registration counts
   const ids = (data || []).map(t => t.id);
