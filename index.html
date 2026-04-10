@@ -510,24 +510,31 @@
         return h >= 8 && h < 19; // 8am–7pm
       }
 
-      db.from('course_status').select('*').eq('id', 1).single().then(({ data }) => {
-        const manualClose = data && !data.is_open;
-        const outsideHours = !withinHours();
-        const badge = document.getElementById('courseStatusBadge');
-        if (manualClose || outsideHours) {
-          const msg = manualClose
-            ? data.message
-            : 'Course is currently closed. Hours: 8am–7pm daily.';
-          document.getElementById('courseClosedMsg').textContent = msg;
-          document.getElementById('courseClosedBanner').style.display = 'block';
+      function showStatus(isOpen, message) {
+        const badge  = document.getElementById('courseStatusBadge');
+        const banner = document.getElementById('courseClosedBanner');
+        if (!isOpen) {
+          document.getElementById('courseClosedMsg').textContent = message || 'Course is currently closed. Hours: 8am–7pm daily.';
+          banner.style.display = 'block';
           badge.textContent = '⛔ Course Closed';
           badge.className = 'course-status-badge course-status-badge--closed';
         } else {
+          banner.style.display = 'none';
           badge.textContent = '⛳ Course Open';
           badge.className = 'course-status-badge course-status-badge--open';
         }
         badge.style.display = 'inline-block';
-      });
+      }
+
+      // Show hour-based status immediately — no waiting for Supabase
+      showStatus(withinHours());
+
+      // Check Supabase only for manual overrides (e.g. weather closure)
+      db.from('course_status').select('is_open,message').eq('id', 1).single()
+        .then(({ data }) => {
+          if (data && !data.is_open) showStatus(false, data.message);
+        })
+        .catch(() => { /* keep hours-based result */ });
     })();
   </script>
 </body>
