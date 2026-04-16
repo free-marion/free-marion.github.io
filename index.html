@@ -83,13 +83,9 @@
       <p class="pricing-subhead">We're actively restoring our greens. Rates reflect where we are — and where we're headed.</p>
 
       <div class="year-tabs">
-        <button class="year-tab active" onclick="showYear('now', this)">
-          Now
-          <span class="tab-note">Best value · Greens improving</span>
-        </button>
-        <button class="year-tab" onclick="showYear('y2026', this)">
+        <button class="year-tab active" onclick="showYear('y2026', this)">
           2026
-          <span class="tab-note">Greens improving</span>
+          <span class="tab-note">Current rates</span>
         </button>
         <button class="year-tab" onclick="showYear('y2027', this)">
           2027
@@ -97,39 +93,8 @@
         </button>
       </div>
 
-      <!-- NOW -->
-      <div class="pricing-panel active" id="panel-now">
-        <div class="season-block">
-          <div class="season-label">Regular Season <span class="season-badge">Apr – Oct</span></div>
-          <table class="price-table">
-            <thead><tr><th></th><th>18 Holes</th><th>9 Holes</th></tr></thead>
-            <tbody>
-              <tr><td>Weekday w/ cart</td><td><span class="price-val">$30</span></td><td><span class="price-val">$20</span></td></tr>
-              <tr><td>Weekend w/ cart <span class="wknd-tag">Sat–Sun</span></td><td><span class="price-val">$34</span></td><td><span class="price-val">$22</span></td></tr>
-              <tr class="row-walking"><td>Walking</td><td><span class="price-val">$22</span></td><td><span class="price-val">$15</span></td></tr>
-            </tbody>
-          </table>
-        </div>
-        <hr class="season-divider">
-        <div class="season-block">
-          <div class="season-label">Winter Season <span class="season-badge winter">Nov – Mar</span></div>
-          <table class="price-table">
-            <thead><tr><th></th><th>18 Holes</th><th>9 Holes</th></tr></thead>
-            <tbody>
-              <tr><td>Weekday w/ cart</td><td><span class="price-val">$24</span></td><td><span class="price-val">$16</span></td></tr>
-              <tr><td>Weekend w/ cart <span class="wknd-tag">Sat–Sun</span></td><td><span class="price-val">$27</span></td><td><span class="price-val">$18</span></td></tr>
-              <tr class="row-walking"><td>Walking</td><td><span class="price-val">$17</span></td><td><span class="price-val">$12</span></td></tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="pricing-cta">
-          <p class="pricing-cta-note">Green fees collected at the Clubhouse on arrival.<br>Call ahead to confirm course conditions.</p>
-          <a href="tel:+15737830012" class="btn-call">📞 Call to Reserve</a>
-        </div>
-      </div>
-
       <!-- 2026 -->
-      <div class="pricing-panel" id="panel-y2026">
+      <div class="pricing-panel active" id="panel-y2026">
         <div class="season-block">
           <div class="season-label">Regular Season <span class="season-badge">Apr – Oct</span></div>
           <table class="price-table">
