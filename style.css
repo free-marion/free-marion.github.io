@@ -1765,3 +1765,165 @@ address {
 
   .hero-content h1 { font-size: clamp(2.8rem, 12vw, 4rem); }
 }
+
+/* ── PRICING SECTION ── */
+.pricing-section-wrap {
+  background: var(--cream, #F6F1E7);
+  padding: 64px 24px;
+}
+.pricing-section {
+  width: 100%;
+  max-width: 820px;
+  margin: 0 auto;
+}
+.pricing-heading {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 2rem;
+  color: #004331;
+  margin-bottom: 6px;
+}
+.pricing-subhead {
+  font-size: 0.9rem;
+  color: #4a6357;
+  margin-bottom: 28px;
+  line-height: 1.5;
+}
+.year-tabs {
+  display: flex;
+  gap: 0;
+  border-radius: 6px 6px 0 0;
+  overflow: hidden;
+  border: 1.5px solid #00854e;
+  border-bottom: none;
+  width: fit-content;
+}
+.year-tab {
+  padding: 10px 24px;
+  font-family: 'Lora', Georgia, serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  background: #EDE5D2;
+  color: #4a6357;
+  border: none;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s;
+  border-right: 1.5px solid #00854e;
+}
+.year-tab:last-child { border-right: none; }
+.year-tab.active { background: #004331; color: #fff; }
+.year-tab .tab-note {
+  display: block;
+  font-size: 0.65rem;
+  font-weight: 400;
+  opacity: 0.8;
+  margin-top: 1px;
+  letter-spacing: 0.02em;
+}
+.pricing-panel {
+  display: none;
+  border: 1.5px solid #00854e;
+  border-radius: 0 6px 6px 6px;
+  background: #fff;
+  padding: 28px;
+}
+.pricing-panel.active { display: block; }
+.season-block { margin-bottom: 28px; }
+.season-block:last-child { margin-bottom: 0; }
+.season-label {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #004331;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1.5px solid #EDE5D2;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.season-badge {
+  font-family: 'Lora', Georgia, serif;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  background: #EDE5D2;
+  color: #4a6357;
+  padding: 2px 8px;
+  border-radius: 20px;
+}
+.season-badge.winter { background: #ddeaf4; color: #2a5070; }
+.price-table { width: 100%; border-collapse: collapse; }
+.price-table th {
+  font-family: 'Lora', Georgia, serif;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: #00854e;
+  text-align: right;
+  padding: 6px 12px 6px 0;
+  border-bottom: 1px solid #EDE5D2;
+}
+.price-table th:first-child { text-align: left; padding-left: 0; }
+.price-table td {
+  font-size: 0.9rem;
+  color: #004331;
+  padding: 9px 12px 9px 0;
+  border-bottom: 1px solid #f0ebe0;
+  text-align: right;
+  vertical-align: middle;
+}
+.price-table td:first-child { text-align: left; padding-left: 0; font-weight: 600; }
+.price-table tr:last-child td { border-bottom: none; }
+.price-table .row-walking td:first-child { color: #4a6357; font-weight: 400; font-style: italic; }
+.price-val {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #004331;
+}
+.wknd-tag {
+  font-size: 0.62rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: #d7aa2b;
+  background: #fdf6e0;
+  border-radius: 3px;
+  padding: 1px 5px;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+.season-divider {
+  border: none;
+  border-top: 1.5px dashed #EDE5D2;
+  margin: 24px 0;
+}
+.pricing-cta {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1.5px solid #EDE5D2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.pricing-cta-note { font-size: 0.82rem; color: #4a6357; line-height: 1.5; }
+.btn-call {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #004331;
+  color: #fff;
+  font-family: 'Lora', Georgia, serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 10px 22px;
+  border-radius: 4px;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background 0.18s;
+}
+.btn-call:hover { background: #00854e; }

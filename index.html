@@ -30,7 +30,7 @@
       <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">&#9776;</button>
       <ul class="nav-links" id="navLinks">
         <li><a href="#about">About</a></li>
-        <li><a href="#tee-times">Tee Times</a></li>
+        <li><a href="#pricing">Pricing</a></li>
         <li><a href="#farm">The Farm</a></li>
         <li><a href="#stay">Stay</a></li>
         <li><a href="#course">The Course</a></li>
@@ -49,7 +49,7 @@
       <h1>Cherrywood<br>Farm &amp; Golf Club</h1>
       <p class="hero-tagline">Where Purpose Grows.</p>
       <div class="hero-actions">
-        <a href="#tee-times" class="hero-cta">Book Tee Time</a>
+        <a href="#pricing" class="hero-cta">View Pricing</a>
         <a href="#eggs" class="hero-cta hero-cta--outline">Reserve Farm Eggs</a>
         <a href="/membership.html" class="hero-cta hero-cta--outline">Apply for Membership</a>
       </div>
@@ -75,137 +75,122 @@
     </div>
   </section>
 
-  <!-- TEE TIMES -->
-  <section class="tee-section" id="tee-times">
-    <div class="tee-section-inner">
+  <!-- PRICING -->
+  <section class="pricing-section-wrap" id="pricing">
+    <div class="pricing-section">
+      <span class="panel-kicker">Green Fees</span>
+      <h2 class="pricing-heading">Course Pricing</h2>
+      <p class="pricing-subhead">We're actively restoring our greens. Rates reflect where we are — and where we're headed.</p>
 
-      <!-- CONDITIONS COLUMN -->
-      <div class="tee-conditions-col">
-        <span class="panel-kicker">Live Conditions</span>
-        <h3 class="tee-conditions-heading">Today on the Course</h3>
-        <div class="conditions-dashboard">
-          <div class="wind-compass-wrap">
-            <div class="compass-ring">
-              <span class="compass-cardinal n">N</span>
-              <span class="compass-cardinal s">S</span>
-              <span class="compass-cardinal e">E</span>
-              <span class="compass-cardinal w">W</span>
-              <svg class="compass-ticks" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-                <g id="ticks"></g>
-              </svg>
-              <div class="needle-wrap" id="needleWrap">
-                <svg class="needle-svg" viewBox="0 0 40 100" xmlns="http://www.w3.org/2000/svg">
-                  <polygon points="20,4 26,52 14,52" fill="#C4627A"/>
-                  <polygon points="20,96 26,52 14,52" fill="rgba(255,255,255,0.18)"/>
-                  <circle cx="20" cy="52" r="5" fill="#fff"/>
-                </svg>
-              </div>
-            </div>
-            <p class="wind-direction-label" id="windDirLabel">—</p>
-          </div>
-          <div class="conditions-stats">
-            <div class="stat-card">
-              <span class="stat-value" id="windSpeed">—</span>
-              <span class="stat-unit">mph</span>
-            </div>
-            <div class="stat-card">
-              <span class="stat-value" id="tempVal">—</span>
-              <span class="stat-unit">°F</span>
-            </div>
-          </div>
-        </div>
-        <p class="tee-conditions-desc" id="teeWeatherDesc">—</p>
+      <div class="year-tabs">
+        <button class="year-tab active" onclick="showYear('now', this)">
+          Now
+          <span class="tab-note">Best value · Greens improving</span>
+        </button>
+        <button class="year-tab" onclick="showYear('y2026', this)">
+          2026
+          <span class="tab-note">Greens improving</span>
+        </button>
+        <button class="year-tab" onclick="showYear('y2027', this)">
+          2027
+          <span class="tab-note">Fully restored</span>
+        </button>
       </div>
 
-      <!-- BOOKING COLUMN -->
-      <div class="tee-booking-wrap">
-
-        <span class="panel-kicker">Golf</span>
-        <h2>Book a Tee Time</h2>
-
-        <!-- STEP 1: Date + Holes -->
-        <div class="tee-step" id="teeStep1">
-          <p class="tee-step-hint">Choose a date and how many holes you'd like to play.</p>
-          <div class="tee-step1-fields">
-            <div class="tee-field">
-              <label for="teeDate">Date</label>
-              <input type="date" id="teeDate" />
-            </div>
-            <div class="tee-field">
-              <label>Holes</label>
-              <div class="holes-toggle">
-                <button type="button" class="holes-btn holes-btn--active" data-holes="9">9</button>
-                <button type="button" class="holes-btn" data-holes="18">18</button>
-              </div>
-            </div>
-          </div>
-          <button type="button" class="btn-tee-primary" id="teeShowSlots">Show Available Times</button>
-          <p class="tee-error" id="teeStep1Error"></p>
+      <!-- NOW -->
+      <div class="pricing-panel active" id="panel-now">
+        <div class="season-block">
+          <div class="season-label">Regular Season <span class="season-badge">Apr – Oct</span></div>
+          <table class="price-table">
+            <thead><tr><th></th><th>18 Holes</th><th>9 Holes</th></tr></thead>
+            <tbody>
+              <tr><td>Weekday w/ cart</td><td><span class="price-val">$30</span></td><td><span class="price-val">$20</span></td></tr>
+              <tr><td>Weekend w/ cart <span class="wknd-tag">Sat–Sun</span></td><td><span class="price-val">$34</span></td><td><span class="price-val">$22</span></td></tr>
+              <tr class="row-walking"><td>Walking</td><td><span class="price-val">$22</span></td><td><span class="price-val">$15</span></td></tr>
+            </tbody>
+          </table>
         </div>
-
-        <!-- STEP 2: Time slot picker -->
-        <div class="tee-step tee-step--hidden" id="teeStep2">
-          <button type="button" class="tee-back-link" id="teeBackTo1">&larr; Change date</button>
-          <p class="tee-date-label" id="teeDateLabel"></p>
-          <p class="tee-step-hint">Select an available time below.</p>
-          <div class="tee-slots-loading" id="teeSlotsLoading">Loading&hellip;</div>
-          <div class="tee-slots-grid" id="teeSlotsGrid"></div>
-          <p class="tee-error" id="teeStep2Error"></p>
+        <hr class="season-divider">
+        <div class="season-block">
+          <div class="season-label">Winter Season <span class="season-badge winter">Nov – Mar</span></div>
+          <table class="price-table">
+            <thead><tr><th></th><th>18 Holes</th><th>9 Holes</th></tr></thead>
+            <tbody>
+              <tr><td>Weekday w/ cart</td><td><span class="price-val">$24</span></td><td><span class="price-val">$16</span></td></tr>
+              <tr><td>Weekend w/ cart <span class="wknd-tag">Sat–Sun</span></td><td><span class="price-val">$27</span></td><td><span class="price-val">$18</span></td></tr>
+              <tr class="row-walking"><td>Walking</td><td><span class="price-val">$17</span></td><td><span class="price-val">$12</span></td></tr>
+            </tbody>
+          </table>
         </div>
-
-        <!-- STEP 3: Booking form -->
-        <div class="tee-step tee-step--hidden" id="teeStep3">
-          <button type="button" class="tee-back-link" id="teeBackTo2">&larr; Change time</button>
-          <p class="tee-selected-slot" id="teeSelectedSlotLabel"></p>
-          <form class="tee-form" id="teeBookingForm" novalidate>
-            <div class="tee-form-row">
-              <div class="tee-form-field">
-                <label for="teeName">Name</label>
-                <input type="text" id="teeName" name="name" required autocomplete="name" />
-              </div>
-              <div class="tee-form-field">
-                <label for="teePhone">Phone</label>
-                <input type="tel" id="teePhone" name="phone" required autocomplete="tel" />
-              </div>
-            </div>
-            <div class="tee-form-field">
-              <label for="teeEmail">Email <span class="tee-optional">(optional)</span></label>
-              <input type="email" id="teeEmail" name="email" autocomplete="email" />
-            </div>
-            <div class="tee-form-row">
-              <div class="tee-form-field">
-                <label for="teeNumPlayers">Players</label>
-                <select id="teeNumPlayers" name="num_players" required></select>
-              </div>
-              <div class="tee-form-field">
-                <label for="teeNumCarts">Carts</label>
-                <select id="teeNumCarts" name="num_carts"></select>
-              </div>
-            </div>
-            <div class="tee-form-field">
-              <label for="teeNotes">Notes <span class="tee-optional">(optional)</span></label>
-              <input type="text" id="teeNotes" name="notes" placeholder="Anything we should know?" />
-            </div>
-            <button type="submit" class="btn-tee-primary" id="teeConfirmBtn">Confirm Booking</button>
-            <p class="tee-error" id="teeStep3Error"></p>
-          </form>
+        <div class="pricing-cta">
+          <p class="pricing-cta-note">Green fees collected at the Clubhouse on arrival.<br>Call ahead to confirm course conditions.</p>
+          <a href="tel:+15737830012" class="btn-call">📞 Call to Reserve</a>
         </div>
-
-        <!-- STEP 4: Confirmation -->
-        <div class="tee-step tee-step--hidden" id="teeStep4">
-          <div class="tee-confirmation">
-            <div class="tee-confirm-check">&#10003;</div>
-            <p class="tee-confirm-title">You&rsquo;re on the course!</p>
-            <p class="tee-confirm-no" id="teeConfirmNo"></p>
-            <div class="tee-confirm-details" id="teeConfirmDetails"></div>
-            <p style="font-size:0.82rem;color:#6a5a3a;margin-top:0.75rem;">Green fees are collected at the Clubhouse on arrival.</p>
-            <button type="button" class="btn-tee-ghost" id="teeBookAnother">Book Another Time</button>
-          </div>
-        </div>
-
       </div>
-    </div><!-- /tee-booking-wrap -->
-  </div><!-- /tee-section-inner -->
+
+      <!-- 2026 -->
+      <div class="pricing-panel" id="panel-y2026">
+        <div class="season-block">
+          <div class="season-label">Regular Season <span class="season-badge">Apr – Oct</span></div>
+          <table class="price-table">
+            <thead><tr><th></th><th>18 Holes</th><th>9 Holes</th></tr></thead>
+            <tbody>
+              <tr><td>Weekday w/ cart</td><td><span class="price-val">$32</span></td><td><span class="price-val">$21</span></td></tr>
+              <tr><td>Weekend w/ cart <span class="wknd-tag">Sat–Sun</span></td><td><span class="price-val">$36</span></td><td><span class="price-val">$23</span></td></tr>
+              <tr class="row-walking"><td>Walking</td><td><span class="price-val">$23</span></td><td><span class="price-val">$16</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <hr class="season-divider">
+        <div class="season-block">
+          <div class="season-label">Winter Season <span class="season-badge winter">Nov – Mar</span></div>
+          <table class="price-table">
+            <thead><tr><th></th><th>18 Holes</th><th>9 Holes</th></tr></thead>
+            <tbody>
+              <tr><td>Weekday w/ cart</td><td><span class="price-val">$26</span></td><td><span class="price-val">$17</span></td></tr>
+              <tr><td>Weekend w/ cart <span class="wknd-tag">Sat–Sun</span></td><td><span class="price-val">$29</span></td><td><span class="price-val">$19</span></td></tr>
+              <tr class="row-walking"><td>Walking</td><td><span class="price-val">$18</span></td><td><span class="price-val">$13</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="pricing-cta">
+          <p class="pricing-cta-note">Green fees collected at the Clubhouse on arrival.<br>Call ahead to confirm course conditions.</p>
+          <a href="tel:+15737830012" class="btn-call">📞 Call to Reserve</a>
+        </div>
+      </div>
+
+      <!-- 2027 -->
+      <div class="pricing-panel" id="panel-y2027">
+        <div class="season-block">
+          <div class="season-label">Regular Season <span class="season-badge">Apr – Oct</span></div>
+          <table class="price-table">
+            <thead><tr><th></th><th>18 Holes</th><th>9 Holes</th></tr></thead>
+            <tbody>
+              <tr><td>Weekday w/ cart</td><td><span class="price-val">$36</span></td><td><span class="price-val">$23</span></td></tr>
+              <tr><td>Weekend w/ cart <span class="wknd-tag">Sat–Sun</span></td><td><span class="price-val">$40</span></td><td><span class="price-val">$25</span></td></tr>
+              <tr class="row-walking"><td>Walking</td><td><span class="price-val">$26</span></td><td><span class="price-val">$18</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <hr class="season-divider">
+        <div class="season-block">
+          <div class="season-label">Winter Season <span class="season-badge winter">Nov – Mar</span></div>
+          <table class="price-table">
+            <thead><tr><th></th><th>18 Holes</th><th>9 Holes</th></tr></thead>
+            <tbody>
+              <tr><td>Weekday w/ cart</td><td><span class="price-val">$29</span></td><td><span class="price-val">$18</span></td></tr>
+              <tr><td>Weekend w/ cart <span class="wknd-tag">Sat–Sun</span></td><td><span class="price-val">$32</span></td><td><span class="price-val">$20</span></td></tr>
+              <tr class="row-walking"><td>Walking</td><td><span class="price-val">$20</span></td><td><span class="price-val">$14</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="pricing-cta">
+          <p class="pricing-cta-note">Green fees collected at the Clubhouse on arrival.<br>Call ahead to confirm course conditions.</p>
+          <a href="tel:+15737830012" class="btn-call">📞 Call to Reserve</a>
+        </div>
+      </div>
+
+    </div>
   </section>
 
   <!-- EGGS -->
@@ -496,7 +481,14 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="script.js"></script>
-  <script src="tee-times.js"></script>
+  <script>
+    function showYear(year, tab) {
+      document.querySelectorAll('.pricing-panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.year-tab').forEach(t => t.classList.remove('active'));
+      document.getElementById('panel-' + year).classList.add('active');
+      tab.classList.add('active');
+    }
+  </script>
   <script src="egg-form.js"></script>
   <script>
     (function() {
