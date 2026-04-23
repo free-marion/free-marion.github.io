@@ -12,22 +12,13 @@ const { createClient } = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_ANON, {
   auth: { persistSession: true, autoRefreshToken: true }
 });
-// ── GOD MODE ─────────────────────────────────────────────────
-// This account always has full admin regardless of DB state.
-// Never touched by permission testing, token refreshes, or
-// anything else. Add email to array to extend.
-const GOD_EMAILS = ['joel.cooper@safeslides.com'];
-function isGod() { return currentUser && GOD_EMAILS.includes(currentUser.email); }
-// ─────────────────────────────────────────────────────────────
 
-let currentUser    = null;
-let currentSession = null;
-let currentRole    = 'viewer';
-let currentPerms   = {};
+let currentUser = null;
 
 // ============================================
 // INACTIVITY LOGOUT — 10 minutes
 // ============================================
+
 const INACTIVITY_MS = 10 * 60 * 1000;
 let _inactivityTimer = null;
 
@@ -53,29 +44,14 @@ function stopInactivityTimer() {
   );
 }
 
-function isAdmin() { return isGod() || currentRole === 'admin'; }
-function can(perm) { return isAdmin() || currentPerms[perm] === true; }
-
 // ============================================
 // AUTH
 // ============================================
 
 db.auth.onAuthStateChange(async (event, session) => {
-  currentUser    = session?.user ?? null;
-  currentSession = session ?? null;
+  currentUser = session?.user ?? null;
 
   if (currentUser) {
-    // Token refresh — don't touch login/app UI, but re-run profile + data loads
-    // because INITIAL_SESSION can fire before the token is refreshed, causing
-    // loadProfile() and loadVto() to fail with a stale/expired access token
-    if (event === 'TOKEN_REFRESHED') {
-      await loadProfile();
-      loadVto();
-      loadCourseStatus();
-      return;
-    }
-
-    // Invite, magic link, or password recovery — prompt user to set a permanent password
     if (_initialHash.includes('type=invite') || _initialHash.includes('type=magiclink') || _initialHash.includes('type=recovery')) {
       showSetPasswordScreen();
       return;
@@ -84,15 +60,10 @@ db.auth.onAuthStateChange(async (event, session) => {
     document.getElementById('setPasswordScreen').hidden = true;
     document.getElementById('loginScreen').hidden = true;
     document.getElementById('appShell').hidden = false;
-    document.getElementById('userEmail').textContent = currentUser.email;
-    await loadProfile();
-    loadVto();
-    loadCourseStatus();
+    loadTournaments();
     startInactivityTimer();
   } else {
     stopInactivityTimer();
-    currentRole  = 'viewer';
-    currentPerms = {};
     document.getElementById('setPasswordScreen').hidden = true;
     document.getElementById('loginScreen').hidden = false;
     document.getElementById('appShell').hidden = true;
@@ -136,15 +107,10 @@ document.getElementById('setPasswordBtn').addEventListener('click', async () => 
     return;
   }
 
-  // Password set — load the app normally
   document.getElementById('setPasswordScreen').hidden = true;
   document.getElementById('appShell').hidden = false;
-  document.getElementById('userEmail').textContent = currentUser.email;
-  await loadProfile();
-  loadVto();
-  loadCourseStatus();
+  loadTournaments();
 });
-
 
 document.getElementById('loginForm').addEventListener('submit', async e => {
   e.preventDefault();
@@ -153,11 +119,10 @@ document.getElementById('loginForm').addEventListener('submit', async e => {
   btn.disabled = true;
   btn.textContent = 'Signing in…';
   err.hidden = true;
-  const { data: signInData, error } = await db.auth.signInWithPassword({
+  const { error } = await db.auth.signInWithPassword({
     email: document.getElementById('loginEmail').value.trim(),
     password: document.getElementById('loginPassword').value
   });
-  if (signInData?.session) currentSession = signInData.session;
   if (error) {
     err.textContent = error.message;
     err.hidden = false;
@@ -193,54 +158,11 @@ document.getElementById('sendResetBtn').addEventListener('click', async () => {
 });
 
 // ============================================
-// PROFILE & PERMISSIONS
-// ============================================
-
-const PERM_TABS = {
-  bookings:    'perm_cancel_bookings',
-  eggs:        'perm_mark_eggs',
-  tournaments: 'perm_manage_tournaments',
-  members:     'perm_view_members',
-};
-
-async function loadProfile() {
-  const { data, error } = await db.from('profiles')
-    .select('role, perm_cancel_bookings, perm_mark_eggs, perm_manage_tournaments, perm_view_members, perm_toggle_course')
-    .eq('id', currentUser.id).single();
-  godLog(`profiles → role:${data?.role} error:${error?.message}`);
-  currentRole  = data?.role ?? 'viewer';
-  currentPerms = data ?? {};
-  if (isGod()) { currentRole = 'admin'; }  // God Mode: DB cannot override this
-  applyPermissions();
-}
-
-function applyPermissions() {
-  document.getElementById('courseToggleBtn').style.display = (isAdmin() || can('perm_toggle_course')) ? '' : 'none';
-
-  Object.entries(PERM_TABS).forEach(([tab, perm]) => {
-    const btn = document.querySelector(`.tab-btn[data-tab="${tab}"]`);
-    if (btn) btn.style.display = can(perm) ? '' : 'none';
-  });
-
-  const usersBtn = document.querySelector('.tab-btn[data-tab="users"]');
-  if (usersBtn) usersBtn.style.display = isAdmin() ? '' : 'none';
-
-  const active = document.querySelector('.tab-btn--active');
-  if (active) {
-    const perm = PERM_TABS[active.dataset.tab];
-    if ((perm && !can(perm)) || (active.dataset.tab === 'users' && !isAdmin())) {
-      document.querySelector('.tab-btn[data-tab="bookings"]').click();
-    }
-  }
-}
-
-// ============================================
 // TAB ROUTING
 // ============================================
 
-// Mobile sidebar toggle
-const _sidebar  = document.getElementById('sidebar');
-const _overlay  = document.getElementById('sidebarOverlay');
+const _sidebar   = document.getElementById('sidebar');
+const _overlay   = document.getElementById('sidebarOverlay');
 const _hamburger = document.getElementById('hamburgerBtn');
 
 function openSidebar()  { _sidebar.classList.add('sidebar--open');  _overlay.classList.add('sidebar-overlay--visible'); }
@@ -258,16 +180,14 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
     const panel = document.getElementById('tab' + btn.dataset.tab.charAt(0).toUpperCase() + btn.dataset.tab.slice(1));
     panel.hidden = false;
     panel.classList.add('tab-panel--active');
-    if (btn.dataset.tab === 'vto')         loadVto();
-    if (btn.dataset.tab === 'bookings')    loadBookings();
-    if (btn.dataset.tab === 'eggs')        loadEggs();
-    if (btn.dataset.tab === 'users')       loadUsers();
     if (btn.dataset.tab === 'tournaments') loadTournaments();
-    if (btn.dataset.tab === 'docs')        loadDocs();
-    if (btn.dataset.tab === 'members')     loadMembers();
-    if (btn.dataset.tab === 'accountability') loadAccountability();
+    if (btn.dataset.tab === 'eggs')        loadEggs();
   });
 });
+
+// ============================================
+// HELPERS
+// ============================================
 
 function esc(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
@@ -279,18 +199,9 @@ function loading() {
 
 function dbErr(table, error) {
   const msg = error ? `${error.message} (code: ${error.code})` : 'no rows returned';
-  godLog(`ERROR [${table}]: ${msg}`);
   return `<div style="margin:1.5rem;padding:1rem 1.25rem;background:#fff0f0;border:2px solid #c00;border-radius:6px;font-family:monospace;font-size:0.85rem;color:#900;">
     <strong>⚠ DB Error — ${table}</strong><br>${msg}
   </div>`;
-}
-
-function godLog(msg) {
-  if (!isGod()) return;
-  const el = document.getElementById('godDiag');
-  if (!el) return;
-  el.style.display = 'block';
-  el.innerHTML += `[${new Date().toLocaleTimeString()}] ${msg}<br>`;
 }
 
 function fmtDate(iso) {
@@ -304,355 +215,6 @@ function fmtDateTime(iso) {
   return d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) +
     ' at ' + d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', timeZone: 'America/Chicago' });
 }
-
-// ============================================
-// V/TO
-// ============================================
-
-async function loadVto() {
-  document.getElementById('vtoContent').innerHTML = loading();
-  const { data, error } = await db.from('vto').select('*').eq('id', 1).single();
-  godLog(`vto → data:${JSON.stringify(data)?.slice(0,80)} error:${error?.message}`);
-  if (error || !data) {
-    document.getElementById('vtoContent').innerHTML = dbErr('vto', error);
-    return;
-  }
-  renderVto(data);
-}
-
-function renderVto(v) {
-  const el = document.getElementById('vtoContent');
-
-  let coreValues = [];
-  try { coreValues = JSON.parse(v.core_values); } catch(e) { coreValues = [v.core_values]; }
-
-  let uniques = [];
-  try { uniques = JSON.parse(v.mktg_uniques); } catch(e) { uniques = [v.mktg_uniques]; }
-
-  el.innerHTML = `
-    <div class="vto-col">
-      <div class="vto-block">
-        <h3>Core Values</h3>
-        <ul>${coreValues.map(c => `<li>${esc(c)}</li>`).join('')}</ul>
-      </div>
-      <div class="vto-block">
-        <h3>Core Focus</h3>
-        <p><strong>Purpose:</strong> ${esc(v.core_focus_purpose)}</p>
-        <p><strong>Niche:</strong> ${esc(v.core_focus_niche)}</p>
-      </div>
-      <div class="vto-block">
-        <h3>10-Year Target</h3>
-        <p>${esc(v.ten_year_target)}</p>
-      </div>
-      <div class="vto-block">
-        <h3>Marketing Strategy</h3>
-        <p><strong>Target Market:</strong> ${esc(v.mktg_target_market)}</p>
-        <p><strong>Uniques:</strong></p>
-        <ul>${uniques.map(u => `<li>${esc(u)}</li>`).join('')}</ul>
-        <p><strong>Proven Process:</strong> ${esc(v.mktg_proven_process)}</p>
-        <p><strong>Guarantee:</strong> ${esc(v.mktg_guarantee)}</p>
-      </div>
-    </div>
-    <div class="vto-col">
-      <div class="vto-block">
-        <h3>3-Year Picture</h3>
-        <p style="white-space:pre-line">${esc(v.three_year_picture)}</p>
-      </div>
-      <div class="vto-block">
-        <h3>1-Year Plan</h3>
-        <p style="white-space:pre-line">${esc(v.one_year_plan)}</p>
-      </div>
-    </div>
-  `;
-}
-
-// ============================================
-// ACCOUNTABILITY CHART
-// ============================================
-
-async function loadAccountability() {
-  document.getElementById('accountabilityList').innerHTML = loading();
-  const { data, error } = await db.from('accountability_nodes').select('*').order('sort_order');
-  if (error) { document.getElementById('accountabilityList').innerHTML = dbErr('accountability_nodes', error); return; }
-  renderAccountability(data || []);
-}
-
-function renderAccountability(rows) {
-  const list  = document.getElementById('accountabilityList');
-  const empty = document.getElementById('accountabilityEmpty');
-  list.innerHTML = '';
-  if (!rows.length) { empty.hidden = false; return; }
-  empty.hidden = true;
-
-  rows.forEach(r => {
-    const card = document.createElement('div');
-    card.className = 'data-card';
-    card.innerHTML = `
-      <div class="data-card__header">
-        <span class="data-card__title">${esc(r.role_name)}</span>
-        ${isAdmin() ? `<button class="btn btn--ghost btn--sm" data-edit="${r.id}">Edit</button>` : ''}
-      </div>
-      <div class="data-card__body">
-        <span class="acct-person" id="acct-person-${r.id}" style="font-weight:600;color:var(--text);">
-          ${r.person_name ? esc(r.person_name) : '<em style="color:var(--text-muted);">Vacant</em>'}
-        </span>
-      </div>
-    `;
-
-    card.querySelector('[data-edit]')?.addEventListener('click', () => {
-      const personEl = document.getElementById(`acct-person-${r.id}`);
-      personEl.innerHTML = `
-        <div style="display:flex;gap:0.5rem;align-items:center;">
-          <input type="text" value="${esc(r.person_name || '')}" placeholder="Name…"
-            style="padding:0.3rem 0.6rem;border:1px solid var(--border);border-radius:5px;font-family:inherit;font-size:0.9rem;flex:1;"
-            id="acct-input-${r.id}">
-          <button class="btn btn--primary btn--sm" data-save="${r.id}">Save</button>
-          <button class="btn btn--ghost btn--sm" data-cancel-edit="${r.id}">✕</button>
-        </div>`;
-      document.getElementById(`acct-input-${r.id}`).focus();
-
-      card.querySelector('[data-save]').addEventListener('click', async () => {
-        const val = document.getElementById(`acct-input-${r.id}`).value.trim();
-        const { error } = await db.from('accountability_nodes').update({ person_name: val || null }).eq('id', r.id);
-        if (error) { alert('Failed to save'); return; }
-        r.person_name = val || null;
-        loadAccountability();
-      });
-
-      card.querySelector('[data-cancel-edit]').addEventListener('click', () => loadAccountability());
-    });
-
-    list.appendChild(card);
-  });
-}
-
-// ============================================
-// BOOKINGS
-// ============================================
-
-let bookingsFilter = 'upcoming';
-let _cancelBookingId = null;
-let _cancelSlotTime  = null;
-
-async function archiveOldBookings() {
-  const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-  await db.from('bookings')
-    .update({ archived_at: new Date().toISOString() })
-    .lt('slot_time', cutoff)
-    .is('archived_at', null);
-}
-
-async function loadBookings() {
-  document.getElementById('bookingsList').innerHTML = loading();
-  await archiveOldBookings();
-
-  let q;
-  if (bookingsFilter === 'archive') {
-    q = db.from('bookings').select('*')
-      .lt('slot_time', new Date().toISOString())
-      .order('slot_time', { ascending: false });
-  } else if (bookingsFilter === 'upcoming') {
-    q = db.from('bookings').select('*')
-      .gte('slot_time', new Date().toISOString())
-      .neq('status', 'cancelled')
-      .order('slot_time', { ascending: true });
-  } else {
-    // past 24 hours
-    const cutoff24 = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-    q = db.from('bookings').select('*')
-      .gte('slot_time', cutoff24)
-      .lte('slot_time', new Date().toISOString())
-      .order('slot_time', { ascending: false });
-  }
-
-  const { data, error } = await q;
-  godLog(`bookings → rows:${data?.length ?? 'null'} error:${error?.message}`);
-  if (error) { document.getElementById('bookingsList').innerHTML = dbErr('bookings', error); return; }
-  renderBookings(data || []);
-}
-
-function renderBookings(rows) {
-  const list  = document.getElementById('bookingsList');
-  const empty = document.getElementById('bookingsEmpty');
-  list.innerHTML = '';
-  if (!rows.length) { empty.hidden = false; return; }
-  empty.hidden = true;
-
-  const now = new Date();
-
-  if (bookingsFilter === 'upcoming') {
-    const pastToday = rows.filter(b => new Date(b.slot_time) < now);
-    const upcoming  = rows.filter(b => new Date(b.slot_time) >= now);
-
-    if (pastToday.length) {
-      list.appendChild(makeDivider('Earlier Today'));
-      pastToday.forEach(b => list.appendChild(buildBookingCard(b)));
-    }
-    if (upcoming.length) {
-      if (pastToday.length) list.appendChild(makeDivider('Upcoming'));
-      upcoming.forEach(b => list.appendChild(buildBookingCard(b)));
-    }
-  } else {
-    rows.forEach(b => list.appendChild(buildBookingCard(b)));
-  }
-}
-
-function makeDivider(label) {
-  const d = document.createElement('div');
-  d.className = 'bookings-divider';
-  d.textContent = label;
-  return d;
-}
-
-function buildBookingCard(b) {
-  const now     = new Date();
-  const isPast  = new Date(b.slot_time) < now;
-  const isCancelled = b.status === 'cancelled';
-
-  const card = document.createElement('div');
-  card.className = 'data-card' + (isCancelled ? ' data-card--muted' : '') + (isPast && !isCancelled ? ' data-card--past' : '');
-
-  const isPaid = b.payment_status === 'paid';
-
-  let actionHtml = '';
-  if (isCancelled) {
-    actionHtml = `
-      <div style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;">
-        <span class="tag tag--cancelled">Cancelled</span>
-        ${b.cancel_reason ? `<span style="font-size:0.78rem;color:#888;">${esc(b.cancel_reason)}${b.cancel_notes ? ' — ' + esc(b.cancel_notes) : ''}${b.cancelled_by ? ' · by ' + esc(b.cancelled_by) : ''}</span>` : ''}
-      </div>`;
-  } else if (isPaid) {
-    actionHtml = `<span class="tag" style="background:#d4edda;color:#1a6630;font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;">Paid · ${esc(b.payment_method)}</span>`;
-  } else if (can('perm_cancel_bookings')) {
-    actionHtml = `
-      <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
-        <button class="btn btn--primary btn--sm" data-pay="${b.id}">Mark Paid</button>
-        <button class="btn btn--ghost btn--sm" data-cancel="${b.id}" style="color:#a00;">Cancel</button>
-      </div>`;
-  } else {
-    actionHtml = isPast ? `<span class="tag" style="background:#f0f0f0;color:#999;font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;">Completed</span>` : '';
-  }
-
-  card.innerHTML = `
-    <div class="data-card__header">
-      <span class="data-card__title">${fmtDateTime(b.slot_time)}</span>
-      <span class="data-card__badge">${esc(b.confirmation_no)}</span>
-    </div>
-    <div class="data-card__body">
-      <span><strong>${esc(b.name)}</strong> &bull; ${esc(b.phone)}${b.email ? ' &bull; ' + esc(b.email) : ''}</span>
-      <span>${b.num_players} player${b.num_players !== 1 ? 's' : ''} &bull; ${b.holes} holes${b.num_carts > 0 ? ' &bull; ' + b.num_carts + ' cart' + (b.num_carts !== 1 ? 's' : '') : ''}</span>
-      ${b.notes ? `<span class="data-card__notes">${esc(b.notes)}</span>` : ''}
-    </div>
-    ${actionHtml}
-  `;
-
-  card.querySelector('[data-cancel]')?.addEventListener('click', () => {
-    openCancelModal(b.id, b.name, b.slot_time);
-  });
-
-  card.querySelector('[data-pay]')?.addEventListener('click', () => {
-    openPayModal(b.id, b.name, b.slot_time);
-  });
-
-  return card;
-}
-
-let _payBookingId = null;
-
-function openPayModal(bookingId, name, slotTime) {
-  _payBookingId = bookingId;
-  document.getElementById('payModalName').textContent = `${name} — ${fmtDateTime(slotTime)}`;
-  document.getElementById('payMethod').value = '';
-  document.getElementById('payModalError').hidden = true;
-  document.getElementById('payModal').hidden = false;
-}
-
-document.getElementById('payModalClose').addEventListener('click', () => {
-  document.getElementById('payModal').hidden = true;
-  _payBookingId = null;
-});
-
-document.getElementById('confirmPayBtn').addEventListener('click', async () => {
-  const method = document.getElementById('payMethod').value;
-  const errEl  = document.getElementById('payModalError');
-  const btn    = document.getElementById('confirmPayBtn');
-
-  if (!method) { errEl.textContent = 'Please select a payment method.'; errEl.hidden = false; return; }
-
-  btn.disabled = true; btn.textContent = 'Saving…';
-
-  const { error } = await db.from('bookings').update({
-    payment_status: 'paid',
-    payment_method: method,
-    paid_by: currentUser.email,
-    paid_at: new Date().toISOString(),
-  }).eq('id', _payBookingId);
-
-  btn.disabled = false; btn.textContent = 'Confirm Payment';
-
-  if (error) { errEl.textContent = error.message; errEl.hidden = false; return; }
-
-  document.getElementById('payModal').hidden = true;
-  _payBookingId = null;
-  loadBookings();
-});
-
-function openCancelModal(bookingId, name, slotTime) {
-  _cancelBookingId = bookingId;
-  _cancelSlotTime  = slotTime;
-  document.getElementById('cancelModalName').textContent = `${name} — ${fmtDateTime(slotTime)}`;
-  document.getElementById('cancelReason').value = '';
-  document.getElementById('cancelNotes').value = '';
-  document.getElementById('cancelModalError').hidden = true;
-  document.getElementById('cancelModal').hidden = false;
-}
-
-document.getElementById('cancelModalClose').addEventListener('click', () => {
-  document.getElementById('cancelModal').hidden = true;
-  _cancelBookingId = null;
-  _cancelSlotTime  = null;
-});
-
-document.getElementById('confirmCancelBtn').addEventListener('click', async () => {
-  const reason = document.getElementById('cancelReason').value;
-  const notes  = document.getElementById('cancelNotes').value.trim();
-  const errEl  = document.getElementById('cancelModalError');
-  const btn    = document.getElementById('confirmCancelBtn');
-
-  if (!reason) { errEl.textContent = 'Please select a reason.'; errEl.hidden = false; return; }
-
-  btn.disabled = true; btn.textContent = 'Cancelling…';
-
-  const { data: updated, error } = await db.from('bookings').update({
-    status: 'cancelled',
-    cancelled_by: currentUser.email,
-    cancel_reason: reason,
-    cancel_notes: notes || null,
-  }).eq('id', _cancelBookingId).select('id');
-
-  btn.disabled = false; btn.textContent = 'Confirm Cancellation';
-
-  if (error) { errEl.textContent = error.message; errEl.hidden = false; return; }
-  if (!updated || updated.length === 0) {
-    errEl.textContent = 'This tee time has already passed and cannot be cancelled.';
-    errEl.hidden = false;
-    return;
-  }
-
-  document.getElementById('cancelModal').hidden = true;
-  _cancelBookingId = null;
-  _cancelSlotTime  = null;
-  loadBookings();
-});
-
-document.querySelectorAll('#tabBookings .filter-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('#tabBookings .filter-btn').forEach(b => b.classList.remove('filter-btn--active'));
-    btn.classList.add('filter-btn--active');
-    bookingsFilter = btn.dataset.filter;
-    loadBookings();
-  });
-});
 
 // ============================================
 // EGG ORDERS
@@ -689,7 +251,7 @@ function renderEggs(rows) {
         ${o.notes ? `<span class="data-card__notes">${esc(o.notes)}</span>` : ''}
       </div>
       ${o.status !== 'complete'
-        ? (can('perm_mark_eggs') ? `<button class="btn btn--primary btn--sm" data-complete="${o.id}">Mark Picked Up</button>` : '')
+        ? `<button class="btn btn--primary btn--sm" data-complete="${o.id}">Mark Picked Up</button>`
         : '<span class="tag tag--complete">Picked Up</span>'}
     `;
     card.querySelector('[data-complete]')?.addEventListener('click', async () => {
@@ -710,279 +272,6 @@ document.querySelectorAll('#tabEggs .filter-btn').forEach(btn => {
 });
 
 // ============================================
-// MEMBERSHIP APPLICATIONS
-// ============================================
-
-let membersFilter = 'new';
-
-async function loadMembers() {
-  document.getElementById('membersList').innerHTML = loading();
-  let q = db.from('membership_applications').select('*').order('created_at', { ascending: false });
-  if (membersFilter === 'new') q = q.eq('status', 'new');
-  const { data, error } = await q;
-  if (error) { document.getElementById('membersList').innerHTML = dbErr('membership_applications', error); return; }
-  renderMembers(data || []);
-}
-
-function renderMembers(rows) {
-  const list  = document.getElementById('membersList');
-  const empty = document.getElementById('membersEmpty');
-  list.innerHTML = '';
-  if (!rows.length) { empty.hidden = false; return; }
-  empty.hidden = true;
-  rows.forEach(r => {
-    const card = document.createElement('div');
-    card.className = 'data-card';
-    card.innerHTML = `
-      <div class="data-card__header">
-        <span class="data-card__title">${esc(r.name)}</span>
-        <span class="data-card__badge">${fmtDate(r.created_at)}</span>
-      </div>
-      <div class="data-card__body">
-        <span>${esc(r.phone)}${r.email ? ' · ' + esc(r.email) : ''}</span>
-        ${r.membership_type ? `<span>Interest: ${esc(r.membership_type)}</span>` : ''}
-        ${r.notes ? `<span class="data-card__notes">${esc(r.notes)}</span>` : ''}
-      </div>
-      <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
-        ${r.status === 'new' ? `<button class="btn btn--primary btn--sm" data-contact="${r.id}">Mark Contacted</button>` : `<span class="tag" style="color:#2e7d32;font-size:0.78rem;font-weight:600;text-transform:uppercase;">Contacted</span>`}
-      </div>
-    `;
-    card.querySelector('[data-contact]')?.addEventListener('click', async () => {
-      await db.from('membership_applications').update({ status: 'contacted' }).eq('id', r.id);
-      loadMembers();
-    });
-    list.appendChild(card);
-  });
-}
-
-document.querySelectorAll('#tabMembers .filter-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('#tabMembers .filter-btn').forEach(b => b.classList.remove('filter-btn--active'));
-    btn.classList.add('filter-btn--active');
-    membersFilter = btn.dataset.filter;
-    loadMembers();
-  });
-});
-
-// ============================================
-// PROCESS LIBRARY
-// ============================================
-
-const TRACK_MAP = {
-  admin: { name: 'Full Certification Track', modules: 6 },
-  staff: { name: 'Staff Operations Track',   modules: 4 },
-};
-
-async function loadDocs() {
-  document.getElementById('trainingList').innerHTML = loading();
-  const { data, error } = await db.from('profiles').select('id, name, email, role').order('name');
-  if (error) { document.getElementById('trainingList').innerHTML = dbErr('profiles/docs', error); return; }
-  const list = document.getElementById('trainingList');
-  if (!list) return;
-  const users = data || [];
-  if (!users.length) { list.innerHTML = '<p class="empty-msg">No team members found.</p>'; return; }
-  list.innerHTML = users.map(u => {
-    const track = TRACK_MAP[u.role] || { name: 'General Track', modules: 1 };
-    return `
-      <div class="training-card">
-        <div class="training-card__info">
-          <span class="training-card__name">${esc(u.name || u.email)}</span>
-          <span class="training-card__track">${track.name} · ${track.modules} modules</span>
-        </div>
-        <button class="btn btn--ghost btn--sm training-card__prog" style="cursor:default;opacity:0.5;" disabled>View Track →</button>
-      </div>`;
-  }).join('');
-}
-
-// ============================================
-// COURSE STATUS
-// ============================================
-
-let courseIsOpen = null; // null = not yet loaded
-
-async function loadCourseStatus() {
-  const { data, error } = await db.from('course_status').select('*').eq('id', 1).single();
-  godLog(`course_status → is_open:${data?.is_open} error:${error?.message}`);
-  if (error || !data) {
-    updateCourseBtn('error');
-    return;
-  }
-  courseIsOpen = data.is_open;
-  updateCourseBtn();
-}
-
-function withinHours() {
-  const now = new Date();
-  const ct  = new Date(now.toLocaleString('en-US', { timeZone: 'America/Chicago' }));
-  const h   = ct.getHours();
-  return h >= 8 && h < 19;
-}
-
-function updateCourseBtn(state) {
-  const btn = document.getElementById('courseToggleBtn');
-  if (state === 'error' || courseIsOpen === null) {
-    btn.textContent = '⚠ Status Unknown';
-    btn.className = 'btn btn--sm course-closed';
-    return;
-  }
-  // Portal shows the DB state directly. Outside-hours is noted but doesn't fake the state.
-  if (courseIsOpen) {
-    btn.textContent = withinHours() ? '⛳ Course Open' : '⛳ Open (outside hrs)';
-    btn.className = 'btn btn--sm course-open';
-  } else {
-    btn.textContent = '⛔ Course Closed';
-    btn.className = 'btn btn--sm course-closed';
-  }
-}
-
-document.getElementById('courseToggleBtn').addEventListener('click', async () => {
-  if (courseIsOpen === null) { alert('Course status not loaded — try refreshing.'); return; }
-  const newStatus = !courseIsOpen;
-  const msg = newStatus ? '' : prompt('Closure message (shown on website):', 'Course is closed due to weather conditions. Check back soon.');
-  if (!newStatus && msg === null) return; // cancelled
-  const label = newStatus ? 'reopen' : 'close';
-  if (!confirm(`${label.charAt(0).toUpperCase() + label.slice(1)} the course?`)) return;
-  const todayCT = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Chicago' });
-  const { error } = await db.from('course_status').update({
-    is_open: newStatus,
-    message: msg || 'Course is closed due to weather conditions. Check back soon.',
-    closed_on: newStatus ? null : todayCT,
-    updated_at: new Date().toISOString()
-  }).eq('id', 1);
-  if (error) { alert('Failed to update course status: ' + error.message); return; }
-  courseIsOpen = newStatus;
-  updateCourseBtn();
-});
-
-// ============================================
-// USERS (admin only)
-// ============================================
-
-const PERM_LABELS = [
-  { key: 'perm_cancel_bookings',    label: 'Bookings' },
-  { key: 'perm_mark_eggs',          label: 'Egg Orders' },
-  { key: 'perm_manage_tournaments', label: 'Tournaments' },
-  { key: 'perm_view_members',       label: 'Members' },
-  { key: 'perm_toggle_course',      label: 'Course Toggle' },
-];
-
-async function loadUsers() {
-  document.getElementById('usersList').innerHTML = loading();
-  const cols = 'id, email, name, role, ' + PERM_LABELS.map(p => p.key).join(', ');
-  const { data, error } = await db.from('profiles').select(cols).order('name');
-  if (error) { document.getElementById('usersList').innerHTML = dbErr('profiles', error); return; }
-  renderUsers(data || []);
-}
-
-function renderUsers(rows) {
-  const list  = document.getElementById('usersList');
-  const empty = document.getElementById('usersEmpty');
-  list.innerHTML = '';
-  if (!rows.length) { empty.hidden = false; return; }
-  empty.hidden = true;
-
-  rows.forEach(u => {
-    const card = document.createElement('div');
-    card.className = 'data-card';
-
-    const isAdminUser = u.role === 'admin';
-
-    card.innerHTML = `
-      <div class="data-card__header">
-        <span class="data-card__title">${esc(u.name || '—')}</span>
-        <span class="data-card__badge">${esc(u.email || '')}</span>
-      </div>
-      ${isAdminUser
-        ? `<span class="tag" style="color:#2e7d32;font-size:0.78rem;font-weight:600;text-transform:uppercase;">Admin — Full Access</span>`
-        : `<div class="perm-grid">
-            ${PERM_LABELS.map(p => `
-              <label class="perm-row">
-                <span class="perm-row__label">${p.label}</span>
-                <span class="perm-toggle">
-                  <input type="checkbox" class="perm-check" data-perm="${p.key}" ${u[p.key] ? 'checked' : ''}>
-                  <span class="perm-slider"></span>
-                </span>
-              </label>`).join('')}
-           </div>`
-      }
-    `;
-
-    if (!isAdminUser) {
-      card.querySelectorAll('.perm-check').forEach(chk => {
-        chk.addEventListener('change', async e => {
-          const perm = e.target.dataset.perm;
-          const val  = e.target.checked;
-          const { error } = await db.from('profiles').update({ [perm]: val }).eq('id', u.id);
-          if (error) { alert('Failed to save: ' + error.message); e.target.checked = !val; }
-          else u[perm] = val;
-        });
-      });
-    }
-
-    list.appendChild(card);
-  });
-}
-
-document.getElementById('addUserBtn').addEventListener('click', () => {
-  document.getElementById('userForm').hidden = false;
-  document.getElementById('newUserName').focus();
-});
-
-document.getElementById('cancelUserBtn').addEventListener('click', () => {
-  document.getElementById('userForm').hidden = true;
-  clearUserForm();
-});
-
-document.getElementById('saveUserBtn').addEventListener('click', async () => {
-  const name  = document.getElementById('newUserName').value.trim();
-  const email = document.getElementById('newUserEmail').value.trim();
-  const role  = document.getElementById('newUserRole').value;
-  const errEl = document.getElementById('userFormError');
-  const btn   = document.getElementById('saveUserBtn');
-  errEl.hidden = true;
-
-  if (!name || !email) {
-    errEl.textContent = 'Name and email are required.';
-    errEl.hidden = false;
-    return;
-  }
-
-  btn.disabled = true;
-  btn.textContent = 'Sending invite…';
-
-  const res = await fetch(`${SUPABASE_URL}/functions/v1/invite-user`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${currentSession.access_token}`,
-      'apikey': SUPABASE_ANON,
-    },
-    body: JSON.stringify({ name, email, role }),
-  });
-
-  const json = await res.json();
-  btn.disabled = false;
-  btn.textContent = 'Send Invite';
-
-  if (!res.ok || json.error) {
-    errEl.textContent = json.error || 'Something went wrong.';
-    errEl.hidden = false;
-    return;
-  }
-
-  document.getElementById('userForm').hidden = true;
-  clearUserForm();
-  loadUsers();
-});
-
-function clearUserForm() {
-  document.getElementById('newUserName').value    = '';
-  document.getElementById('newUserEmail').value   = '';
-  document.getElementById('newUserRole').value    = 'viewer';
-  document.getElementById('userFormError').hidden = true;
-}
-
-// ============================================
 // TOURNAMENTS
 // ============================================
 
@@ -992,12 +281,12 @@ async function loadTournaments() {
   document.getElementById('registrationsPanel').hidden = true;
   document.getElementById('tournamentsList').style.display = '';
   document.getElementById('tournamentsEmpty').hidden = true;
+  document.getElementById('addTournamentBtn').style.display = '';
 
   document.getElementById('tournamentsList').innerHTML = loading();
   const { data, error } = await db.from('tournaments').select('*').order('date', { ascending: false });
   if (error) { document.getElementById('tournamentsList').innerHTML = dbErr('tournaments', error); return; }
 
-  // Fetch registration counts
   const ids = (data || []).map(t => t.id);
   let counts = {};
   if (ids.length) {
@@ -1167,7 +456,7 @@ async function loadRegistrations(tournamentId, name) {
     .eq('tournament_id', tournamentId)
     .order('created_at', { ascending: true });
 
-  if (error) { console.error(error); return; }
+  if (error) { document.getElementById('registrationsList').innerHTML = dbErr('tournament_registrations', error); return; }
   renderRegistrations(data || [], tournamentId);
 }
 
@@ -1208,6 +497,6 @@ function renderRegistrations(rows, tournamentId) {
 document.getElementById('closeRegPanel').addEventListener('click', () => {
   document.getElementById('registrationsPanel').hidden = true;
   document.getElementById('tournamentsList').style.display = '';
-  document.getElementById('addTournamentBtn').style.display = can('perm_manage_tournaments') ? '' : 'none';
+  document.getElementById('addTournamentBtn').style.display = '';
   loadTournaments();
 });
