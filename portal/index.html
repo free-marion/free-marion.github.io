@@ -18,54 +18,19 @@
 </head>
 <body>
 
-<!-- SET PASSWORD (invite flow) -->
-<div id="setPasswordScreen" class="login-screen" hidden>
-  <div class="login-card">
-    <h1 class="login-title">Cherrywood</h1>
-    <p class="login-sub">Set your password to continue</p>
-    <div class="field">
-      <label>New Password</label>
-      <input type="password" id="setPasswordInput" autocomplete="new-password">
-    </div>
-    <div class="field">
-      <label>Confirm Password</label>
-      <input type="password" id="setPasswordConfirm" autocomplete="new-password">
-    </div>
-    <p id="setPasswordError" class="error-msg" hidden></p>
-    <button id="setPasswordBtn" class="btn btn--primary btn--full">Set Password & Sign In</button>
-  </div>
-</div>
-
-<!-- LOGIN -->
+<!-- PASSWORD GATE -->
 <div id="loginScreen" class="login-screen">
   <div class="login-card">
     <h1 class="login-title">Cherrywood</h1>
     <p class="login-sub">Team Portal</p>
     <form id="loginForm">
       <div class="field">
-        <label>Email</label>
-        <input type="email" id="loginEmail" required autocomplete="email">
-      </div>
-      <div class="field">
         <label>Password</label>
-        <input type="password" id="loginPassword" required autocomplete="current-password">
+        <input type="password" id="loginPassword" required autocomplete="current-password" autofocus>
       </div>
       <p id="loginError" class="error-msg" hidden></p>
-      <button type="submit" id="loginBtn" class="btn btn--primary btn--full">Sign In</button>
+      <button type="submit" id="loginBtn" class="btn btn--primary btn--full">Enter</button>
     </form>
-    <p style="text-align:center;margin-top:1rem;">
-      <button id="showForgotBtn" class="btn btn--ghost btn--sm" style="font-size:0.78rem;">Forgot password?</button>
-    </p>
-    <div id="forgotForm" hidden style="margin-top:1rem;border-top:1px solid #e8dfc8;padding-top:1rem;">
-      <p style="font-size:0.82rem;color:#6a5a3a;margin-bottom:0.75rem;">Enter your email and we'll send a reset link.</p>
-      <div class="field">
-        <label>Email</label>
-        <input type="email" id="forgotEmail" autocomplete="email">
-      </div>
-      <p id="forgotError"   class="error-msg" hidden></p>
-      <p id="forgotSuccess" style="font-size:0.82rem;color:#2a5a2a;display:none;">Reset link sent — check your inbox.</p>
-      <button id="sendResetBtn" class="btn btn--primary btn--full">Send Reset Link</button>
-    </div>
   </div>
 </div>
 
@@ -81,7 +46,7 @@
     </div>
     <div class="portal-header__right">
       <a href="https://cherrywoodgolf.com" class="btn btn--ghost btn--sm">← Site</a>
-      <button class="btn btn--ghost btn--sm" onclick="(async()=>{ await db.auth.signOut(); window.location.reload(); })()">Sign Out</button>
+      <button class="btn btn--ghost btn--sm" onclick="sessionStorage.removeItem('cwAuth'); window.location.reload();">Lock</button>
     </div>
   </header>
 
@@ -163,7 +128,7 @@
 </div><!-- /appShell -->
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="app.js?v=47"></script>
+<script src="app.js?v=48"></script>
 <script>
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.getRegistrations().then(regs => regs.forEach(r => r.unregister()));

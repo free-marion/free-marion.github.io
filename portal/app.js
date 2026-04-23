@@ -2,168 +2,50 @@
 // CHERRYWOOD PORTAL
 // ============================================
 
-// Capture hash immediately — Supabase clears it before onAuthStateChange fires
-const _initialHash = window.location.hash;
-
 const SUPABASE_URL  = 'https://giwfigekjatujubjknjf.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdpd2ZpZ2VramF0dWp1YmprbmpmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMDEwMDMsImV4cCI6MjA4OTU3NzAwM30.p3OaPA5qYROqz8d0tNyhytl__n_bzH2l2MOX3olDn3A';
 
 const { createClient } = supabase;
-const db = createClient(SUPABASE_URL, SUPABASE_ANON, {
-  auth: { persistSession: true, autoRefreshToken: true }
-});
-
-let currentUser = null;
+const db = createClient(SUPABASE_URL, SUPABASE_ANON);
 
 // ============================================
-// INACTIVITY LOGOUT — 10 minutes
+// PASSWORD GATE
 // ============================================
 
-const INACTIVITY_MS = 10 * 60 * 1000;
-let _inactivityTimer = null;
+const PORTAL_PASSWORD = 'Arabia';
 
-function resetInactivityTimer() {
-  clearTimeout(_inactivityTimer);
-  _inactivityTimer = setTimeout(async () => {
-    await db.auth.signOut();
-    window.location.reload();
-  }, INACTIVITY_MS);
-}
-
-function startInactivityTimer() {
-  ['mousemove', 'keydown', 'click', 'touchstart', 'scroll'].forEach(evt =>
-    document.addEventListener(evt, resetInactivityTimer, { passive: true })
-  );
-  resetInactivityTimer();
-}
-
-function stopInactivityTimer() {
-  clearTimeout(_inactivityTimer);
-  ['mousemove', 'keydown', 'click', 'touchstart', 'scroll'].forEach(evt =>
-    document.removeEventListener(evt, resetInactivityTimer)
-  );
-}
-
-// ============================================
-// AUTH
-// ============================================
-
-db.auth.onAuthStateChange(async (event, session) => {
-  currentUser = session?.user ?? null;
-
-  if (currentUser) {
-    if (_initialHash.includes('type=invite') || _initialHash.includes('type=magiclink') || _initialHash.includes('type=recovery')) {
-      showSetPasswordScreen();
-      return;
-    }
-
-    document.getElementById('setPasswordScreen').hidden = true;
-    document.getElementById('loginScreen').hidden = true;
-    document.getElementById('appShell').hidden = false;
-    loadTournaments();
-    startInactivityTimer();
-  } else {
-    stopInactivityTimer();
-    document.getElementById('setPasswordScreen').hidden = true;
-    document.getElementById('loginScreen').hidden = false;
-    document.getElementById('appShell').hidden = true;
-  }
-});
-
-function showSetPasswordScreen() {
+function unlock() {
+  sessionStorage.setItem('cwAuth', '1');
   document.getElementById('loginScreen').hidden = true;
-  document.getElementById('appShell').hidden = true;
-  document.getElementById('setPasswordScreen').hidden = false;
-  document.getElementById('setPasswordInput').focus();
-}
-
-document.getElementById('setPasswordBtn').addEventListener('click', async () => {
-  const password = document.getElementById('setPasswordInput').value;
-  const confirm  = document.getElementById('setPasswordConfirm').value;
-  const errEl    = document.getElementById('setPasswordError');
-  const btn      = document.getElementById('setPasswordBtn');
-  errEl.hidden   = true;
-
-  if (password.length < 8) {
-    errEl.textContent = 'Password must be at least 8 characters.';
-    errEl.hidden = false;
-    return;
-  }
-  if (password !== confirm) {
-    errEl.textContent = 'Passwords do not match.';
-    errEl.hidden = false;
-    return;
-  }
-
-  btn.disabled = true;
-  btn.textContent = 'Saving…';
-
-  const { error } = await db.auth.updateUser({ password });
-  if (error) {
-    errEl.textContent = error.message;
-    errEl.hidden = false;
-    btn.disabled = false;
-    btn.textContent = 'Set Password & Sign In';
-    return;
-  }
-
-  document.getElementById('setPasswordScreen').hidden = true;
   document.getElementById('appShell').hidden = false;
   loadTournaments();
-});
+}
 
-document.getElementById('loginForm').addEventListener('submit', async e => {
+if (sessionStorage.getItem('cwAuth') === '1') {
+  unlock();
+}
+
+document.getElementById('loginForm').addEventListener('submit', e => {
   e.preventDefault();
-  const btn = document.getElementById('loginBtn');
-  const err = document.getElementById('loginError');
-  btn.disabled = true;
-  btn.textContent = 'Signing in…';
-  err.hidden = true;
-  const { error } = await db.auth.signInWithPassword({
-    email: document.getElementById('loginEmail').value.trim(),
-    password: document.getElementById('loginPassword').value
-  });
-  if (error) {
-    err.textContent = error.message;
+  const val = document.getElementById('loginPassword').value;
+  if (val === PORTAL_PASSWORD) {
+    unlock();
+  } else {
+    const err = document.getElementById('loginError');
+    err.textContent = 'Incorrect password.';
     err.hidden = false;
-    btn.disabled = false;
-    btn.textContent = 'Sign In';
+    document.getElementById('loginPassword').value = '';
+    document.getElementById('loginPassword').focus();
   }
-});
-
-document.getElementById('showForgotBtn').addEventListener('click', () => {
-  const form = document.getElementById('forgotForm');
-  form.hidden = !form.hidden;
-  if (!form.hidden) document.getElementById('forgotEmail').focus();
-});
-
-document.getElementById('sendResetBtn').addEventListener('click', async () => {
-  const email  = document.getElementById('forgotEmail').value.trim();
-  const errEl  = document.getElementById('forgotError');
-  const okEl   = document.getElementById('forgotSuccess');
-  const btn    = document.getElementById('sendResetBtn');
-  errEl.hidden = true; okEl.style.display = 'none';
-
-  if (!email) { errEl.textContent = 'Please enter your email.'; errEl.hidden = false; return; }
-
-  btn.disabled = true; btn.textContent = 'Sending…';
-  const { error } = await db.auth.resetPasswordForEmail(email, {
-    redirectTo: 'https://free-marion.github.io/portal/'
-  });
-  btn.disabled = false; btn.textContent = 'Send Reset Link';
-
-  if (error) { errEl.textContent = error.message; errEl.hidden = false; return; }
-  okEl.style.display = 'block';
-  document.getElementById('forgotEmail').value = '';
 });
 
 // ============================================
 // TAB ROUTING
 // ============================================
 
-const _sidebar   = document.getElementById('sidebar');
-const _overlay   = document.getElementById('sidebarOverlay');
-const _hamburger = document.getElementById('hamburgerBtn');
+const _sidebar    = document.getElementById('sidebar');
+const _overlay    = document.getElementById('sidebarOverlay');
+const _hamburger  = document.getElementById('hamburgerBtn');
 
 function openSidebar()  { _sidebar.classList.add('sidebar--open');  _overlay.classList.add('sidebar-overlay--visible'); }
 function closeSidebar() { _sidebar.classList.remove('sidebar--open'); _overlay.classList.remove('sidebar-overlay--visible'); }
