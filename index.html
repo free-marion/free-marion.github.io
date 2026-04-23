@@ -16,12 +16,28 @@
 </head>
 <body>
 
+  <!-- COURSE STATUS BANNER -->
+  <div id="courseClosedBanner" style="display:none;background:#7B1C2E;color:#fff;text-align:center;padding:0.75rem 1rem;font-family:Georgia,serif;font-size:0.95rem;position:relative;z-index:999;">
+    ⚠️ <span id="courseClosedMsg">Course is closed due to weather conditions. Check back soon.</span>
+  </div>
+
   <!-- NAV -->
   <nav id="navbar">
     <div class="nav-inner">
       <a href="#home" class="nav-logo">
         <img src="images/crest-badge.png" alt="Cherrywood Farm and Golf Club" class="nav-logo-img">
       </a>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">&#9776;</button>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="#about">About</a></li>
+        <li><a href="#pricing">Pricing</a></li>
+        <li><a href="#farm">The Farm</a></li>
+        <li><a href="#stay">Stay</a></li>
+        <li><a href="#course">The Course</a></li>
+        <li><a href="/events.html">Events</a></li>
+        <li><a href="#contact">Visit</a></li>
+      </ul>
+      <div id="courseStatusBadge" class="course-status-badge" style="display:none"></div>
     </div>
   </nav>
 
@@ -32,6 +48,11 @@
       <p class="hero-eyebrow">Fredericktown, Missouri</p>
       <h1>Cherrywood<br>Farm &amp; Golf Club</h1>
       <p class="hero-tagline">Where Purpose Grows.</p>
+      <div class="hero-actions">
+        <a href="#pricing" class="hero-cta">View Pricing</a>
+        <a href="#eggs" class="hero-cta hero-cta--outline">Reserve Farm Eggs</a>
+        <a href="/membership.html" class="hero-cta hero-cta--outline">Apply for Membership</a>
+      </div>
     </div>
   </section>
 
@@ -41,78 +62,437 @@
 
       <h2 class="about-heading">Our Story</h2>
 
-      <p class="about-intro">Tucked into the rolling Ozark foothills of Fredericktown, Missouri, Cherrywood Farm &amp; Golf Club is one of those rare places that earns the word <em>destination</em>. Nine holes of golf laid down in 1948, still playing true on bent grass greens. A working farm — cattle, chickens, goats, sheep, ducks, and honeybees — all raised with intention. Come for a round. Breathe easier.</p>
+      <p class="about-intro">Tucked into the rolling Ozark foothills of Fredericktown, Missouri, Cherrywood Farm &amp; Golf Club is one of those rare places that earns the word <em>destination</em>. Nine holes of golf laid down in 1948, still playing true on bent grass greens. A working farm — cattle, chickens, goats, sheep, ducks, and honeybees — all raised with intention. Conestoga wagon rentals that put you inside the history of a state that once launched a nation westward. Come for a round. Stay for the eggs. Breathe easier.</p>
 
       <p class="about-text">Dale Cooper started Cherrywood with a piece of land and a desire to create something meaningful.  A farm came first; regenerative agriculture, cattle, chickens, sheep, ducks, even honeybees!  A vision for a sustainable community, designed to connect people with nature, each other, and their Creator.  Then came a need for Dale's waterslide restoration company to find a headquarters.  The neighboring golf course came up for sale, and the pieces clicked into place.</p>
 
-      <p class="about-text">Cherrywood Farm &amp; Golf Club is named for Dale's true passion, his wife Cherry.  Their 12 children and (for now) 10 grandchildren are their proudest legacy.  They hope you will stop by for a round of golf or simply take a peaceful stroll in the meadow.  Just watch out for the goats, they are very annoying.</p>
+      <p class="about-text">Now here we are almost a year into the adventure, and the vision has only grown! In December we welcomed the first of our 8 Conestoga Wagon vacation rentals, adding to the truly unique experience of Cherrywood.  Immerse yourself in the proud history of our state,  honoring the brave pioneers who set out from our "Gateway to the West" with dreams of a brighter future for their families.</p>
 
+      <p class="about-text">Farm fresh eggs are now available for purchase.  The superiority of these eggs is clear from the deep color of the yolk to the rich flavor that can't be replicated within a commercial operation.  Be kind to your body, eat good food!</p>
+
+      <p class="about-text">Cherrywood Farm &amp; Golf Club is named for Dale's true passion, his wife Cherry.  Their 12 children and (for now) 10 grandchildren are their proudest legacy.  They hope you will stop by for a round of golf, some eggs, or simply take a peaceful stroll in the meadow.  Just watch out for the goats, they are very annoying.</p>
+
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section class="pricing-section-wrap" id="pricing">
+    <div class="pricing-section">
+      <span class="panel-kicker">Green Fees</span>
+      <h2 class="pricing-heading">Course Pricing</h2>
+      <p class="pricing-subhead">We're actively restoring our greens. Rates reflect where we are — and where we're headed.</p>
+
+      <div class="year-tabs">
+        <button class="year-tab active" onclick="showYear('y2026', this)">
+          2026
+          <span class="tab-note">Current rates</span>
+        </button>
+        <button class="year-tab" onclick="showYear('y2027', this)">
+          2027
+          <span class="tab-note">Fully restored</span>
+        </button>
+      </div>
+
+      <!-- 2026 -->
+      <div class="pricing-panel active" id="panel-y2026">
+        <div class="season-block">
+          <div class="season-label">Regular Season <span class="season-badge">Apr – Oct</span></div>
+          <table class="price-table">
+            <thead><tr><th></th><th>18 Holes</th><th>9 Holes</th></tr></thead>
+            <tbody>
+              <tr><td>Weekday w/ cart</td><td><span class="price-val">$32</span></td><td><span class="price-val">$21</span></td></tr>
+              <tr><td>Weekend w/ cart <span class="wknd-tag">Sat–Sun</span></td><td><span class="price-val">$36</span></td><td><span class="price-val">$23</span></td></tr>
+              <tr class="row-walking"><td>Walking</td><td><span class="price-val">$23</span></td><td><span class="price-val">$16</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <hr class="season-divider">
+        <div class="season-block">
+          <div class="season-label">Winter Season <span class="season-badge winter">Nov – Mar</span></div>
+          <table class="price-table">
+            <thead><tr><th></th><th>18 Holes</th><th>9 Holes</th></tr></thead>
+            <tbody>
+              <tr><td>Weekday w/ cart</td><td><span class="price-val">$26</span></td><td><span class="price-val">$17</span></td></tr>
+              <tr><td>Weekend w/ cart <span class="wknd-tag">Sat–Sun</span></td><td><span class="price-val">$29</span></td><td><span class="price-val">$19</span></td></tr>
+              <tr class="row-walking"><td>Walking</td><td><span class="price-val">$18</span></td><td><span class="price-val">$13</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="pricing-cta">
+          <p class="pricing-cta-note">Green fees collected at the Clubhouse on arrival.<br>Call ahead to confirm course conditions.</p>
+          <a href="tel:+15737830012" class="btn-call">📞 Call to Reserve</a>
+        </div>
+      </div>
+
+      <!-- 2027 -->
+      <div class="pricing-panel" id="panel-y2027">
+        <div class="season-block">
+          <div class="season-label">Regular Season <span class="season-badge">Apr – Oct</span></div>
+          <table class="price-table">
+            <thead><tr><th></th><th>18 Holes</th><th>9 Holes</th></tr></thead>
+            <tbody>
+              <tr><td>Weekday w/ cart</td><td><span class="price-val">$36</span></td><td><span class="price-val">$23</span></td></tr>
+              <tr><td>Weekend w/ cart <span class="wknd-tag">Sat–Sun</span></td><td><span class="price-val">$40</span></td><td><span class="price-val">$25</span></td></tr>
+              <tr class="row-walking"><td>Walking</td><td><span class="price-val">$26</span></td><td><span class="price-val">$18</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <hr class="season-divider">
+        <div class="season-block">
+          <div class="season-label">Winter Season <span class="season-badge winter">Nov – Mar</span></div>
+          <table class="price-table">
+            <thead><tr><th></th><th>18 Holes</th><th>9 Holes</th></tr></thead>
+            <tbody>
+              <tr><td>Weekday w/ cart</td><td><span class="price-val">$29</span></td><td><span class="price-val">$18</span></td></tr>
+              <tr><td>Weekend w/ cart <span class="wknd-tag">Sat–Sun</span></td><td><span class="price-val">$32</span></td><td><span class="price-val">$20</span></td></tr>
+              <tr class="row-walking"><td>Walking</td><td><span class="price-val">$20</span></td><td><span class="price-val">$14</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="pricing-cta">
+          <p class="pricing-cta-note">Green fees collected at the Clubhouse on arrival.<br>Call ahead to confirm course conditions.</p>
+          <a href="tel:+15737830012" class="btn-call">📞 Call to Reserve</a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- EGGS -->
+  <section class="egg-section" id="eggs">
+    <div class="egg-section-inner">
+
+      <div class="egg-slideshow-col">
+        <div class="egg-slideshow" id="eggSlideshow">
+          <div class="egg-slide" data-index="0">
+            <div class="egg-slide-placeholder" style="background:#2d4a2d;">
+              <span class="egg-slide-emoji">🥚</span>
+              <span class="egg-slide-label">Life Begins</span>
+            </div>
+          </div>
+          <div class="egg-slide egg-slide--hidden" data-index="1">
+            <img src="images/son-of-chicken.jpg" alt="Freshly gathered eggs at Cherrywood Farm" />
+          </div>
+          <div class="egg-slide egg-slide--hidden" data-index="2">
+            <div class="egg-slide-placeholder" style="background:#3a3020;">
+              <span class="egg-slide-emoji">📦</span>
+              <span class="egg-slide-label">Into the Carton</span>
+            </div>
+          </div>
+          <div class="egg-slide egg-slide--hidden" data-index="3">
+            <div class="egg-slide-placeholder" style="background:#1e3a2a;">
+              <span class="egg-slide-emoji">🛒</span>
+              <span class="egg-slide-label">Ready for You</span>
+            </div>
+          </div>
+          <div class="egg-slide egg-slide--hidden" data-index="4">
+            <div class="egg-slide-placeholder" style="background:#2a2a1e;">
+              <span class="egg-slide-emoji">🍳</span>
+              <span class="egg-slide-label">In Your Kitchen</span>
+            </div>
+          </div>
+          <div class="egg-slide egg-slide--hidden" data-index="5">
+            <div class="egg-slide-placeholder" style="background:#3a1e1e;">
+              <span class="egg-slide-emoji">🍽️</span>
+              <span class="egg-slide-label">On the Table</span>
+            </div>
+          </div>
+          <button class="egg-slide-prev" id="eggPrev" aria-label="Previous">&#8592;</button>
+          <button class="egg-slide-next" id="eggNext" aria-label="Next">&#8594;</button>
+          <div class="egg-slide-dots" id="eggDots">
+            <span class="egg-dot egg-dot--active"></span>
+            <span class="egg-dot"></span>
+            <span class="egg-dot"></span>
+            <span class="egg-dot"></span>
+            <span class="egg-dot"></span>
+            <span class="egg-dot"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="egg-form-col">
+        <span class="panel-kicker">The Farm</span>
+        <h2>Farm Fresh Eggs</h2>
+        <p>Our chickens are raised right here on the property. Reserve your dozen below and we'll have them waiting for you.</p>
+        <p style="font-size:1.15rem;font-weight:700;color:#004331;margin:0.25rem 0 0.1rem;"><strong>$5 / dozen</strong></p>
+        <p style="font-size:0.82rem;color:#6a5a3a;">Payment collected at pickup — Cherrywood Clubhouse only.</p>
+        <div class="notepad">
+          <form id="eggForm" class="egg-form">
+            <div class="form-row">
+              <div class="form-field">
+                <label for="egg-name">Name</label>
+                <input type="text" id="egg-name" name="name" required autocomplete="name" />
+              </div>
+              <div class="form-field">
+                <label for="egg-contact">Phone or Email</label>
+                <input type="text" id="egg-contact" name="contact" required />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-field form-field--narrow">
+                <label for="egg-qty">How many dozen?</label>
+                <select id="egg-qty" name="dozens" required>
+                  <option value="">—</option>
+                  <option>1</option>
+                  <option>2</option>
+                  <option>3</option>
+                  <option>4</option>
+                  <option>5+</option>
+                </select>
+              </div>
+              <div class="form-field">
+                <label for="egg-date">Pickup date</label>
+                <input type="date" id="egg-date" name="pickup_date" required />
+              </div>
+            </div>
+            <div class="form-field">
+              <label for="egg-notes">Anything else?</label>
+              <input type="text" id="egg-notes" name="notes" placeholder="Optional" />
+            </div>
+            <p id="eggMsg" style="display:none;padding:0.5rem 0;font-weight:600;"></p>
+            <p class="egg-pickup-notice">Pickup &amp; payment at the <strong>Cherrywood Clubhouse only</strong> — no delivery. Payment due at pickup.</p>
+            <button type="submit" id="eggSubmitBtn" class="btn-reserve">Reserve My Eggs</button>
+          </form>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- THE FARM FAMILY -->
+  <section id="farm" class="farm-section">
+    <div class="farm-inner">
+      <span class="panel-kicker">Life on the Land</span>
+      <h2 class="farm-heading">The Farm Family</h2>
+      <p class="farm-subhead">Everyone here has a job. Most of them are doing it.</p>
+      <div class="farm-cards">
+
+        <div class="farm-card" tabindex="0" role="button" aria-pressed="false">
+          <div class="farm-card-inner">
+            <div class="farm-card-front"><span class="farm-emoji">🐔</span><span class="farm-name">Chickens</span></div>
+            <div class="farm-card-back"><p>Chickens can recognize and remember over 100 individual faces — chicken and human alike. They know exactly who you are. Act accordingly.</p></div>
+          </div>
+        </div>
+
+        <div class="farm-card" tabindex="0" role="button" aria-pressed="false">
+          <div class="farm-card-inner">
+            <div class="farm-card-front"><span class="farm-emoji">🐄</span><span class="farm-name">Cattle</span></div>
+            <div class="farm-card-back"><p>Cows form genuine best friendships. Research shows they get stressed when separated from their closest companion, and their heart rates drop when reunited. So do ours.</p></div>
+          </div>
+        </div>
+
+        <div class="farm-card" tabindex="0" role="button" aria-pressed="false">
+          <div class="farm-card-inner">
+            <div class="farm-card-front"><span class="farm-emoji">🐐</span><span class="farm-name">Goats</span></div>
+            <div class="farm-card-back"><p>Goats are mean.</p></div>
+          </div>
+        </div>
+
+        <div class="farm-card" tabindex="0" role="button" aria-pressed="false">
+          <div class="farm-card-inner">
+            <div class="farm-card-front"><span class="farm-emoji">🦆</span><span class="farm-name">Ducks</span></div>
+            <div class="farm-card-back"><p>Ducks can sleep with one eye open, keeping half their brain conscious and alert while the other half rests. They are, scientifically, always watching.</p></div>
+          </div>
+        </div>
+
+        <div class="farm-card" tabindex="0" role="button" aria-pressed="false">
+          <div class="farm-card-inner">
+            <div class="farm-card-front"><span class="farm-emoji">🐑</span><span class="farm-name">Sheep</span></div>
+            <div class="farm-card-back"><p>Sheep self-medicate. When ill, they seek out specific plants with medicinal properties — antifungals, antiparasitic herbs — and adjust what they eat accordingly. In this way only, be like a sheep.</p></div>
+          </div>
+        </div>
+
+        <div class="farm-card" tabindex="0" role="button" aria-pressed="false">
+          <div class="farm-card-inner">
+            <div class="farm-card-front"><span class="farm-emoji">🐝</span><span class="farm-name">Bees</span></div>
+            <div class="farm-card-back"><p>A single honeybee produces about 1/12th of a teaspoon of honey in its entire lifetime. Every jar represents millions of individual decisions. Dale's personal favorite. Respect the bees.</p></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- WAGONS -->
+  <section id="stay" class="wagon-section">
+    <div class="wagon-inner">
+      <div class="wagon-image">
+        <img src="images/wagon.jpg" alt="Conestoga Wagon vacation rental at Cherrywood" />
+        <div class="wagon-banner">Airbnb Listing Coming Soon</div>
+      </div>
+      <div class="wagon-text">
+        <span class="panel-kicker">Stay With Us</span>
+        <h2 class="wagon-heading">Conestoga Wagon Rentals</h2>
+        <p class="wagon-body">Step back in time and spend the night in one of our beautifully restored Conestoga Wagons. Nestled on the property, each wagon offers a one-of-a-kind glamping experience surrounded by nature — warm lights, fresh air, and the sounds of the farm at dusk.</p>
+        <p class="wagon-body">We're adding wagons to the property — check Airbnb for availability and booking.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- THE COURSE -->
+  <section id="course" class="course">
+    <div class="course-image">
+      <img src="images/course.jpg" alt="Cherrywood golf course" />
+    </div>
+    <div class="course-text">
+      <span class="panel-kicker panel-kicker--light">The Course</span>
+      <h2>Nine Holes.<br>Since 1948.</h2>
+      <p>Set in the foothills of the Ozark Mountains with bent grass greens, rolling terrain, and water on two holes. This course has been part of Fredericktown for generations. We're proud to be the next.</p>
+      <ul class="course-facts">
+        <li><strong>Par 36</strong> &mdash; 9 holes</li>
+        <li><strong>3,007 yards</strong> from the tips</li>
+        <li><strong>Bent grass greens</strong></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact" class="contact">
+    <div class="contact-inner">
+      <h2>Come Find Us</h2>
+      <address>
+        <div class="contact-line">
+          <span class="contact-label">Where</span>
+          <span>1157 Madison 502, Fredericktown, MO 63645</span>
+        </div>
+        <div class="contact-line">
+          <span class="contact-label">Phone</span>
+          <a href="tel:+15737830012">(573) 783-0012</a>
+        </div>
+        <div class="contact-line">
+          <span class="contact-label">Email</span>
+          <a href="mailto:events@cherrywoodfgc.com">events@cherrywoodfgc.com</a>
+        </div>
+        <div class="contact-line">
+          <span class="contact-label">Hours</span>
+          <span id="courseHours">7 Days a Week &nbsp;|&nbsp; 8am–7pm</span>
+        </div>
+      </address>
+      <div class="contact-map">
+        <iframe
+          title="Cherrywood Farm &amp; Golf Club location"
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3131.0!2d-90.2955!3d37.5583!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x87d8b3e3e3e3e3e3%3A0x0!2s1157+Madison+502%2C+Fredericktown%2C+MO+63645!5e0!3m2!1sen!2sus!4v1700000000000"
+          width="100%" height="300" style="border:0;" allowfullscreen="" loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade">
+        </iframe>
+      </div>
     </div>
   </section>
 
   <!-- FOOTER -->
   <footer class="footer">
+    <div class="footer-tree" aria-hidden="true">
+      <svg viewBox="0 0 600 520" xmlns="http://www.w3.org/2000/svg" fill="none">
+        <path d="M290,520 C288,480 284,440 286,380 C287,340 280,310 282,290" stroke="#F0C8D0" stroke-width="18" stroke-linecap="round"/>
+        <path d="M310,520 C312,478 316,438 314,376 C313,336 320,308 318,290" stroke="#F0C8D0" stroke-width="12" stroke-linecap="round"/>
+        <path d="M284,310 C270,295 240,270 200,245 C165,222 130,210 100,198" stroke="#F0C8D0" stroke-width="9" stroke-linecap="round"/>
+        <path d="M286,345 C265,340 230,330 195,318 C165,308 140,295 115,282" stroke="#F0C8D0" stroke-width="7" stroke-linecap="round"/>
+        <path d="M316,310 C330,295 360,270 400,245 C435,222 470,210 500,198" stroke="#F0C8D0" stroke-width="9" stroke-linecap="round"/>
+        <path d="M314,345 C335,340 370,330 405,318 C435,308 460,295 485,282" stroke="#F0C8D0" stroke-width="7" stroke-linecap="round"/>
+        <path d="M300,288 C298,265 295,238 290,210 C286,186 280,165 272,142" stroke="#F0C8D0" stroke-width="8" stroke-linecap="round"/>
+        <path d="M200,245 C185,230 165,212 148,200" stroke="#F0C8D0" stroke-width="4" stroke-linecap="round"/>
+        <path d="M160,222 C148,208 130,194 115,185" stroke="#F0C8D0" stroke-width="3" stroke-linecap="round"/>
+        <path d="M200,245 C195,225 188,205 182,190" stroke="#F0C8D0" stroke-width="3" stroke-linecap="round"/>
+        <path d="M195,318 C178,308 158,295 142,285" stroke="#F0C8D0" stroke-width="4" stroke-linecap="round"/>
+        <path d="M155,300 C140,290 122,280 108,272" stroke="#F0C8D0" stroke-width="3" stroke-linecap="round"/>
+        <path d="M400,245 C415,230 435,212 452,200" stroke="#F0C8D0" stroke-width="4" stroke-linecap="round"/>
+        <path d="M440,222 C452,208 470,194 485,185" stroke="#F0C8D0" stroke-width="3" stroke-linecap="round"/>
+        <path d="M400,245 C405,225 412,205 418,190" stroke="#F0C8D0" stroke-width="3" stroke-linecap="round"/>
+        <path d="M405,318 C422,308 442,295 458,285" stroke="#F0C8D0" stroke-width="4" stroke-linecap="round"/>
+        <path d="M445,300 C460,290 478,280 492,272" stroke="#F0C8D0" stroke-width="3" stroke-linecap="round"/>
+        <path d="M280,210 C265,198 248,182 235,168" stroke="#F0C8D0" stroke-width="4" stroke-linecap="round"/>
+        <path d="M272,142 C260,128 248,115 238,100" stroke="#F0C8D0" stroke-width="3" stroke-linecap="round"/>
+        <path d="M272,142 C282,126 290,110 294,94" stroke="#F0C8D0" stroke-width="3" stroke-linecap="round"/>
+        <path d="M280,210 C292,196 302,180 308,165" stroke="#F0C8D0" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="100" cy="196" r="7" fill="#F0C8D0"/><circle cx="112" cy="188" r="5" fill="#E8A0B0"/><circle cx="90" cy="186" r="5" fill="#F0C8D0"/><circle cx="104" cy="178" r="5" fill="#E8A0B0"/><circle cx="118" cy="194" r="4" fill="#F0C8D0"/><circle cx="130" cy="184" r="5" fill="#F0C8D0"/><circle cx="122" cy="176" r="4" fill="#E8A0B0"/><circle cx="148" cy="198" r="5" fill="#F0C8D0"/><circle cx="138" cy="190" r="4" fill="#E8A0B0"/>
+        <circle cx="108" cy="270" r="6" fill="#F0C8D0"/><circle cx="118" cy="263" r="4" fill="#E8A0B0"/><circle cx="100" cy="263" r="4" fill="#F0C8D0"/><circle cx="142" cy="283" r="5" fill="#F0C8D0"/><circle cx="132" cy="276" r="4" fill="#E8A0B0"/>
+        <circle cx="500" cy="196" r="7" fill="#F0C8D0"/><circle cx="488" cy="188" r="5" fill="#E8A0B0"/><circle cx="510" cy="186" r="5" fill="#F0C8D0"/><circle cx="496" cy="178" r="5" fill="#E8A0B0"/><circle cx="482" cy="194" r="4" fill="#F0C8D0"/><circle cx="470" cy="184" r="5" fill="#F0C8D0"/><circle cx="478" cy="176" r="4" fill="#E8A0B0"/><circle cx="452" cy="198" r="5" fill="#F0C8D0"/><circle cx="462" cy="190" r="4" fill="#E8A0B0"/>
+        <circle cx="492" cy="270" r="6" fill="#F0C8D0"/><circle cx="482" cy="263" r="4" fill="#E8A0B0"/><circle cx="500" cy="263" r="4" fill="#F0C8D0"/><circle cx="458" cy="283" r="5" fill="#F0C8D0"/><circle cx="468" cy="276" r="4" fill="#E8A0B0"/>
+        <circle cx="238" cy="98" r="7" fill="#F0C8D0"/><circle cx="248" cy="88" r="6" fill="#E8A0B0"/><circle cx="228" cy="90" r="5" fill="#F0C8D0"/><circle cx="242" cy="78" r="5" fill="#C4627A"/><circle cx="256" cy="96" r="4" fill="#F0C8D0"/><circle cx="235" cy="108" r="4" fill="#E8A0B0"/>
+        <circle cx="294" cy="92" r="7" fill="#F0C8D0"/><circle cx="304" cy="82" r="6" fill="#E8A0B0"/><circle cx="284" cy="84" r="5" fill="#F0C8D0"/><circle cx="298" cy="72" r="5" fill="#C4627A"/><circle cx="308" cy="98" r="4" fill="#F0C8D0"/>
+        <circle cx="182" cy="188" r="5" fill="#F0C8D0"/><circle cx="175" cy="198" r="4" fill="#E8A0B0"/><circle cx="235" cy="166" r="5" fill="#F0C8D0"/><circle cx="243" cy="158" r="4" fill="#E8A0B0"/><circle cx="308" cy="163" r="5" fill="#F0C8D0"/><circle cx="316" cy="155" r="4" fill="#E8A0B0"/><circle cx="418" cy="188" r="5" fill="#F0C8D0"/><circle cx="425" cy="198" r="4" fill="#E8A0B0"/>
+        <circle cx="270" cy="515" r="3" fill="#F0C8D0" opacity="0.5"/><circle cx="285" cy="518" r="2" fill="#E8A0B0" opacity="0.4"/><circle cx="320" cy="514" r="3" fill="#F0C8D0" opacity="0.5"/><circle cx="335" cy="518" r="2" fill="#E8A0B0" opacity="0.3"/>
+      </svg>
+    </div>
     <div class="footer-content">
       <p class="footer-name">Cherrywood Farm &amp; Golf Club</p>
       <p class="footer-tagline">Fredericktown, Missouri</p>
+      <div class="footer-social">
+        <a href="https://www.facebook.com/beavervalleyfredericktown/" target="_blank" rel="noopener" aria-label="Facebook">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+        </a>
+        <a href="https://www.instagram.com/cherrywood_farm/" target="_blank" rel="noopener" aria-label="Instagram">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+        </a>
+      </div>
+      <p class="footer-copy">&copy; 2026 &nbsp;&middot;&nbsp; <a href="/portal/" style="color:inherit;opacity:0.5;font-size:0.8em;text-decoration:none;">Team Portal</a></p>
+      <div class="footer-powered">
+        <svg width="18" height="20" viewBox="0 0 18 20" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;vertical-align:middle;margin-right:7px;flex-shrink:0">
+          <polygon points="9,1 17,5.5 17,14.5 9,19 1,14.5 1,5.5" fill="#6B1229" stroke="#4a0c1c" stroke-width="0.5"/>
+          <text x="9" y="14" text-anchor="middle" font-family="Georgia,serif" font-size="10" font-weight="700" fill="#0a0a0a">j</text>
+        </svg>
+        <span>Powered by <strong>Magus Jane Solutions</strong></span>
+      </div>
     </div>
   </footer>
 
-<!--=== EVERYTHING BELOW IS COMMENTED OUT FOR DEMO — RESTORE TO BRING BACK ===
-
-  COURSE STATUS BANNER:
-  <div id="courseClosedBanner" style="display:none;background:#7B1C2E;color:#fff;text-align:center;padding:0.75rem 1rem;font-family:Georgia,serif;font-size:0.95rem;position:relative;z-index:999;">
-    ⚠️ <span id="courseClosedMsg">Course is closed due to weather conditions. Check back soon.</span>
-  </div>
-
-  NAV LINKS:
-        <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">&#9776;</button>
-        <ul class="nav-links" id="navLinks">
-          <li><a href="#about">About</a></li>
-          <li><a href="#pricing">Pricing</a></li>
-          <li><a href="#farm">The Farm</a></li>
-          <li><a href="#course">The Course</a></li>
-          <li><a href="#stay">Stay</a></li>
-          <li><a href="/events.html">Events</a></li>
-          <li><a href="#contact">Visit</a></li>
-        </ul>
-        <div id="courseStatusBadge" class="course-status-badge" style="display:none"></div>
-
-  HERO BUTTONS:
-        <a href="#pricing" class="hero-cta">View Pricing</a>
-        <a href="#eggs" class="hero-cta hero-cta--outline">Reserve Farm Eggs</a>
-        <a href="/membership.html" class="hero-cta hero-cta--outline">Apply for Membership</a>
-
-  PRICING SECTION:
-  <section class="pricing-section-wrap" id="pricing"> ... </section>
-
-  EGGS SECTION:
-  <section class="egg-section" id="eggs"> ... </section>
-
-  FARM FAMILY SECTION:
-  <section id="farm" class="farm-section"> ... </section>
-
-  WAGONS SECTION:
-  <section id="stay" class="wagon-section"> ... </section>
-
-  COURSE SECTION:
-  <section id="course" class="course"> ... </section>
-
-  CONTACT SECTION:
-  <section id="contact" class="contact"> ... </section>
-
-  FOOTER EXTRAS (social links, tree SVG, powered-by):
-  ...
-
-  AUDIO + SCRIPTS:
   <audio id="ambience" src="audio/nature.mp3" loop preload="none"></audio>
-  <button class="sound-toggle" ...></button>
+
+  <!-- Sound toggle button -->
+  <button class="sound-toggle" id="soundToggle" aria-label="Toggle nature sounds" title="Toggle nature sounds">
+    <svg id="soundIconOn" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+    <svg id="soundIconOff" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+  </button>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="script.js"></script>
+  <script>
+    function showYear(year, tab) {
+      document.querySelectorAll('.pricing-panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.year-tab').forEach(t => t.classList.remove('active'));
+      document.getElementById('panel-' + year).classList.add('active');
+      tab.classList.add('active');
+    }
+  </script>
   <script src="egg-form.js"></script>
-  ... all inline scripts ...
+  <script>
+    (function() {
+      const SUPABASE_URL  = 'https://giwfigekjatujubjknjf.supabase.co';
+      const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdpd2ZpZ2VramF0dWp1YmprbmpmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMDEwMDMsImV4cCI6MjA4OTU3NzAwM30.p3OaPA5qYROqz8d0tNyhytl__n_bzH2l2MOX3olDn3A';
+      const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+      function withinHours() {
+        const now = new Date();
+        const ct  = new Date(now.toLocaleString('en-US', { timeZone: 'America/Chicago' }));
+        const h   = ct.getHours();
+        return h >= 8 && h < 19; // 8am–7pm
+      }
 
-=== END COMMENTED SECTION ===-->
+      function showStatus(isOpen, message) {
+        const badge  = document.getElementById('courseStatusBadge');
+        const banner = document.getElementById('courseClosedBanner');
+        if (!isOpen) {
+          document.getElementById('courseClosedMsg').textContent = message || 'Course is currently closed. Hours: 8am–7pm daily.';
+          banner.style.display = 'block';
+          badge.textContent = '⛔ Course Closed';
+          badge.className = 'course-status-badge course-status-badge--closed';
+        } else {
+          banner.style.display = 'none';
+          badge.textContent = '⛳ Course Open';
+          badge.className = 'course-status-badge course-status-badge--open';
+        }
+        badge.style.display = 'inline-block';
+      }
 
+      // Show hour-based status immediately — no waiting for Supabase
+      showStatus(withinHours());
+
+      // Check Supabase only for manual overrides (e.g. weather closure)
+      db.from('course_status').select('is_open,message').eq('id', 1).single()
+        .then(({ data }) => {
+          if (data && !data.is_open) showStatus(false, data.message);
+        })
+        .catch(() => { /* keep hours-based result */ });
+    })();
+  </script>
 </body>
 </html>
