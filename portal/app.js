@@ -349,31 +349,64 @@ function renderRegistrations(rows, tournamentId) {
   if (!rows.length) { empty.hidden = false; return; }
   empty.hidden = true;
 
+  const activeCount = rows.filter(r => r.status !== 'cancelled').length;
+
+  const wrap = document.createElement('div');
+  wrap.style.overflowX = 'auto';
+
+  const summary = document.createElement('p');
+  summary.style.cssText = 'margin:0 0 0.75rem;font-size:0.85rem;color:#555;';
+  summary.textContent = `${activeCount} team${activeCount !== 1 ? 's' : ''} registered`;
+  wrap.appendChild(summary);
+
+  const table = document.createElement('table');
+  table.style.cssText = 'width:100%;border-collapse:collapse;font-size:0.88rem;';
+  table.innerHTML = `
+    <thead>
+      <tr style="background:#1C3320;color:#fff;text-align:left;">
+        <th style="padding:0.55rem 0.75rem;">#</th>
+        <th style="padding:0.55rem 0.75rem;">Team</th>
+        <th style="padding:0.55rem 0.75rem;">Captain</th>
+        <th style="padding:0.55rem 0.75rem;">Phone</th>
+        <th style="padding:0.55rem 0.75rem;">Cart</th>
+        <th style="padding:0.55rem 0.75rem;">Registered</th>
+        <th style="padding:0.55rem 0.75rem;"></th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  `;
+
+  const tbody = table.querySelector('tbody');
+  let num = 0;
   rows.forEach((r, i) => {
-    const card = document.createElement('div');
-    card.className = 'data-card' + (r.status === 'cancelled' ? ' data-card--muted' : '');
-    card.innerHTML = `
-      <div class="data-card__header">
-        <span class="data-card__title">#${i + 1} ${esc(r.team_name || r.captain_name || '—')}</span>
-        <span class="data-card__badge">${fmtDate(r.created_at)}</span>
-      </div>
-      <div class="data-card__body">
-        ${r.team_name ? `<span><strong>Captain:</strong> ${esc(r.captain_name)}</span>` : ''}
-        <span>${esc(r.phone)}${r.email ? ' · ' + esc(r.email) : ''}</span>
-        ${r.num_players > 1 ? `<span>${r.num_players} players</span>` : ''}
-        <span>${r.cart ? '🛒 Cart requested' : 'Walking'}</span>
-      </div>
-      ${r.status !== 'cancelled'
-        ? `<button class="btn btn--ghost btn--sm" data-cancel-reg="${r.id}" style="color:#a00;">Cancel</button>`
-        : '<span class="tag tag--cancelled">Cancelled</span>'}
+    const cancelled = r.status === 'cancelled';
+    if (!cancelled) num++;
+    const tr = document.createElement('tr');
+    tr.style.cssText = `border-bottom:1px solid #e8dfc8;${i % 2 === 1 ? 'background:#fdf9f2;' : ''}${cancelled ? 'opacity:0.4;' : ''}`;
+    tr.innerHTML = `
+      <td style="padding:0.55rem 0.75rem;color:#888;">${cancelled ? '—' : num}</td>
+      <td style="padding:0.55rem 0.75rem;font-weight:${cancelled ? '400' : '600'};">${esc(r.team_name || '—')}</td>
+      <td style="padding:0.55rem 0.75rem;">${esc(r.captain_name || '—')}</td>
+      <td style="padding:0.55rem 0.75rem;white-space:nowrap;">${r.phone || '—'}</td>
+      <td style="padding:0.55rem 0.75rem;">${r.cart ? 'Yes' : 'No'}</td>
+      <td style="padding:0.55rem 0.75rem;color:#888;font-size:0.8rem;white-space:nowrap;">${fmtDate(r.created_at)}</td>
+      <td style="padding:0.55rem 0.75rem;">
+        ${!cancelled
+          ? `<button class="btn btn--ghost btn--sm" data-del="${r.id}" data-name="${esc(r.team_name || r.captain_name)}" style="color:#a00;font-size:0.75rem;padding:0.2rem 0.5rem;">Delete</button>`
+          : ''}
+      </td>
     `;
-    card.querySelector('[data-cancel-reg]')?.addEventListener('click', async () => {
-      if (!confirm('Cancel this registration?')) return;
-      await db.from('tournament_registrations').update({ status: 'cancelled' }).eq('id', r.id);
+    tr.querySelector('[data-del]')?.addEventListener('click', async e => {
+      const name = e.target.dataset.name;
+      if (!confirm(`Delete "${name}"?`)) return;
+      await db.from('tournament_registrations').delete().eq('id', r.id);
       loadRegistrations(tournamentId, document.getElementById('regPanelTitle').textContent);
     });
-    list.appendChild(card);
+    tbody.appendChild(tr);
   });
+
+  wrap.appendChild(table);
+  list.appendChild(wrap);
 }
 
 document.getElementById('closeRegPanel').addEventListener('click', () => {
