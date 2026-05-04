@@ -1,0 +1,29 @@
+{
+  "name": "cherrywoodgolf",
+  "version": "1.0.0",
+  "description": "",
+  "main": "egg-form.js",
+  "scripts": {
+    "test": "cucumber-js",
+    "test:integration": "cucumber-js --profile integration",
+    "test:all": "npm test && npm run test:integration"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/free-marion/free-marion.github.io.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/free-marion/free-marion.github.io/issues"
+  },
+  "homepage": "https://github.com/free-marion/free-marion.github.io#readme",
+  "devDependencies": {
+    "@cucumber/cucumber": "^12.8.2",
+    "@playwright/test": "^1.59.1",
+    "chai": "^6.2.2",
+    "http-server": "^14.1.1",
+    "playwright-bdd": "^8.5.0"
+  }
+}

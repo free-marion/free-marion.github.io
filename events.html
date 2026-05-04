@@ -520,6 +520,7 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="src/event-utils.js"></script>
   <script>
     const SUPABASE_URL  = 'https://giwfigekjatujubjknjf.supabase.co';
     const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdpd2ZpZ2VramF0dWp1YmprbmpmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMDEwMDMsImV4cCI6MjA4OTU3NzAwM30.p3OaPA5qYROqz8d0tNyhytl__n_bzH2l2MOX3olDn3A';
@@ -612,27 +613,7 @@
       renderEventCards();
     }
 
-    function urgencyClass(t, isPast) {
-      if (t.status === 'cancelled')                        return 'cancelled';
-      if (isPast)                                          return 'past';
-      const count     = t.registered_count || 0;
-      const remaining = t.max_slots > 0 ? t.max_slots - count : null;
-      if (remaining !== null && remaining <= 0)            return 'soldout';
-      if (remaining !== null && remaining <= 2)            return 'critical';
-      if (remaining !== null && remaining <= 5)            return 'low';
-      return 'open';
-    }
-
-    function slotsLabel(t, urgency) {
-      const count     = t.registered_count || 0;
-      const remaining = t.max_slots > 0 ? t.max_slots - count : null;
-      if (urgency === 'soldout')  return 'Sold Out';
-      if (urgency === 'cancelled') return 'Cancelled';
-      if (remaining === null)     return `${count} registered`;
-      if (urgency === 'critical') return `🔴 Only ${remaining} left!`;
-      if (urgency === 'low')      return `⚠️ ${remaining} spots left`;
-      return `${remaining} of ${t.max_slots} spots open`;
-    }
+    const { urgencyClass, slotsLabel } = EventUtils;
 
     function buildCalChip(t, isPast) {
       const urgency = urgencyClass(t, isPast);
