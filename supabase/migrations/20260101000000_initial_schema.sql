@@ -96,7 +96,7 @@ create table if not exists tournaments (
   max_slots        int not null default 0,
   format           text,
   entry_fee        numeric,
-  status           text not null default 'open',
+  status           text not null default 'open' check (status in ('open','closed','cancelled','draft')),
   notes            text,
   registered_count int not null default 0,
   created_at       timestamptz default now()
@@ -297,26 +297,29 @@ create policy "Users can update own profile"   on profiles for update using (aut
 create policy "Admin can update any profile"   on profiles for update
   using (public.portal_can('admin')) with check (public.portal_can('admin'));
 
--- tournaments (open to anon — portal uses password gate, not auth)
-create policy "Anon can read tournaments"    on tournaments for select using (true);
-create policy "Anon can manage tournaments"  on tournaments for all using (true) with check (true);
+-- tournaments
+-- Public site reads tournaments; only authenticated portal user writes.
+create policy "Anyone can read tournaments"             on tournaments for select using (true);
+create policy "Authenticated can insert tournament"     on tournaments for insert with check (auth.uid() is not null);
+create policy "Authenticated can update tournament"     on tournaments for update using (auth.uid() is not null);
+create policy "Authenticated can delete tournament"     on tournaments for delete using (auth.uid() is not null);
 
 -- tournament_registrations
-create policy "Anon can read tournament registrations"   on tournament_registrations for select using (true);
-create policy "Anon can insert tournament registrations" on tournament_registrations for insert with check (true);
-create policy "Anon can update tournament registrations" on tournament_registrations for update using (true) with check (true);
-create policy "Anon can delete tournament registrations" on tournament_registrations for delete using (true);
+-- Public site reads and submits registrations; only authenticated portal user can modify or delete.
+create policy "Anyone can read tournament registrations"      on tournament_registrations for select using (true);
+create policy "Anyone can register for tournament"            on tournament_registrations for insert with check (true);
+create policy "Authenticated can update registration"         on tournament_registrations for update using (auth.uid() is not null) with check (auth.uid() is not null);
+create policy "Authenticated can delete registration"         on tournament_registrations for delete using (auth.uid() is not null);
 
 -- egg_orders
--- Portal uses a client-side password gate (not Supabase auth), so reads must be open to anon.
-create policy "Anyone can submit egg order"   on egg_orders for insert with check (true);
-create policy "Anon can read egg orders"      on egg_orders for select using (true);
-create policy "Anon can update egg orders"    on egg_orders for update using (true) with check (true);
+-- Public site submits and reads egg orders; only authenticated portal user can update status.
+create policy "Anyone can submit egg order"             on egg_orders for insert with check (true);
+create policy "Anyone can read egg orders"              on egg_orders for select using (true);
+create policy "Authenticated can update egg order"      on egg_orders for update using (auth.uid() is not null) with check (auth.uid() is not null);
 
 -- course_status
-create policy "Anyone can read course status"      on course_status for select using (true);
-create policy "Authorized can update course status" on course_status for update
-  using (exists (select 1 from profiles where id = auth.uid() and (role = 'admin' or perm_toggle_course = true)));
+create policy "Anyone can read course status"           on course_status for select using (true);
+create policy "Authenticated can update course status"  on course_status for update using (auth.uid() is not null);
 
 -- bookings
 create policy "Anyone can create booking"  on bookings for insert with check (true);

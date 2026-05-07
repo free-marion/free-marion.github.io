@@ -46,7 +46,7 @@
     </div>
     <div class="portal-header__right">
       <a href="https://cherrywoodgolf.com" class="btn btn--ghost btn--sm">← Site</a>
-      <button class="btn btn--ghost btn--sm" onclick="sessionStorage.removeItem('cwAuth'); window.location.reload();">Lock</button>
+      <button class="btn btn--ghost btn--sm" onclick="signOut()">Lock</button>
     </div>
   </header>
 
@@ -85,6 +85,7 @@
             <input type="number" id="tEntryFee" placeholder="Entry fee ($)" step="0.01" min="0">
           </div>
           <select id="tStatus" style="font-family:inherit;padding:0.55rem 0.75rem;border:1px solid #d4c8b0;border-radius:5px;">
+            <option value="draft">Draft</option>
             <option value="open">Open</option>
             <option value="closed">Closed</option>
             <option value="cancelled">Cancelled</option>

@@ -178,6 +178,7 @@
     .chip--soldout  { background: var(--burgundy); color: #fff;    border-left-color: #5a0010; }
     .chip--past     { background: #f0f0f0; color: var(--ink-faint); border-left-color: #ccc; }
     .chip--cancelled{ background: #f5f5f5; color: #aaa;            border-left-color: #ddd; text-decoration: line-through; }
+    .chip--draft    { background: #eef2f7; color: #4a6080;         border-left-color: #8aa3c0; }
 
     /* ── Event detail panel ── */
     .event-detail {
@@ -328,10 +329,8 @@
       text-decoration: underline;
     }
 
-    /* ── Upcoming event cards ── */
-    .upcoming-section {
-      margin-top: 1rem;
-    }
+    /* ── Upcoming events list ── */
+    .upcoming-section { margin-top: 1rem; }
     .upcoming-section__title {
       font-family: var(--serif);
       font-size: 1.35rem;
@@ -341,99 +340,58 @@
       padding-bottom: 0.6rem;
       border-bottom: 1px solid var(--cream-dark);
     }
-    .event-cards-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 1.25rem;
-    }
-    .event-card {
-      background: var(--off-white);
-      border: 1px solid var(--cream-dark);
-      border-radius: 10px;
-      padding: 1.25rem;
+    .event-list { display: flex; flex-direction: column; }
+    .event-list-item {
       display: flex;
-      flex-direction: column;
-      gap: 0.6rem;
+      align-items: center;
+      gap: 1.5rem;
+      padding: 0.9rem 0.5rem;
+      border-bottom: 1px solid var(--cream-dark);
       cursor: pointer;
-      transition: box-shadow 0.2s, transform 0.15s;
-      border-top: 4px solid var(--green);
+      border-radius: 6px;
+      transition: background 0.15s;
     }
-    .event-card:hover { box-shadow: 0 4px 18px rgba(0,40,20,0.1); transform: translateY(-2px); }
-    .event-card--low      { border-top-color: #d4870a; }
-    .event-card--critical { border-top-color: #c0392b; }
-    .event-card--soldout  { border-top-color: var(--burgundy); opacity: 0.85; }
-    .event-card--past     { border-top-color: #bbb; opacity: 0.7; }
-    .event-card__date {
-      font-size: 0.7rem;
-      letter-spacing: 0.1em;
+    .event-list-item:first-child { border-top: 1px solid var(--cream-dark); }
+    .event-list-item:hover { background: var(--parchment); }
+    .event-list-item__date {
+      font-family: var(--body);
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
       text-transform: uppercase;
       color: var(--green);
-      font-family: var(--body);
+      min-width: 5.5rem;
+      flex-shrink: 0;
     }
-    .event-card--low .event-card__date      { color: #8a5700; }
-    .event-card--critical .event-card__date { color: #a00; }
-    .event-card--soldout .event-card__date  { color: var(--burgundy); }
-    .event-card--past .event-card__date     { color: var(--ink-faint); }
-    .event-card__name {
+    .event-list-item__info { flex: 1; min-width: 0; }
+    .event-list-item__name {
       font-family: var(--serif);
-      font-size: 1.1rem;
+      font-size: 1.05rem;
       color: var(--ink);
       line-height: 1.25;
+      margin-bottom: 0.15rem;
     }
-    .event-card__badges {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.35rem;
-    }
-    .event-card__slots {
-      font-size: 0.82rem;
+    .event-list-item__meta {
       font-family: var(--body);
-      margin-top: 0.1rem;
+      font-size: 0.75rem;
+      color: var(--ink-faint);
     }
-    .event-card__slots-bar {
-      height: 5px;
-      background: var(--cream-dark);
-      border-radius: 3px;
-      overflow: hidden;
-      margin-top: 0.3rem;
-    }
-    .event-card__slots-fill {
-      height: 100%;
-      border-radius: 3px;
-      transition: width 0.4s ease;
-    }
-    .fill--open     { background: var(--green); }
-    .fill--low      { background: #d4870a; }
-    .fill--critical { background: #c0392b; }
-    .fill--soldout  { background: var(--burgundy); }
-    .event-card__slots-label { color: var(--ink-mid); }
-    .event-card__slots-label--low      { color: #8a5700; font-weight: 600; }
-    .event-card__slots-label--critical { color: #a00;    font-weight: 700; }
-    .event-card__slots-label--soldout  { color: var(--burgundy); font-weight: 700; }
-    .event-card__desc {
-      font-size: 0.82rem;
-      color: var(--ink-mid);
-      line-height: 1.55;
-      flex: 1;
-    }
-    .event-card__cta {
-      margin-top: auto;
+    .event-list-item__action { flex-shrink: 0; }
+    .btn-list-register {
       font-family: var(--body);
-      font-size: 0.78rem;
-      letter-spacing: 0.08em;
+      font-size: 0.75rem;
+      letter-spacing: 0.07em;
       text-transform: uppercase;
-      padding: 0.5rem 1rem;
+      padding: 0.45rem 1.1rem;
       background: var(--green);
       color: var(--cream);
       border: none;
       border-radius: 5px;
       cursor: pointer;
       transition: background 0.2s;
-      width: 100%;
+      white-space: nowrap;
     }
-    .event-card__cta:hover { background: var(--bark); }
-    .event-card__cta--soldout { background: var(--burgundy); cursor: default; }
-    .event-card__cta--disabled { background: var(--ink-faint); cursor: default; }
+    .btn-list-register:hover { background: var(--bark); }
     .no-upcoming {
       font-style: italic;
       color: var(--ink-faint);
@@ -449,7 +407,10 @@
       .cal-event-chip__slots { display: none; }
       .reg-form__row { grid-template-columns: 1fr; }
       .cal-weekday { font-size: 0.6rem; }
-      .event-cards-grid { grid-template-columns: 1fr; }
+      .event-list-item { flex-wrap: wrap; gap: 0.5rem; }
+      .event-list-item__date { min-width: auto; }
+      .event-list-item__action { width: 100%; }
+      .btn-list-register { width: 100%; text-align: center; }
     }
   </style>
 </head>
@@ -514,7 +475,7 @@
     <!-- Upcoming event cards -->
     <div class="upcoming-section">
       <h3 class="upcoming-section__title">Upcoming Events</h3>
-      <div class="event-cards-grid" id="eventCardsGrid"></div>
+      <div class="event-list" id="eventCardsGrid"></div>
     </div>
 
   </div>
@@ -636,72 +597,55 @@
         <div class="cal-event-chip__name">${esc(t.name)}</div>
         ${timeStr ? `<div class="cal-event-chip__time">${timeStr}</div>` : ''}
         <div class="cal-event-chip__type">${infoStr}</div>
-        <div class="cal-event-chip__slots">${slotsLabel(t, urgency)}</div>
+        ${slotsLabel(t, urgency) ? `<div class="cal-event-chip__slots">${slotsLabel(t, urgency)}</div>` : ''}
       `;
       return chip;
     }
 
     function renderEventCards() {
-      const grid  = document.getElementById('eventCardsGrid');
+      const list  = document.getElementById('eventCardsGrid');
       const today = new Date().toISOString().split('T')[0];
-      const upcoming = allTournaments.filter(t => t.date >= today && t.status !== 'cancelled');
+      const upcoming = allTournaments.filter(t =>
+        t.date >= today && t.status !== 'cancelled'
+      );
 
       if (!upcoming.length) {
-        grid.innerHTML = '<p class="no-upcoming">No upcoming events scheduled. Check back soon.</p>';
+        list.innerHTML = '<p class="no-upcoming">No upcoming events scheduled. Check back soon.</p>';
         return;
       }
 
-      grid.innerHTML = '';
+      list.innerHTML = '';
       upcoming.forEach(t => {
-        const urgency   = urgencyClass(t, false);
-        const count     = t.registered_count || 0;
-        const remaining = t.max_slots > 0 ? t.max_slots - count : null;
-        const pct       = (t.max_slots > 0 && remaining !== null) ? Math.round((count / t.max_slots) * 100) : 0;
-        const isOpen    = t.status === 'open' && urgency !== 'soldout';
+        const urgency = urgencyClass(t, false);
+        const isOpen  = t.status === 'open' && urgency !== 'soldout';
 
         const d = new Date(t.date + 'T00:00:00');
-        const dateStr = d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
-        let timeStr = '';
+        const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+
+        const metaParts = [];
         if (t.time) {
           const [h, m] = t.time.split(':');
           const dt = new Date(); dt.setHours(+h, +m);
-          timeStr = ' · ' + dt.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+          metaParts.push(dt.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }));
         }
+        if (t.format)    metaParts.push(esc(t.format));
+        if (t.entry_fee) metaParts.push('$' + parseFloat(t.entry_fee).toFixed(0) + ' entry');
 
-        let slotsHtml = '';
-        if (t.max_slots > 0 && remaining !== null) {
-          const labelClass = urgency === 'soldout' ? 'soldout' : urgency === 'critical' ? 'critical' : urgency === 'low' ? 'low' : '';
-          slotsHtml = `
-            <div class="event-card__slots">
-              <span class="event-card__slots-label event-card__slots-label--${labelClass}">${slotsLabel(t, urgency)}</span>
-              <div class="event-card__slots-bar">
-                <div class="event-card__slots-fill fill--${urgency}" style="width:${pct}%"></div>
-              </div>
-            </div>`;
-        } else if (count > 0) {
-          slotsHtml = `<div class="event-card__slots"><span class="event-card__slots-label">${count} registered</span></div>`;
-        }
-
-        const ctaClass = urgency === 'soldout' ? 'event-card__cta--soldout' : !isOpen ? 'event-card__cta--disabled' : '';
-        const ctaText  = urgency === 'soldout' ? 'Sold Out' : !isOpen ? t.status.charAt(0).toUpperCase() + t.status.slice(1) : 'Register Now →';
-
-        const card = document.createElement('div');
-        card.className = `event-card event-card--${urgency}`;
-        card.innerHTML = `
-          <div class="event-card__date">${esc(dateStr)}${timeStr}</div>
-          <div class="event-card__name">${esc(t.name)}</div>
-          <div class="event-card__badges">
-            <span class="badge badge--${t.type}">${t.type === 'team' ? '👥 Team' : '🏌️ Individual'}${t.type === 'team' && t.team_size ? ' · ' + t.team_size + 'p' : ''}</span>
-            ${t.format    ? `<span class="badge badge--format">${esc(t.format)}</span>` : ''}
-            ${t.entry_fee ? `<span class="badge badge--fee">$${parseFloat(t.entry_fee).toFixed(0)} entry</span>` : ''}
+        const item = document.createElement('div');
+        item.className = 'event-list-item';
+        item.innerHTML = `
+          <div class="event-list-item__date">${esc(dateStr)}</div>
+          <div class="event-list-item__info">
+            <div class="event-list-item__name">${esc(t.name)}</div>
+            ${metaParts.length ? `<div class="event-list-item__meta">${metaParts.join(' · ')}</div>` : ''}
           </div>
-          ${slotsHtml}
-          ${t.description ? `<p class="event-card__desc">${esc(t.description)}</p>` : ''}
-          <button class="event-card__cta ${ctaClass}" data-id="${t.id}" ${!isOpen ? 'disabled' : ''}>${ctaText}</button>
+          <div class="event-list-item__action">
+            ${isOpen ? `<button class="btn-list-register" data-id="${t.id}">Register Now →</button>` : ''}
+          </div>
         `;
 
         if (isOpen) {
-          card.querySelector('.event-card__cta').addEventListener('click', e => {
+          item.querySelector('.btn-list-register').addEventListener('click', e => {
             e.stopPropagation();
             showEventDetail(t);
             setTimeout(() => {
@@ -710,12 +654,12 @@
             }, 80);
           });
         }
-        card.addEventListener('click', () => {
+        item.addEventListener('click', () => {
           showEventDetail(t);
           document.getElementById('eventDetail').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         });
 
-        grid.appendChild(card);
+        list.appendChild(item);
       });
     }
 

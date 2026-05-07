@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Patriot 250 Tournament — Cherrywood Farm & Golf Club</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,900;1,400&family=Barlow:wght@300;400;500;600&family=Barlow+Condensed:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    @page { size: 8.5in 11in; margin: 0; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:        #071B34;
+      --navy-deep:   #040F1E;
+      --navy-card:   #0C2444;
+      --red:         #A32035;
+      --ivory:       #F5F1E8;
+      --ivory-dim:   rgba(245,241,232,0.62);
+      --ivory-faint: rgba(245,241,232,0.35);
+      --gold:        #C9A44C;
+      --gold-border: rgba(201,164,76,0.28);
+      --gold-faint:  rgba(201,164,76,0.1);
+      --serif:  'Playfair Display', Georgia, serif;
+      --sans:   'Barlow', system-ui, sans-serif;
+      --scond:  'Barlow Condensed', system-ui, sans-serif;
+    }
+
+    html, body {
+      width: 8.5in;
+      height: 11in;
+      overflow: hidden;
+      background: var(--navy-deep);
+    }
+
+    .flyer {
+      width: 8.5in;
+      height: 11in;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ─────────────── HERO ─────────────── */
+    .hero {
+      position: relative;
+      height: 4.55in;
+      flex-shrink: 0;
+      background-image: url('images/hero.jpg');
+      background-size: cover;
+      background-position: center 32%;
+      display: flex;
+      align-items: flex-end;
+      padding-bottom: 0.38in;
+    }
+
+    /* Warm-dark overlay */
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        to bottom,
+        rgba(4,10,22,0.46) 0%,
+        rgba(5,12,28,0.42) 28%,
+        rgba(6,15,34,0.80) 62%,
+        rgba(4,10,20,0.98) 100%
+      );
+    }
+
+    /* Red accent strip */
+    .hero-top-strip {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 5px;
+      background: var(--red);
+      z-index: 2;
+    }
+
+    .hero-inner {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      text-align: center;
+      padding: 0 0.7in;
+    }
+
+    .crest {
+      width: 1.0in;
+      display: block;
+      margin: 0 auto 0.18in;
+      filter: drop-shadow(0 3px 16px rgba(0,0,0,0.75));
+    }
+
+    .hero-eyebrow {
+      font-family: var(--scond);
+      font-size: 0.58rem;
+      font-weight: 500;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--ivory-faint);
+      margin-bottom: 0.14in;
+    }
+
+    /* Main title block */
+    .title-block { line-height: 1; }
+
+    .t-patriot {
+      display: block;
+      font-family: var(--serif);
+      font-weight: 900;
+      font-size: 4.9rem;
+      color: var(--ivory);
+      text-transform: uppercase;
+      letter-spacing: 0.01em;
+      text-shadow: 0 4px 30px rgba(0,0,0,0.85), 0 2px 8px rgba(0,0,0,0.5);
+      line-height: 0.9;
+    }
+
+    .t-250 {
+      display: block;
+      font-family: var(--serif);
+      font-weight: 900;
+      font-size: 4.9rem;
+      color: var(--gold);
+      text-transform: uppercase;
+      letter-spacing: 0.01em;
+      text-shadow: 0 4px 30px rgba(0,0,0,0.85), 0 0 40px rgba(201,164,76,0.35);
+      line-height: 0.9;
+    }
+
+    .t-tournament {
+      display: block;
+      font-family: var(--scond);
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--ivory);
+      text-transform: uppercase;
+      letter-spacing: 0.38em;
+      padding-left: 0.38em;
+      margin-top: 0.1in;
+      opacity: 0.82;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.6);
+    }
+
+    /* Honor line — immediately below title block */
+    .hero-honor {
+      font-family: var(--scond);
+      font-size: 0.6rem;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ivory-faint);
+      margin-top: 0.14in;
+    }
+
+    .hero-honor-dot {
+      color: var(--red);
+      margin: 0 0.1em;
+      font-size: 0.45rem;
+      vertical-align: middle;
+    }
+
+    /* Ceremonial footer of hero */
+    .hero-ceremonial {
+      margin-top: 0.12in;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.04in;
+    }
+
+    .hero-memorial-day {
+      font-family: var(--scond);
+      font-size: 0.62rem;
+      font-weight: 500;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--ivory-faint);
+    }
+
+    .hero-anniversary {
+      font-family: var(--serif);
+      font-size: 1.0rem;
+      font-style: italic;
+      color: var(--gold);
+      letter-spacing: 0.06em;
+      opacity: 0.88;
+    }
+
+    /* ─────────────── GOLD RULE ─────────────── */
+    .gold-rule {
+      height: 1px;
+      background: linear-gradient(to right, transparent, var(--gold) 18%, var(--gold) 82%, transparent);
+      flex-shrink: 0;
+    }
+
+    /* ─────────────── DETAILS ─────────────── */
+    .details {
+      flex: 1;
+      background: var(--navy);
+      display: flex;
+      flex-direction: column;
+      padding: 0.28in 0.52in 0;
+      gap: 0.19in;
+    }
+
+    /* ── INFO CARDS ── */
+    .info-cards {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      border: 1px solid var(--gold-border);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .info-card {
+      background: var(--navy-card);
+      padding: 0.16in 0.1in;
+      text-align: center;
+      border-right: 1px solid var(--gold-border);
+    }
+
+    .info-card:last-child { border-right: none; }
+
+    .info-card-label {
+      font-family: var(--scond);
+      font-size: 0.48rem;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 0.07in;
+    }
+
+    .info-card-value {
+      font-family: var(--serif);
+      font-size: 1.08rem;
+      font-weight: 600;
+      color: var(--ivory);
+      line-height: 1.1;
+    }
+
+    .info-card-sub {
+      font-family: var(--sans);
+      font-size: 0.5rem;
+      font-weight: 400;
+      color: var(--ivory-faint);
+      margin-top: 0.03in;
+    }
+
+    /* ── FORMAT + PRICE ── */
+    .format-section { text-align: center; }
+
+    .format-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.22in;
+    }
+
+    .format-name {
+      font-family: var(--serif);
+      font-size: 1.55rem;
+      font-weight: 700;
+      color: var(--ivory);
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+    }
+
+    .price-badge {
+      display: inline-flex;
+      align-items: center;
+      background: var(--gold);
+      color: var(--navy);
+      font-family: var(--scond);
+      font-weight: 700;
+      font-size: 1.0rem;
+      letter-spacing: 0.04em;
+      padding: 0.055in 0.2in;
+      border-radius: 100px;
+      white-space: nowrap;
+    }
+
+    .format-includes {
+      font-family: var(--sans);
+      font-size: 0.59rem;
+      font-weight: 400;
+      color: var(--ivory-faint);
+      margin-top: 0.07in;
+      letter-spacing: 0.04em;
+    }
+
+    /* ── CONTESTS ── */
+    .contests-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.13in 0.4in;
+      padding: 0.16in 0;
+      border-top: 1px solid var(--gold-border);
+      border-bottom: 1px solid var(--gold-border);
+    }
+
+    .contest-item {
+      display: flex;
+      gap: 0.11in;
+      align-items: flex-start;
+    }
+
+    .contest-pip {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--red);
+      flex-shrink: 0;
+      margin-top: 0.07in;
+    }
+
+    .contest-title {
+      font-family: var(--scond);
+      font-size: 0.74rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--ivory);
+    }
+
+    .contest-desc {
+      font-family: var(--sans);
+      font-size: 0.6rem;
+      font-weight: 400;
+      color: var(--ivory-dim);
+      margin-top: 0.025in;
+      line-height: 1.45;
+    }
+
+    /* ── MEMORIAL RIBBON ── */
+    .memorial {
+      background: var(--navy-deep);
+      border-left: 3px solid var(--red);
+      border-radius: 0 3px 3px 0;
+      padding: 0.16in 0.2in 0.16in 0.2in;
+      display: flex;
+      align-items: center;
+      gap: 0.18in;
+    }
+
+    .memorial-star {
+      font-size: 1.1rem;
+      color: var(--gold);
+      flex-shrink: 0;
+      opacity: 0.7;
+      line-height: 1;
+    }
+
+    .memorial-body { flex: 1; }
+
+    .memorial-title {
+      font-family: var(--serif);
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--ivory);
+      letter-spacing: 0.01em;
+    }
+
+    .memorial-sub {
+      font-family: var(--sans);
+      font-size: 0.58rem;
+      font-weight: 400;
+      color: var(--ivory-faint);
+      margin-top: 0.04in;
+      line-height: 1.4;
+    }
+
+    .memorial-price {
+      font-family: var(--serif);
+      font-size: 1.45rem;
+      font-weight: 700;
+      color: var(--gold);
+      flex-shrink: 0;
+    }
+
+    /* ── SILENCE ── */
+    .silence {
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: 0.68rem;
+      color: rgba(245,241,232,0.28);
+      text-align: center;
+      letter-spacing: 0.02em;
+    }
+
+    /* ─────────────── FOOTER ─────────────── */
+    .footer {
+      margin-top: auto;
+      background: var(--navy-deep);
+      border-top: 1px solid var(--gold-border);
+      padding: 0.2in 0.52in;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .footer-left { text-align: left; }
+
+    .footer-register-label {
+      font-family: var(--scond);
+      font-size: 0.5rem;
+      font-weight: 700;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--red);
+      margin-bottom: 0.04in;
+    }
+
+    .footer-phone {
+      font-family: var(--serif);
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--gold);
+    }
+
+    .footer-avail {
+      font-family: var(--scond);
+      font-size: 0.5rem;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ivory-faint);
+      margin-top: 0.04in;
+    }
+
+    .footer-right { text-align: right; }
+
+    .footer-venue {
+      font-family: var(--serif);
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--ivory);
+      opacity: 0.8;
+    }
+
+    .footer-location {
+      font-family: var(--sans);
+      font-size: 0.56rem;
+      font-weight: 400;
+      color: var(--ivory-faint);
+      margin-top: 0.04in;
+    }
+
+    .footer-center {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.06in;
+    }
+
+    .footer-qr-label {
+      font-family: var(--scond);
+      font-size: 0.42rem;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ivory-faint);
+    }
+
+    #qrcode img, #qrcode canvas {
+      border-radius: 4px;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+<div class="flyer">
+
+  <!-- ── HERO ── -->
+  <div class="hero">
+    <div class="hero-top-strip"></div>
+    <div class="hero-inner">
+      <img src="images/crest-badge.png" alt="Cherrywood Farm & Golf Club" class="crest">
+      <div class="hero-eyebrow">Cherrywood Farm &amp; Golf Club &nbsp;·&nbsp; Fredericktown, Missouri</div>
+
+      <div class="title-block">
+        <span class="t-patriot">Patriot</span>
+        <span class="t-250">250</span>
+        <span class="t-tournament">Tournament</span>
+      </div>
+
+      <div class="hero-honor">
+        Honor
+        <span class="hero-honor-dot">●</span>
+        Remember
+        <span class="hero-honor-dot">●</span>
+        Support
+      </div>
+
+      <div class="hero-ceremonial">
+        <div class="hero-memorial-day">Memorial Day Weekend</div>
+        <div class="hero-anniversary">1776 &mdash; 2026</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="gold-rule"></div>
+
+  <!-- ── DETAILS ── -->
+  <div class="details">
+
+    <!-- Info Cards -->
+    <div class="info-cards">
+      <div class="info-card">
+        <div class="info-card-label">Date</div>
+        <div class="info-card-value">May 23<sup style="font-size:0.55em;font-family:var(--sans)">rd</sup></div>
+      </div>
+      <div class="info-card">
+        <div class="info-card-label">Registration</div>
+        <div class="info-card-value">7:00 AM</div>
+      </div>
+      <div class="info-card">
+        <div class="info-card-label">Tee Off</div>
+        <div class="info-card-value">8:00 AM</div>
+      </div>
+      <div class="info-card">
+        <div class="info-card-label">Location</div>
+        <div class="info-card-value">Cherrywood</div>
+        <div class="info-card-sub">Golf Course</div>
+      </div>
+    </div>
+
+    <!-- Format + Price -->
+    <div class="format-section">
+      <div class="format-row">
+        <div class="format-name">2-Person Scramble</div>
+        <div class="price-badge">$130 / Team</div>
+      </div>
+      <div class="format-includes">Green fee &nbsp;·&nbsp; Cart &nbsp;·&nbsp; BBQ included &nbsp;·&nbsp; Burgers · Hot Dogs · Chips</div>
+    </div>
+
+    <!-- Contests -->
+    <div class="contests-grid">
+      <div class="contest-item">
+        <div class="contest-pip"></div>
+        <div>
+          <div class="contest-title">Skins</div>
+          <div class="contest-desc">Optional buy-in &nbsp;·&nbsp; $10 per player</div>
+        </div>
+      </div>
+      <div class="contest-item">
+        <div class="contest-pip"></div>
+        <div>
+          <div class="contest-title">Mulligans</div>
+          <div class="contest-desc">$10 each &nbsp;·&nbsp; 1 front / 1 back &nbsp;·&nbsp; $20 for both</div>
+        </div>
+      </div>
+      <div class="contest-item">
+        <div class="contest-pip"></div>
+        <div>
+          <div class="contest-title">Longest Drive</div>
+          <div class="contest-desc">On-course contest</div>
+        </div>
+      </div>
+      <div class="contest-item">
+        <div class="contest-pip"></div>
+        <div>
+          <div class="contest-title">Closest to Pin</div>
+          <div class="contest-desc">On-course contest</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Memorial Ribbon -->
+    <div class="memorial">
+      <div class="memorial-star">✦</div>
+      <div class="memorial-body">
+        <div class="memorial-title">Sponsor a Hole in Honor of a Fallen Veteran</div>
+        <div class="memorial-sub">Your sponsorship will be displayed on-course in remembrance.</div>
+      </div>
+      <div class="memorial-price">$20</div>
+    </div>
+
+    <div class="silence">A moment of silence will be observed in honor of our fallen heroes.</div>
+
+  </div>
+
+  <!-- ── FOOTER ── -->
+  <div class="footer">
+    <div class="footer-left">
+      <div class="footer-register-label">Register Now</div>
+      <div class="footer-phone">573-783-0012</div>
+      <div class="footer-avail">Limited Team Availability</div>
+    </div>
+    <div class="footer-center">
+      <div id="qrcode"></div>
+      <div class="footer-qr-label">Register Online</div>
+    </div>
+    <div class="footer-right">
+      <div class="footer-venue">Cherrywood Farm &amp; Golf Club</div>
+      <div class="footer-location">Fredericktown, Missouri</div>
+    </div>
+  </div>
+
+</div>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+<script>
+  new QRCode(document.getElementById('qrcode'), {
+    text: 'https://cherrywoodgolf.com/events.html',
+    width: 64,
+    height: 64,
+    colorDark: '#071B34',
+    colorLight: '#F5F1E8',
+    correctLevel: QRCode.CorrectLevel.M
+  });
+</script>
+</body>
+</html>
