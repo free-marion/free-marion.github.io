@@ -402,7 +402,7 @@ function renderRegistrations(rows, tournamentId) {
 
   const summary = document.createElement('p');
   summary.style.cssText = 'margin:0 0 0.75rem;font-size:0.85rem;color:#555;';
-  summary.textContent = `${activeCount} team${activeCount !== 1 ? 's' : ''} registered`;
+  summary.textContent = `${activeCount} registration${activeCount !== 1 ? 's' : ''}`;
   wrap.appendChild(summary);
 
   const table = document.createElement('table');
@@ -411,8 +411,8 @@ function renderRegistrations(rows, tournamentId) {
     <thead>
       <tr style="background:#1C3320;color:#fff;text-align:left;">
         <th style="padding:0.55rem 0.75rem;">#</th>
-        <th style="padding:0.55rem 0.75rem;">Team</th>
-        <th style="padding:0.55rem 0.75rem;">Captain</th>
+        <th style="padding:0.55rem 0.75rem;">Player 1</th>
+        <th style="padding:0.55rem 0.75rem;">Player 2</th>
         <th style="padding:0.55rem 0.75rem;">Phone</th>
         <th style="padding:0.55rem 0.75rem;">Cart</th>
         <th style="padding:0.55rem 0.75rem;">Registered</th>
@@ -431,14 +431,14 @@ function renderRegistrations(rows, tournamentId) {
     tr.style.cssText = `border-bottom:1px solid #e8dfc8;${i % 2 === 1 ? 'background:#fdf9f2;' : ''}${cancelled ? 'opacity:0.4;' : ''}`;
     tr.innerHTML = `
       <td style="padding:0.55rem 0.75rem;color:#888;">${cancelled ? '—' : num}</td>
-      <td style="padding:0.55rem 0.75rem;font-weight:${cancelled ? '400' : '600'};">${esc(r.team_name || '—')}</td>
-      <td style="padding:0.55rem 0.75rem;">${esc(r.captain_name || '—')}</td>
+      <td style="padding:0.55rem 0.75rem;font-weight:${cancelled ? '400' : '600'};">${esc(r.captain_name || '—')}</td>
+      <td style="padding:0.55rem 0.75rem;">${esc(r.team_name || '—')}</td>
       <td style="padding:0.55rem 0.75rem;white-space:nowrap;">${r.phone || '—'}</td>
       <td style="padding:0.55rem 0.75rem;">${r.cart ? 'Yes' : 'No'}</td>
       <td style="padding:0.55rem 0.75rem;color:#888;font-size:0.8rem;white-space:nowrap;">${fmtDate(r.created_at)}</td>
       <td style="padding:0.55rem 0.75rem;">
         ${!cancelled
-          ? `<button class="btn btn--ghost btn--sm" data-del="${r.id}" data-name="${esc(r.team_name || r.captain_name)}" style="color:#a00;font-size:0.75rem;padding:0.2rem 0.5rem;">Delete</button>`
+          ? `<button class="btn btn--ghost btn--sm" data-del="${r.id}" data-name="${esc(r.captain_name || r.team_name)}" style="color:#a00;font-size:0.75rem;padding:0.2rem 0.5rem;">Delete</button>`
           : ''}
       </td>
     `;

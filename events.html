@@ -719,8 +719,8 @@
       const isTeam = t.type === 'team';
       document.getElementById('regFormArea').innerHTML = `
         <div class="reg-form" id="regFormInner">
-          ${isTeam ? `<input type="text" id="rf-team" placeholder="Team name *">` : ''}
-          <input type="text"  id="rf-name"  placeholder="${isTeam ? 'Captain name *' : 'Your name *'}">
+          <input type="text" id="rf-player1" placeholder="Player 1 name *">
+          ${isTeam ? `<input type="text" id="rf-player2" placeholder="Player 2 name *">` : ''}
           <div class="reg-form__row">
             <input type="tel"   id="rf-phone" placeholder="Phone *">
             <input type="email" id="rf-email" placeholder="Email (optional)">
@@ -745,19 +745,19 @@
     }
 
     async function submitReg(t) {
-      const isTeam   = t.type === 'team';
-      const teamName = isTeam ? document.getElementById('rf-team')?.value.trim() : null;
-      const name     = document.getElementById('rf-name').value.trim();
-      const phone    = document.getElementById('rf-phone').value.trim();
-      const email    = document.getElementById('rf-email').value.trim();
-      const cart     = document.getElementById('rf-cart').checked;
-      const errEl    = document.getElementById('rf-err');
-      const btn      = document.getElementById('rf-submit');
+      const isTeam  = t.type === 'team';
+      const player1 = document.getElementById('rf-player1').value.trim();
+      const player2 = isTeam ? document.getElementById('rf-player2')?.value.trim() : null;
+      const phone   = document.getElementById('rf-phone').value.trim();
+      const email   = document.getElementById('rf-email').value.trim();
+      const cart    = document.getElementById('rf-cart').checked;
+      const errEl   = document.getElementById('rf-err');
+      const btn     = document.getElementById('rf-submit');
       errEl.className = 'reg-form__error';
 
-      if (isTeam && !teamName) { showErr(errEl, 'Please enter your team name.'); return; }
-      if (!name)  { showErr(errEl, 'Please enter your name.'); return; }
-      if (!phone) { showErr(errEl, 'Please enter a phone number.'); return; }
+      if (!player1)           { showErr(errEl, 'Please enter Player 1\'s name.'); return; }
+      if (isTeam && !player2) { showErr(errEl, 'Please enter Player 2\'s name.'); return; }
+      if (!phone)             { showErr(errEl, 'Please enter a phone number.'); return; }
 
       // Re-check slots
       const { count } = await db
@@ -773,8 +773,8 @@
 
       const { data: inserted, error } = await db.from('tournament_registrations').insert({
         tournament_id: t.id,
-        team_name:     teamName,
-        captain_name:  name,
+        captain_name:  player1,
+        team_name:     player2 || null,
         phone,
         email:         email || null,
         num_players:   t.type === 'team' ? (t.team_size || 1) : 1,
