@@ -1116,33 +1116,56 @@
 
 </div><!-- /mainContent -->
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-  // ── Lock Screen ──
-  const PASSWORD = 'Arabia';
+  // ── Auth (Supabase — password verified server-side) ──
+  const CAMPFIRE_EMAIL = 'portal@cherrywoodgolf.com';
+  const _db = supabase.createClient(
+    'https://giwfigekjatujubjknjf.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdpd2ZpZ2VramF0dWp1YmprbmpmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMDEwMDMsImV4cCI6MjA4OTU3NzAwM30.p3OaPA5qYROqz8d0tNyhytl__n_bzH2l2MOX3olDn3A'
+  );
+
+  function revealContent() {
+    const ls = document.getElementById('lockScreen');
+    ls.style.transition = 'opacity 0.6s ease';
+    ls.style.opacity = '0';
+    setTimeout(() => {
+      ls.style.display = 'none';
+      const mc = document.getElementById('mainContent');
+      mc.style.display = 'block';
+      requestAnimationFrame(() => requestAnimationFrame(() => mc.style.opacity = '1'));
+      initObserver();
+    }, 600);
+  }
+
+  // Restore existing session on page load
+  _db.auth.getSession().then(({ data: { session } }) => {
+    if (session) revealContent();
+  });
+
+  async function tryUnlock() {
+    const btn   = document.getElementById('lockBtn');
+    const input = document.getElementById('lockInput');
+    const err   = document.getElementById('lockError');
+    btn.disabled = true;
+
+    const { error } = await _db.auth.signInWithPassword({
+      email: CAMPFIRE_EMAIL, password: input.value,
+    });
+
+    if (!error) {
+      revealContent();
+    } else {
+      err.textContent = 'Incorrect access code.';
+      input.value = '';
+      input.classList.add('shake');
+      setTimeout(() => { err.textContent = ''; input.classList.remove('shake'); }, 3000);
+      btn.disabled = false;
+    }
+  }
 
   document.getElementById('lockBtn').addEventListener('click', tryUnlock);
   document.getElementById('lockInput').addEventListener('keydown', e => { if (e.key === 'Enter') tryUnlock(); });
-
-  function tryUnlock() {
-    if (document.getElementById('lockInput').value === PASSWORD) {
-      const ls = document.getElementById('lockScreen');
-      ls.style.transition = 'opacity 0.6s ease';
-      ls.style.opacity = '0';
-      setTimeout(() => {
-        ls.style.display = 'none';
-        const mc = document.getElementById('mainContent');
-        mc.style.display = 'block';
-        requestAnimationFrame(() => requestAnimationFrame(() => mc.style.opacity = '1'));
-        initObserver();
-      }, 600);
-    } else {
-      const err = document.getElementById('lockError');
-      err.textContent = 'Incorrect access code.';
-      document.getElementById('lockInput').value = '';
-      document.getElementById('lockInput').classList.add('shake');
-      setTimeout(() => { err.textContent = ''; document.getElementById('lockInput').classList.remove('shake'); }, 3000);
-    }
-  }
 
   // ── Tabs ──
   document.querySelectorAll('.cf-tab').forEach(tab => {

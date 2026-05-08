@@ -149,3 +149,47 @@ tests/
 src/
   tee-utils.js      ← Pure utility functions (UMD — works in Node and browser)
 ```
+
+## 6. Authentication Design
+
+### Model
+The portal uses a **single shared Supabase auth user**. There is no per-user account management — one password grants portal access to all staff.
+
+| Credential | Value |
+|------------|-------|
+| Email | `portal@cherrywoodgolf.com` — not secret, hardcoded in `portal/app.js` |
+| Password | Lives only in Supabase Auth — never in source code |
+
+### How Login Works
+1. User enters the password on the portal login screen
+2. `portal/app.js` calls `db.auth.signInWithPassword({ email: PORTAL_EMAIL, password })`
+3. Supabase verifies the password server-side and returns a signed JWT session
+4. The Supabase JS SDK stores the session in `localStorage` automatically
+5. On page refresh, `db.auth.getSession()` restores the session without re-prompting
+6. The Lock button calls `signOut()` → `db.auth.signOut()` to invalidate the session
+
+### RLS Policy Design — Locked by Default
+All tables default to no access. Every grant is explicit. If an operation is not listed below, it is denied.
+
+| Table | Public (anon) can… | Authenticated (portal) can also… |
+|-------|-------------------|----------------------------------|
+| `tournaments` | SELECT | INSERT, UPDATE, DELETE |
+| `tournament_registrations` | SELECT, INSERT | UPDATE, DELETE |
+| `egg_orders` | SELECT, INSERT | UPDATE |
+| `course_status` | SELECT | UPDATE |
+| `bookings` | SELECT, INSERT | UPDATE |
+
+> **Rule for future changes:** to add a new portal operation, add an explicit `auth.uid() is not null` policy to the migration *and* add a row to this table.
+
+### Local Development
+The portal auth user is created automatically by `supabase/seed.sql` on every `supabase db reset`. No manual steps required. Email is `portal@cherrywoodgolf.com` — password is defined in seed.sql (local dev only, never used in production).
+
+The `BeforeAll` cleanup hook in `tests/support/world.js` uses the **service role key** to bypass RLS when wiping test data between runs. The service role key in that file is the standard local dev key — identical on every machine, has zero access to production.
+
+### Production Setup (one-time)
+1. Supabase dashboard → **Authentication → Users → Add user**
+2. Email: `portal@cherrywoodgolf.com`, tick **Auto Confirm User**
+3. Set a strong password — never commit it, never reuse the local dev password
+4. Apply the updated migration (`supabase/migrations/20260101000000_initial_schema.sql`) via the Supabase SQL editor
+
+Never commit the production password. Rotate it in the Supabase dashboard if compromised.

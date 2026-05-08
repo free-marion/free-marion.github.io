@@ -9,34 +9,80 @@ const { createClient } = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_ANON);
 
 // ============================================
-// PASSWORD GATE
+// AUTH
 // ============================================
 
-const PORTAL_PASSWORD = 'Arabia';
+// The email is not a secret — it identifies the single shared portal account.
+// The password lives only in Supabase Auth and is verified server-side.
+const PORTAL_EMAIL = 'portal@cherrywoodgolf.com';
+
+// ── Inactivity logout — 10 minutes ──
+const INACTIVITY_MS = 10 * 60 * 1000;
+let _inactivityTimer = null;
+
+function resetInactivityTimer() {
+  clearTimeout(_inactivityTimer);
+  _inactivityTimer = setTimeout(async () => {
+    await db.auth.signOut();
+    window.location.reload();
+  }, INACTIVITY_MS);
+}
+
+function startInactivityTimer() {
+  ['mousemove', 'keydown', 'click', 'touchstart', 'scroll'].forEach(evt =>
+    document.addEventListener(evt, resetInactivityTimer, { passive: true })
+  );
+  resetInactivityTimer();
+}
+
+function stopInactivityTimer() {
+  clearTimeout(_inactivityTimer);
+  ['mousemove', 'keydown', 'click', 'touchstart', 'scroll'].forEach(evt =>
+    document.removeEventListener(evt, resetInactivityTimer)
+  );
+}
 
 function unlock() {
-  sessionStorage.setItem('cwAuth', '1');
   document.getElementById('loginScreen').hidden = true;
   document.getElementById('appShell').hidden = false;
+  startInactivityTimer();
   loadTournaments();
 }
 
-if (sessionStorage.getItem('cwAuth') === '1') {
-  unlock();
+async function signOut() {
+  stopInactivityTimer();
+  await db.auth.signOut();
+  window.location.reload();
 }
 
-document.getElementById('loginForm').addEventListener('submit', e => {
+// Restore an existing session on page load (e.g. after a refresh).
+db.auth.getSession().then(({ data: { session } }) => {
+  if (session) unlock();
+});
+
+document.getElementById('loginForm').addEventListener('submit', async e => {
   e.preventDefault();
-  const val = document.getElementById('loginPassword').value;
-  if (val === PORTAL_PASSWORD) {
-    unlock();
-  } else {
+  const btn = document.getElementById('loginBtn');
+  btn.disabled = true;
+  btn.textContent = 'Checking…';
+
+  const { error } = await db.auth.signInWithPassword({
+    email:    PORTAL_EMAIL,
+    password: document.getElementById('loginPassword').value,
+  });
+
+  if (error) {
     const err = document.getElementById('loginError');
     err.textContent = 'Incorrect password.';
     err.hidden = false;
     document.getElementById('loginPassword').value = '';
     document.getElementById('loginPassword').focus();
+  } else {
+    unlock();
   }
+
+  btn.disabled = false;
+  btn.textContent = 'Enter';
 });
 
 // ============================================
