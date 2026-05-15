@@ -82,19 +82,7 @@
       <h2 class="pricing-heading">Course Pricing</h2>
       <p class="pricing-subhead">We're actively restoring our greens. Rates reflect where we are — and where we're headed.</p>
 
-      <div class="year-tabs">
-        <button class="year-tab active" onclick="showYear('y2026', this)">
-          2026
-          <span class="tab-note">Current rates</span>
-        </button>
-        <button class="year-tab" onclick="showYear('y2027', this)">
-          2027
-          <span class="tab-note">Fully restored</span>
-        </button>
-      </div>
-
-      <!-- 2026 -->
-      <div class="pricing-panel active" id="panel-y2026">
+      <div class="pricing-panel active" id="panel-y2026" style="border-radius:6px;">
         <div class="season-block">
           <div class="season-label">Regular Season <span class="season-badge">Apr – Oct</span></div>
           <table class="price-table">
@@ -115,37 +103,6 @@
               <tr><td>Weekday w/ cart</td><td><span class="price-val">$26</span></td><td><span class="price-val">$17</span></td></tr>
               <tr><td>Weekend w/ cart <span class="wknd-tag">Sat–Sun</span></td><td><span class="price-val">$29</span></td><td><span class="price-val">$19</span></td></tr>
               <tr class="row-walking"><td>Walking</td><td><span class="price-val">$18</span></td><td><span class="price-val">$13</span></td></tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="pricing-cta">
-          <p class="pricing-cta-note">Green fees collected at the Clubhouse on arrival.<br>Call ahead to confirm course conditions.</p>
-          <a href="tel:+15737830012" class="btn-call">📞 Call to Reserve</a>
-        </div>
-      </div>
-
-      <!-- 2027 -->
-      <div class="pricing-panel" id="panel-y2027">
-        <div class="season-block">
-          <div class="season-label">Regular Season <span class="season-badge">Apr – Oct</span></div>
-          <table class="price-table">
-            <thead><tr><th></th><th>18 Holes</th><th>9 Holes</th></tr></thead>
-            <tbody>
-              <tr><td>Weekday w/ cart</td><td><span class="price-val">$36</span></td><td><span class="price-val">$23</span></td></tr>
-              <tr><td>Weekend w/ cart <span class="wknd-tag">Sat–Sun</span></td><td><span class="price-val">$40</span></td><td><span class="price-val">$25</span></td></tr>
-              <tr class="row-walking"><td>Walking</td><td><span class="price-val">$26</span></td><td><span class="price-val">$18</span></td></tr>
-            </tbody>
-          </table>
-        </div>
-        <hr class="season-divider">
-        <div class="season-block">
-          <div class="season-label">Winter Season <span class="season-badge winter">Nov – Mar</span></div>
-          <table class="price-table">
-            <thead><tr><th></th><th>18 Holes</th><th>9 Holes</th></tr></thead>
-            <tbody>
-              <tr><td>Weekday w/ cart</td><td><span class="price-val">$29</span></td><td><span class="price-val">$18</span></td></tr>
-              <tr><td>Weekend w/ cart <span class="wknd-tag">Sat–Sun</span></td><td><span class="price-val">$32</span></td><td><span class="price-val">$20</span></td></tr>
-              <tr class="row-walking"><td>Walking</td><td><span class="price-val">$20</span></td><td><span class="price-val">$14</span></td></tr>
             </tbody>
           </table>
         </div>
@@ -474,14 +431,6 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="src/weather-utils.js"></script>
   <script src="script.js"></script>
-  <script>
-    function showYear(year, tab) {
-      document.querySelectorAll('.pricing-panel').forEach(p => p.classList.remove('active'));
-      document.querySelectorAll('.year-tab').forEach(t => t.classList.remove('active'));
-      document.getElementById('panel-' + year).classList.add('active');
-      tab.classList.add('active');
-    }
-  </script>
   <script src="egg-form.js"></script>
   <script>
     (function() {
