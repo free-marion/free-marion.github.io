@@ -298,24 +298,24 @@ create policy "Admin can update any profile"   on profiles for update
   using (public.portal_can('admin')) with check (public.portal_can('admin'));
 
 -- tournaments
--- Public site reads tournaments; only authenticated portal user writes.
-create policy "Anyone can read tournaments"             on tournaments for select using (true);
-create policy "Authenticated can insert tournament"     on tournaments for insert with check (auth.uid() is not null);
-create policy "Authenticated can update tournament"     on tournaments for update using (auth.uid() is not null);
-create policy "Authenticated can delete tournament"     on tournaments for delete using (auth.uid() is not null);
+-- Public site reads; only admin role can write.
+create policy "Anyone can read tournaments"         on tournaments for select using (true);
+create policy "Admin can insert tournament"         on tournaments for insert with check (public.portal_can('admin'));
+create policy "Admin can update tournament"         on tournaments for update using (public.portal_can('admin'));
+create policy "Admin can delete tournament"         on tournaments for delete using (public.portal_can('admin'));
 
 -- tournament_registrations
--- Public site reads and submits registrations; only authenticated portal user can modify or delete.
-create policy "Anyone can read tournament registrations"      on tournament_registrations for select using (true);
-create policy "Anyone can register for tournament"            on tournament_registrations for insert with check (true);
-create policy "Authenticated can update registration"         on tournament_registrations for update using (auth.uid() is not null) with check (auth.uid() is not null);
-create policy "Authenticated can delete registration"         on tournament_registrations for delete using (auth.uid() is not null);
+-- Public site reads and submits; only admin role can modify or delete.
+create policy "Anyone can read tournament registrations"  on tournament_registrations for select using (true);
+create policy "Anyone can register for tournament"        on tournament_registrations for insert with check (true);
+create policy "Admin can update registration"             on tournament_registrations for update using (public.portal_can('admin')) with check (public.portal_can('admin'));
+create policy "Admin can delete registration"             on tournament_registrations for delete using (public.portal_can('admin'));
 
 -- egg_orders
--- Public site submits and reads egg orders; only authenticated portal user can update status.
-create policy "Anyone can submit egg order"             on egg_orders for insert with check (true);
-create policy "Anyone can read egg orders"              on egg_orders for select using (true);
-create policy "Authenticated can update egg order"      on egg_orders for update using (auth.uid() is not null) with check (auth.uid() is not null);
+-- Public site submits and reads; only admin role can update status.
+create policy "Anyone can submit egg order"         on egg_orders for insert with check (true);
+create policy "Anyone can read egg orders"          on egg_orders for select using (true);
+create policy "Admin can update egg order"          on egg_orders for update using (public.portal_can('admin')) with check (public.portal_can('admin'));
 
 -- course_status
 create policy "Anyone can read course status"           on course_status for select using (true);

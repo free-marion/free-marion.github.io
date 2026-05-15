@@ -12,11 +12,8 @@ const db = createClient(SUPABASE_URL, SUPABASE_ANON);
 // AUTH
 // ============================================
 
-// The email is not a secret — it identifies the single shared portal account.
-// The password lives only in Supabase Auth and is verified server-side.
-const PORTAL_EMAIL = 'portal@cherrywoodgolf.com';
+let PORTAL_ROLE = null; // 'admin' | 'viewer' | null
 
-// ── Inactivity logout — 10 minutes ──
 const INACTIVITY_MS = 10 * 60 * 1000;
 let _inactivityTimer = null;
 
@@ -42,11 +39,21 @@ function stopInactivityTimer() {
   );
 }
 
-function unlock() {
-  document.getElementById('loginScreen').hidden = true;
-  document.getElementById('appShell').hidden = false;
-  startInactivityTimer();
-  loadTournaments();
+async function signInWithGoogle() {
+  const btn = document.getElementById('loginBtn');
+  btn.disabled = true;
+  btn.textContent = 'Redirecting…';
+  const { error } = await db.auth.signInWithOAuth({
+    provider: 'google',
+    options: { redirectTo: 'https://cherrywoodgolf.com/portal/' },
+  });
+  if (error) {
+    const err = document.getElementById('loginError');
+    err.textContent = error.message;
+    err.hidden = false;
+    btn.disabled = false;
+    btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908C16.658 11.83 17.64 9.525 17.64 9.2z" fill="#4285F4"/><path d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z" fill="#34A853"/><path d="M3.964 10.707c-.18-.54-.282-1.117-.282-1.707s.102-1.167.282-1.707V4.961H.957C.347 6.175 0 7.548 0 9s.348 2.825.957 4.039l3.007-2.332z" fill="#FBBC05"/><path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z" fill="#EA4335"/></svg> Sign in with Google`;
+  }
 }
 
 async function signOut() {
@@ -55,48 +62,66 @@ async function signOut() {
   window.location.reload();
 }
 
-// Restore an existing session on page load (e.g. after a refresh).
-db.auth.getSession().then(({ data: { session } }) => {
-  if (session) unlock();
-});
+function unlock(role, user) {
+  PORTAL_ROLE = role;
+  const isAdmin = role === 'admin';
 
-document.getElementById('loginForm').addEventListener('submit', async e => {
-  e.preventDefault();
-  const btn = document.getElementById('loginBtn');
-  btn.disabled = true;
-  btn.textContent = 'Checking…';
+  document.getElementById('loginScreen').hidden        = true;
+  document.getElementById('accessDeniedScreen').hidden = true;
+  document.getElementById('appShell').hidden           = false;
 
-  const { error } = await db.auth.signInWithPassword({
-    email:    PORTAL_EMAIL,
-    password: document.getElementById('loginPassword').value,
-  });
+  // Identity in header
+  const name = user.user_metadata?.full_name || user.user_metadata?.name || user.email;
+  document.getElementById('userLabel').textContent = name;
 
-  if (error) {
-    const err = document.getElementById('loginError');
-    err.textContent = 'Incorrect password.';
-    err.hidden = false;
-    document.getElementById('loginPassword').value = '';
-    document.getElementById('loginPassword').focus();
-  } else {
-    unlock();
+  const roleBadge = document.getElementById('roleLabel');
+  if (!isAdmin) {
+    roleBadge.textContent = 'Viewer';
+    roleBadge.style.display = 'inline-block';
   }
 
-  btn.disabled = false;
-  btn.textContent = 'Enter';
+  // Hide admin-only shell elements
+  if (!isAdmin) {
+    document.getElementById('addTournamentBtn').hidden = true;
+    document.getElementById('tournamentForm').hidden   = true;
+  }
+
+  startInactivityTimer();
+  loadTournaments();
+}
+
+function showAccessDenied(email) {
+  document.getElementById('loginScreen').hidden        = true;
+  document.getElementById('accessDeniedScreen').hidden = false;
+  document.getElementById('deniedEmail').textContent   = email;
+}
+
+// Handles both OAuth redirect callback and session restore on page load.
+db.auth.onAuthStateChange(async (event, session) => {
+  if (!session) return;
+  const { data } = await db.from('profiles').select('role').eq('id', session.user.id).single();
+  const role = data?.role;
+  if (role === 'admin' || role === 'viewer') {
+    unlock(role, session.user);
+  } else {
+    showAccessDenied(session.user.email);
+  }
 });
 
 // ============================================
 // TAB ROUTING
 // ============================================
 
-const _sidebar    = document.getElementById('sidebar');
-const _overlay    = document.getElementById('sidebarOverlay');
-const _hamburger  = document.getElementById('hamburgerBtn');
+const _sidebar   = document.getElementById('sidebar');
+const _overlay   = document.getElementById('sidebarOverlay');
+const _hamburger = document.getElementById('hamburgerBtn');
 
-function openSidebar()  { _sidebar.classList.add('sidebar--open');  _overlay.classList.add('sidebar-overlay--visible'); }
+function openSidebar()  { _sidebar.classList.add('sidebar--open');    _overlay.classList.add('sidebar-overlay--visible'); }
 function closeSidebar() { _sidebar.classList.remove('sidebar--open'); _overlay.classList.remove('sidebar-overlay--visible'); }
 
-_hamburger.addEventListener('click', () => _sidebar.classList.contains('sidebar--open') ? closeSidebar() : openSidebar());
+_hamburger.addEventListener('click', () =>
+  _sidebar.classList.contains('sidebar--open') ? closeSidebar() : openSidebar()
+);
 _overlay.addEventListener('click', closeSidebar);
 
 document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -120,28 +145,19 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
 function esc(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
-
 function loading() {
   return `<p style="padding:1.5rem;color:#888;font-style:italic;">Loading…</p>`;
 }
-
 function dbErr(table, error) {
   const msg = error ? `${error.message} (code: ${error.code})` : 'no rows returned';
   return `<div style="margin:1.5rem;padding:1rem 1.25rem;background:#fff0f0;border:2px solid #c00;border-radius:6px;font-family:monospace;font-size:0.85rem;color:#900;">
     <strong>⚠ DB Error — ${table}</strong><br>${msg}
   </div>`;
 }
-
 function fmtDate(iso) {
   if (!iso) return '—';
   const d = new Date(iso + (iso.length === 10 ? 'T00:00:00' : ''));
   return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-}
-
-function fmtDateTime(iso) {
-  const d = new Date(iso);
-  return d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }) +
-    ' at ' + d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', timeZone: 'America/Chicago' });
 }
 
 // ============================================
@@ -160,11 +176,13 @@ async function loadEggs() {
 }
 
 function renderEggs(rows) {
-  const list  = document.getElementById('eggsList');
-  const empty = document.getElementById('eggsEmpty');
+  const isAdmin = PORTAL_ROLE === 'admin';
+  const list    = document.getElementById('eggsList');
+  const empty   = document.getElementById('eggsEmpty');
   list.innerHTML = '';
   if (!rows.length) { empty.hidden = false; return; }
   empty.hidden = true;
+
   rows.forEach(o => {
     const card = document.createElement('div');
     card.className = 'data-card' + (o.status === 'complete' ? ' data-card--muted' : '');
@@ -179,13 +197,17 @@ function renderEggs(rows) {
         ${o.notes ? `<span class="data-card__notes">${esc(o.notes)}</span>` : ''}
       </div>
       ${o.status !== 'complete'
-        ? `<button class="btn btn--primary btn--sm" data-complete="${o.id}">Mark Picked Up</button>`
+        ? (isAdmin
+            ? `<button class="btn btn--primary btn--sm" data-complete="${o.id}">Mark Picked Up</button>`
+            : `<span class="tag">Pending pickup</span>`)
         : '<span class="tag tag--complete">Picked Up</span>'}
     `;
-    card.querySelector('[data-complete]')?.addEventListener('click', async () => {
-      await db.from('egg_orders').update({ status: 'complete' }).eq('id', o.id);
-      loadEggs();
-    });
+    if (isAdmin) {
+      card.querySelector('[data-complete]')?.addEventListener('click', async () => {
+        await db.from('egg_orders').update({ status: 'complete' }).eq('id', o.id);
+        loadEggs();
+      });
+    }
     list.appendChild(card);
   });
 }
@@ -209,7 +231,7 @@ async function loadTournaments() {
   document.getElementById('registrationsPanel').hidden = true;
   document.getElementById('tournamentsList').style.display = '';
   document.getElementById('tournamentsEmpty').hidden = true;
-  document.getElementById('addTournamentBtn').style.display = '';
+  if (PORTAL_ROLE === 'admin') document.getElementById('addTournamentBtn').style.display = '';
 
   document.getElementById('tournamentsList').innerHTML = loading();
   const { data, error } = await db.from('tournaments').select('*').order('date', { ascending: false });
@@ -230,8 +252,9 @@ async function loadTournaments() {
 }
 
 function renderTournaments(rows, counts) {
-  const list  = document.getElementById('tournamentsList');
-  const empty = document.getElementById('tournamentsEmpty');
+  const isAdmin = PORTAL_ROLE === 'admin';
+  const list    = document.getElementById('tournamentsList');
+  const empty   = document.getElementById('tournamentsEmpty');
   list.innerHTML = '';
   if (!rows.length) { empty.hidden = false; return; }
   empty.hidden = true;
@@ -261,27 +284,30 @@ function renderTournaments(rows, counts) {
         <span class="data-card__badge">${dateStr}</span>
       </div>
       <div class="data-card__body">
-        <span>${t.type === 'team' ? '👥 Team' : '🏌️ Individual'}${t.type === 'team' && t.team_size ? ' · ' + t.team_size + ' players' : ''}${t.format ? ' · ' + esc(t.format) : ''}</span>
+        <span>${t.type === 'team' ? '👥 Team' : t.type === 'venue' ? '🎉 Venue' : '🏌️ Individual'}${t.type === 'team' && t.team_size ? ' · ' + t.team_size + ' players' : ''}${t.format ? ' · ' + esc(t.format) : ''}</span>
         <span>${slotStr} ${statusTag}</span>
         ${t.entry_fee ? `<span>$${parseFloat(t.entry_fee).toFixed(2)} entry fee</span>` : ''}
         ${t.notes ? `<span class="data-card__notes">📋 ${esc(t.notes)}</span>` : ''}
       </div>
       <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.5rem;">
         <button class="btn btn--ghost btn--sm" data-view="${t.id}" data-name="${esc(t.name)}">View Registrations (${count})</button>
-        <button class="btn btn--ghost btn--sm" data-edit="${t.id}">Edit</button>
-        ${t.status !== 'cancelled' ? `<button class="btn btn--ghost btn--sm" data-cancel-t="${t.id}" style="color:#a00;">Cancel Event</button>` : ''}
+        ${isAdmin ? `<button class="btn btn--ghost btn--sm" data-edit="${t.id}">Edit</button>` : ''}
+        ${isAdmin && t.status !== 'cancelled' ? `<button class="btn btn--ghost btn--sm" data-cancel-t="${t.id}" style="color:#a00;">Cancel Event</button>` : ''}
       </div>
     `;
 
     card.querySelector('[data-view]').addEventListener('click', e => {
       loadRegistrations(e.target.dataset.view, e.target.dataset.name);
     });
-    card.querySelector('[data-edit]').addEventListener('click', () => editTournament(t));
-    card.querySelector('[data-cancel-t]')?.addEventListener('click', async () => {
-      if (!confirm(`Cancel "${t.name}"? This cannot be undone.`)) return;
-      await db.from('tournaments').update({ status: 'cancelled' }).eq('id', t.id);
-      loadTournaments();
-    });
+
+    if (isAdmin) {
+      card.querySelector('[data-edit]')?.addEventListener('click', () => editTournament(t));
+      card.querySelector('[data-cancel-t]')?.addEventListener('click', async () => {
+        if (!confirm(`Cancel "${t.name}"? This cannot be undone.`)) return;
+        await db.from('tournaments').update({ status: 'cancelled' }).eq('id', t.id);
+        loadTournaments();
+      });
+    }
 
     list.appendChild(card);
   });
@@ -371,12 +397,12 @@ function clearTournamentForm() {
 // ── Registrations sub-panel ──
 
 async function loadRegistrations(tournamentId, name) {
-  document.getElementById('tournamentsList').style.display = 'none';
-  document.getElementById('tournamentsEmpty').hidden = true;
-  document.getElementById('addTournamentBtn').style.display = 'none';
-  document.getElementById('tournamentForm').hidden = true;
-  document.getElementById('regPanelTitle').textContent = name;
-  document.getElementById('registrationsPanel').hidden = false;
+  document.getElementById('tournamentsList').style.display   = 'none';
+  document.getElementById('tournamentsEmpty').hidden         = true;
+  document.getElementById('addTournamentBtn').style.display  = 'none';
+  document.getElementById('tournamentForm').hidden           = true;
+  document.getElementById('regPanelTitle').textContent       = name;
+  document.getElementById('registrationsPanel').hidden       = false;
 
   const { data, error } = await db
     .from('tournament_registrations')
@@ -389,8 +415,9 @@ async function loadRegistrations(tournamentId, name) {
 }
 
 function renderRegistrations(rows, tournamentId) {
-  const list  = document.getElementById('registrationsList');
-  const empty = document.getElementById('registrationsEmpty');
+  const isAdmin = PORTAL_ROLE === 'admin';
+  const list    = document.getElementById('registrationsList');
+  const empty   = document.getElementById('registrationsEmpty');
   list.innerHTML = '';
   if (!rows.length) { empty.hidden = false; return; }
   empty.hidden = true;
@@ -416,7 +443,7 @@ function renderRegistrations(rows, tournamentId) {
         <th style="padding:0.55rem 0.75rem;">Phone</th>
         <th style="padding:0.55rem 0.75rem;">Cart</th>
         <th style="padding:0.55rem 0.75rem;">Registered</th>
-        <th style="padding:0.55rem 0.75rem;"></th>
+        ${isAdmin ? '<th style="padding:0.55rem 0.75rem;"></th>' : ''}
       </tr>
     </thead>
     <tbody></tbody>
@@ -436,18 +463,18 @@ function renderRegistrations(rows, tournamentId) {
       <td style="padding:0.55rem 0.75rem;white-space:nowrap;">${r.phone || '—'}</td>
       <td style="padding:0.55rem 0.75rem;">${r.cart ? 'Yes' : 'No'}</td>
       <td style="padding:0.55rem 0.75rem;color:#888;font-size:0.8rem;white-space:nowrap;">${fmtDate(r.created_at)}</td>
-      <td style="padding:0.55rem 0.75rem;">
-        ${!cancelled
-          ? `<button class="btn btn--ghost btn--sm" data-del="${r.id}" data-name="${esc(r.captain_name || r.team_name)}" style="color:#a00;font-size:0.75rem;padding:0.2rem 0.5rem;">Delete</button>`
-          : ''}
-      </td>
+      ${isAdmin ? `<td style="padding:0.55rem 0.75rem;">
+        ${!cancelled ? `<button class="btn btn--ghost btn--sm" data-del="${r.id}" data-name="${esc(r.captain_name || r.team_name)}" style="color:#a00;font-size:0.75rem;padding:0.2rem 0.5rem;">Delete</button>` : ''}
+      </td>` : ''}
     `;
-    tr.querySelector('[data-del]')?.addEventListener('click', async e => {
-      const name = e.target.dataset.name;
-      if (!confirm(`Delete "${name}"?`)) return;
-      await db.from('tournament_registrations').delete().eq('id', r.id);
-      loadRegistrations(tournamentId, document.getElementById('regPanelTitle').textContent);
-    });
+    if (isAdmin) {
+      tr.querySelector('[data-del]')?.addEventListener('click', async e => {
+        const name = e.target.dataset.name;
+        if (!confirm(`Delete "${name}"?`)) return;
+        await db.from('tournament_registrations').delete().eq('id', r.id);
+        loadRegistrations(tournamentId, document.getElementById('regPanelTitle').textContent);
+      });
+    }
     tbody.appendChild(tr);
   });
 
@@ -458,6 +485,6 @@ function renderRegistrations(rows, tournamentId) {
 document.getElementById('closeRegPanel').addEventListener('click', () => {
   document.getElementById('registrationsPanel').hidden = true;
   document.getElementById('tournamentsList').style.display = '';
-  document.getElementById('addTournamentBtn').style.display = '';
+  if (PORTAL_ROLE === 'admin') document.getElementById('addTournamentBtn').style.display = '';
   loadTournaments();
 });
