@@ -179,6 +179,7 @@
     .chip--past     { background: #f0f0f0; color: var(--ink-faint); border-left-color: #ccc; }
     .chip--cancelled{ background: #f5f5f5; color: #aaa;            border-left-color: #ddd; text-decoration: line-through; }
     .chip--draft    { background: #eef2f7; color: #4a6080;         border-left-color: #8aa3c0; }
+    .chip--closed   { background: #f5f0e8; color: #6b4a1a;         border-left-color: #c8a86b; }
 
     /* ── Event detail panel ── */
     .event-detail {
@@ -586,9 +587,11 @@
         timeStr = dt.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
       }
 
-      const typeLabel = t.type === 'team'
-        ? `👥 Team${t.team_size ? ' · ' + t.team_size + 'p' : ''}`
-        : '🏌️ Indiv.';
+      const typeLabel = t.type === 'venue'
+        ? '🎉 Private'
+        : t.type === 'team'
+          ? `👥 Team${t.team_size ? ' · ' + t.team_size + 'p' : ''}`
+          : '🏌️ Indiv.';
       const infoStr = t.format ? `${typeLabel} · ${esc(t.format)}` : typeLabel;
 
       const chip = document.createElement('span');
@@ -672,7 +675,7 @@
       const count     = t.registered_count || 0;
       const remaining = t.max_slots > 0 ? t.max_slots - count : null;
       const isSoldOut = remaining !== null && remaining <= 0;
-      const isOpen    = !isPast && !isCancelled && !isSoldOut && t.status === 'open';
+      const isOpen    = !isPast && !isCancelled && !isSoldOut && t.status === 'open' && t.type !== 'venue';
 
       const d       = new Date(t.date + 'T00:00:00');
       const dateStr = d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
@@ -698,8 +701,10 @@
         <h3 class="event-detail__title">${esc(t.name)}</h3>
         <p class="event-detail__meta">${dateStr}${timeStr}</p>
         <div class="event-detail__badges">
-          <span class="badge badge--${t.type}">${t.type === 'team' ? '👥 Team' : '🏌️ Individual'}${t.type === 'team' && t.team_size ? ' · ' + t.team_size + ' players' : ''}</span>
-          ${t.format   ? `<span class="badge badge--format">${esc(t.format)}</span>` : ''}
+          ${t.type === 'venue'
+            ? `<span class="badge badge--format">🎉 Private Venue Event</span>`
+            : `<span class="badge badge--${t.type}">${t.type === 'team' ? '👥 Team' : '🏌️ Individual'}${t.type === 'team' && t.team_size ? ' · ' + t.team_size + ' players' : ''}</span>`}
+          ${t.format    ? `<span class="badge badge--format">${esc(t.format)}</span>` : ''}
           ${t.entry_fee ? `<span class="badge badge--fee">$${parseFloat(t.entry_fee).toFixed(0)} entry — collected at the Clubhouse</span>` : ''}
         </div>
         ${slotsHtml}

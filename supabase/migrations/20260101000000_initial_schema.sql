@@ -91,7 +91,7 @@ create table if not exists tournaments (
   date             date not null,
   time             text,
   description      text,
-  type             text not null default 'individual',
+  type             text not null default 'individual' check (type in ('individual', 'team', 'venue')),
   team_size        int,
   max_slots        int not null default 0,
   format           text,
