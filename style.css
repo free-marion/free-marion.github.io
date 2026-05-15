@@ -1927,3 +1927,47 @@ address {
   transition: background 0.18s;
 }
 .btn-call:hover { background: #00854e; }
+
+/* ── Venue rental pricing ── */
+.venue-pricing-section { margin-top: 0; padding-top: 0; }
+.venue-pricing-divider {
+  border: none;
+  border-top: 2px solid #c8b78a;
+  margin: 48px 0 40px;
+}
+.venue-kicker { color: #6b4a1a; }
+.venue-cards {
+  display: flex;
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+}
+.venue-card {
+  flex: 1;
+  border: 1.5px solid #c8b78a;
+  border-radius: 8px;
+  background: #fff;
+  padding: 1.75rem 1.5rem;
+  text-align: center;
+}
+.venue-card--full {
+  border-color: #004331;
+  background: #f0f7f4;
+}
+.venue-card__duration {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #004331;
+  margin-bottom: 0.2rem;
+}
+.venue-card__hours {
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #6b8c7a;
+  margin-bottom: 1rem;
+}
+.venue-card__price .price-val { font-size: 2.2rem; }
+@media (max-width: 480px) {
+  .venue-cards { flex-direction: column; max-width: 280px; }
+}
