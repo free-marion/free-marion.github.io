@@ -2,6 +2,17 @@
 // CHERRYWOOD PORTAL
 // ============================================
 
+// Synchronously hide the login screen if a Supabase session is already stored.
+// This prevents a login-screen flash when navigating back from a process page.
+(function () {
+  try {
+    const key = Object.keys(localStorage).find(k => k.startsWith('sb-') && k.endsWith('-auth-token'));
+    if (key && localStorage.getItem(key)) {
+      document.getElementById('loginScreen').hidden = true;
+    }
+  } catch (e) {}
+})();
+
 const SUPABASE_URL  = 'https://giwfigekjatujubjknjf.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdpd2ZpZ2VramF0dWp1YmprbmpmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMDEwMDMsImV4cCI6MjA4OTU3NzAwM30.p3OaPA5qYROqz8d0tNyhytl__n_bzH2l2MOX3olDn3A';
 
@@ -62,18 +73,10 @@ async function signOut() {
   window.location.reload();
 }
 
-function showLogin() {
-  document.getElementById('loadingScreen').hidden      = true;
-  document.getElementById('loginScreen').hidden        = false;
-  document.getElementById('accessDeniedScreen').hidden = true;
-  document.getElementById('appShell').hidden           = true;
-}
-
 function unlock(role, user) {
   PORTAL_ROLE = role;
   const isAdmin = role === 'admin';
 
-  document.getElementById('loadingScreen').hidden      = true;
   document.getElementById('loginScreen').hidden        = true;
   document.getElementById('accessDeniedScreen').hidden = true;
   document.getElementById('appShell').hidden           = false;
@@ -101,7 +104,6 @@ function unlock(role, user) {
 }
 
 function showAccessDenied(email) {
-  document.getElementById('loadingScreen').hidden      = true;
   document.getElementById('loginScreen').hidden        = true;
   document.getElementById('accessDeniedScreen').hidden = false;
   document.getElementById('deniedEmail').textContent   = email;
@@ -109,10 +111,7 @@ function showAccessDenied(email) {
 
 // Handles both OAuth redirect callback and session restore on page load.
 db.auth.onAuthStateChange(async (event, session) => {
-  if (!session) {
-    if (event === 'INITIAL_SESSION' || event === 'SIGNED_OUT') showLogin();
-    return;
-  }
+  if (!session) return;
   const { data } = await db.from('profiles').select('role').eq('id', session.user.id).single();
   const role = data?.role;
   if (role === 'admin' || role === 'viewer') {
