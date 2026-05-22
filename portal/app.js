@@ -62,10 +62,18 @@ async function signOut() {
   window.location.reload();
 }
 
+function showLogin() {
+  document.getElementById('loadingScreen').hidden      = true;
+  document.getElementById('loginScreen').hidden        = false;
+  document.getElementById('accessDeniedScreen').hidden = true;
+  document.getElementById('appShell').hidden           = true;
+}
+
 function unlock(role, user) {
   PORTAL_ROLE = role;
   const isAdmin = role === 'admin';
 
+  document.getElementById('loadingScreen').hidden      = true;
   document.getElementById('loginScreen').hidden        = true;
   document.getElementById('accessDeniedScreen').hidden = true;
   document.getElementById('appShell').hidden           = false;
@@ -93,6 +101,7 @@ function unlock(role, user) {
 }
 
 function showAccessDenied(email) {
+  document.getElementById('loadingScreen').hidden      = true;
   document.getElementById('loginScreen').hidden        = true;
   document.getElementById('accessDeniedScreen').hidden = false;
   document.getElementById('deniedEmail').textContent   = email;
@@ -100,7 +109,10 @@ function showAccessDenied(email) {
 
 // Handles both OAuth redirect callback and session restore on page load.
 db.auth.onAuthStateChange(async (event, session) => {
-  if (!session) return;
+  if (!session) {
+    if (event === 'INITIAL_SESSION' || event === 'SIGNED_OUT') showLogin();
+    return;
+  }
   const { data } = await db.from('profiles').select('role').eq('id', session.user.id).single();
   const role = data?.role;
   if (role === 'admin' || role === 'viewer') {
