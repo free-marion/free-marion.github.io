@@ -14,7 +14,7 @@ const db = createClient(SUPABASE_URL, SUPABASE_ANON);
 
 let PORTAL_ROLE = null; // 'admin' | 'viewer' | null
 
-const INACTIVITY_MS = 10 * 60 * 1000;
+const INACTIVITY_MS = 20 * 60 * 1000;
 let _inactivityTimer = null;
 
 function resetInactivityTimer() {
