@@ -58,7 +58,7 @@ async function signInWithGoogle() {
 
 async function signOut() {
   stopInactivityTimer();
-  await db.auth.signOut();
+  try { await db.auth.signOut(); } catch (e) {}
   window.location.reload();
 }
 
