@@ -71,14 +71,61 @@
   <div class="sidebar-overlay" id="sidebarOverlay"></div>
   <div class="app-body">
     <nav class="sidebar" id="sidebar">
-      <button class="tab-btn tab-btn--active" data-tab="tournaments">Tournaments</button>
+      <button class="tab-btn tab-btn--active" data-tab="home">Home</button>
+      <button class="tab-btn" data-tab="tournaments">Tournaments</button>
       <button class="tab-btn" data-tab="eggs">Egg Orders</button>
       <button class="tab-btn" data-tab="resources">Resources</button>
     </nav>
     <div class="content-area">
 
+      <!-- HOME -->
+      <section id="tabHome" class="tab-panel tab-panel--active">
+        <div style="max-width:640px;margin:0 auto;padding:1rem 0 2rem;">
+
+          <div style="margin-bottom:2rem;">
+            <h2 style="font-family:'Playfair Display',serif;font-size:1.75rem;color:#1C3320;margin:0 0 0.35rem;">Welcome, <span id="welcomeName"></span>.</h2>
+            <p style="color:#6b7c6b;font-size:0.95rem;margin:0;">Cherrywood Farm &amp; Golf Club — Staff Portal</p>
+          </div>
+
+          <p style="color:#3a4a3a;line-height:1.7;margin:0 0 2rem;font-size:0.95rem;">
+            This portal is your hub for tournament management, farm store egg orders, and staff process documentation.
+            Use the menu on the left to navigate between sections. Process guides open in a new tab so you never lose your place here.
+          </p>
+
+          <div style="display:grid;gap:0.75rem;margin-bottom:2rem;">
+            <button data-tab="tournaments" class="welcome-card" style="display:flex;align-items:flex-start;gap:1rem;background:#fff;border:1px solid #d4c8b0;border-radius:8px;padding:1rem 1.25rem;cursor:pointer;text-align:left;width:100%;">
+              <span style="font-size:1.5rem;line-height:1;">🏆</span>
+              <div>
+                <div style="font-family:'Playfair Display',serif;font-weight:600;color:#1C3320;font-size:1rem;margin-bottom:0.2rem;">Tournaments</div>
+                <div style="color:#6b7c6b;font-size:0.875rem;line-height:1.5;">Create and manage tournaments, view registrations, and track signups.</div>
+              </div>
+            </button>
+            <button data-tab="eggs" class="welcome-card" style="display:flex;align-items:flex-start;gap:1rem;background:#fff;border:1px solid #d4c8b0;border-radius:8px;padding:1rem 1.25rem;cursor:pointer;text-align:left;width:100%;">
+              <span style="font-size:1.5rem;line-height:1;">🥚</span>
+              <div>
+                <div style="font-family:'Playfair Display',serif;font-weight:600;color:#1C3320;font-size:1rem;margin-bottom:0.2rem;">Egg Orders</div>
+                <div style="color:#6b7c6b;font-size:0.875rem;line-height:1.5;">View and manage pending egg orders from the farm store.</div>
+              </div>
+            </button>
+            <button data-tab="resources" class="welcome-card" style="display:flex;align-items:flex-start;gap:1rem;background:#fff;border:1px solid #d4c8b0;border-radius:8px;padding:1rem 1.25rem;cursor:pointer;text-align:left;width:100%;">
+              <span style="font-size:1.5rem;line-height:1;">📋</span>
+              <div>
+                <div style="font-family:'Playfair Display',serif;font-weight:600;color:#1C3320;font-size:1rem;margin-bottom:0.2rem;">Resources</div>
+                <div style="color:#6b7c6b;font-size:0.875rem;line-height:1.5;">Staff process guides for every role — check-in, cart management, grounds, events, and more.</div>
+              </div>
+            </button>
+          </div>
+
+          <div style="background:#f5f0e8;border-radius:8px;padding:1rem 1.25rem;">
+            <div style="font-size:0.8rem;text-transform:uppercase;letter-spacing:0.06em;color:#8B6914;font-weight:600;margin-bottom:0.5rem;">Need help?</div>
+            <p style="color:#3a4a3a;font-size:0.875rem;line-height:1.6;margin:0;">If you're locked out, don't recognize a process, or spot something wrong — contact Joel Cooper to get it sorted.</p>
+          </div>
+
+        </div>
+      </section>
+
       <!-- TOURNAMENTS -->
-      <section id="tabTournaments" class="tab-panel tab-panel--active">
+      <section id="tabTournaments" class="tab-panel" hidden>
         <div class="panel-header">
           <h2 class="panel-title">Tournaments</h2>
           <button id="addTournamentBtn" class="btn btn--primary btn--sm">+ Create Tournament</button>

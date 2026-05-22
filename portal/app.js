@@ -70,9 +70,11 @@ function unlock(role, user) {
   document.getElementById('accessDeniedScreen').hidden = true;
   document.getElementById('appShell').hidden           = false;
 
-  // Identity in header
+  // Identity in header and welcome panel
   const name = user.user_metadata?.full_name || user.user_metadata?.name || user.email;
+  const firstName = name.split(' ')[0];
   document.getElementById('userLabel').textContent = name;
+  document.getElementById('welcomeName').textContent = firstName;
 
   const roleBadge = document.getElementById('roleLabel');
   if (!isAdmin) {
@@ -124,18 +126,24 @@ _hamburger.addEventListener('click', () =>
 );
 _overlay.addEventListener('click', closeSidebar);
 
+function switchTab(tabName) {
+  closeSidebar();
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('tab-btn--active'));
+  document.querySelectorAll('.tab-panel').forEach(p => { p.hidden = true; p.classList.remove('tab-panel--active'); });
+  const btn = document.querySelector(`.tab-btn[data-tab="${tabName}"]`);
+  if (btn) btn.classList.add('tab-btn--active');
+  const panel = document.getElementById('tab' + tabName.charAt(0).toUpperCase() + tabName.slice(1));
+  if (panel) { panel.hidden = false; panel.classList.add('tab-panel--active'); }
+  if (tabName === 'tournaments') loadTournaments();
+  if (tabName === 'eggs')        loadEggs();
+}
+
 document.querySelectorAll('.tab-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    closeSidebar();
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('tab-btn--active'));
-    document.querySelectorAll('.tab-panel').forEach(p => { p.hidden = true; p.classList.remove('tab-panel--active'); });
-    btn.classList.add('tab-btn--active');
-    const panel = document.getElementById('tab' + btn.dataset.tab.charAt(0).toUpperCase() + btn.dataset.tab.slice(1));
-    panel.hidden = false;
-    panel.classList.add('tab-panel--active');
-    if (btn.dataset.tab === 'tournaments') loadTournaments();
-    if (btn.dataset.tab === 'eggs')        loadEggs();
-  });
+  btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+});
+
+document.querySelectorAll('.welcome-card').forEach(card => {
+  card.addEventListener('click', () => switchTab(card.dataset.tab));
 });
 
 // ============================================
