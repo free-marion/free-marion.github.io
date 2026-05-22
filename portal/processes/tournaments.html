@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tournaments & Outings — Cherrywood</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <style>
+    :root {
+      --green:      #1C3320;
+      --green-mid:  #2D5A3D;
+      --green-pale: #e8f0ea;
+      --burgundy:   #7A1E2E;
+      --burg-pale:  #f5e8eb;
+      --gold:       #8B6914;
+      --gold-pale:  #faf3e0;
+      --text:       #1A1A1A;
+      --muted:      #6B6259;
+      --border:     #ddd6cc;
+      --bg:         #fdf9f4;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Lora', Georgia, serif;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 1rem;
+      line-height: 1.6;
+    }
+
+    /* ── HEADER ── */
+    .page-header {
+      background: var(--green);
+      color: #fff;
+      padding: 1.25rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .back-btn {
+      color: rgba(255,255,255,0.7);
+      text-decoration: none;
+      font-size: 0.85rem;
+      white-space: nowrap;
+    }
+    .back-btn:hover { color: #fff; }
+    .page-header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+    }
+    .page-header .role-tag {
+      margin-left: auto;
+      background: rgba(255,255,255,0.15);
+      border-radius: 20px;
+      padding: 0.2rem 0.75rem;
+      font-size: 0.75rem;
+      white-space: nowrap;
+    }
+
+    /* ── LAYOUT ── */
+    .content {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 1.5rem 1.25rem 4rem;
+    }
+
+    /* ── FLOW DIAGRAM ── */
+    .flow-wrap {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem 1rem 0.75rem;
+      margin-bottom: 2rem;
+      overflow-x: auto;
+    }
+    .flow-wrap .mermaid { font-size: 0.85rem; }
+
+    /* ── PHASE SECTIONS ── */
+    .phase { margin-bottom: 2rem; }
+    .phase-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+    .phase-dot {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.9rem;
+      flex-shrink: 0;
+    }
+    .phase-dot--book  { background: var(--green-pale); color: var(--green); }
+    .phase-dot--prep  { background: var(--gold-pale);  color: var(--gold); }
+    .phase-dot--day   { background: var(--burg-pale);  color: var(--burgundy); }
+    .phase-dot--after { background: #ece8f4;           color: #4a3080; }
+
+    .phase-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.15rem;
+    }
+    .phase-sub {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 0.1rem;
+    }
+
+    /* ── STEP CARDS ── */
+    .steps { display: flex; flex-direction: column; gap: 0.6rem; }
+    .step {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.85rem 1rem;
+      display: flex;
+      gap: 0.9rem;
+      align-items: flex-start;
+    }
+    .step-num {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-top: 0.05rem;
+    }
+    .phase--book  .step-num { background: var(--green-pale); color: var(--green); }
+    .phase--prep  .step-num { background: var(--gold-pale);  color: var(--gold); }
+    .phase--day   .step-num { background: var(--burg-pale);  color: var(--burgundy); }
+    .phase--after .step-num { background: #ece8f4;           color: #4a3080; }
+
+    .step-body {}
+    .step-title { font-weight: 600; font-size: 0.95rem; }
+    .step-note  { font-size: 0.83rem; color: var(--muted); margin-top: 0.2rem; }
+
+    /* ── CALLOUT ── */
+    .callout {
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      font-size: 0.85rem;
+      margin-top: 0.6rem;
+      display: flex;
+      gap: 0.6rem;
+      align-items: flex-start;
+    }
+    .callout--tip  { background: var(--green-pale); color: var(--green-mid); }
+    .callout--warn { background: #fff4e5; color: #8B4C00; }
+    .callout-icon  { font-size: 1rem; flex-shrink: 0; line-height: 1.4; }
+
+    /* ── FORMATS GRID ── */
+    .formats-section { margin-bottom: 2rem; }
+    .formats-section h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem;
+      margin-bottom: 0.75rem;
+      color: var(--green);
+    }
+    .formats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.6rem;
+    }
+    @media (max-width: 480px) {
+      .formats-grid { grid-template-columns: 1fr; }
+    }
+    .format-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.75rem 1rem;
+    }
+    .format-name {
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin-bottom: 0.2rem;
+    }
+    .format-desc {
+      font-size: 0.8rem;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+    .format-tag {
+      display: inline-block;
+      font-size: 0.68rem;
+      background: var(--green-pale);
+      color: var(--green-mid);
+      border-radius: 20px;
+      padding: 0.1rem 0.5rem;
+      margin-top: 0.35rem;
+    }
+
+    /* ── CHECKLIST STRIP ── */
+    .checklist-strip {
+      background: var(--green);
+      color: #fff;
+      border-radius: 12px;
+      padding: 1.1rem 1.25rem;
+      margin-bottom: 2rem;
+    }
+    .checklist-strip h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1rem;
+      margin-bottom: 0.75rem;
+      opacity: 0.9;
+    }
+    .checklist-strip .items {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.35rem 1.5rem;
+    }
+    @media (max-width: 480px) {
+      .checklist-strip .items { grid-template-columns: 1fr; }
+    }
+    .checklist-strip .item {
+      font-size: 0.82rem;
+      opacity: 0.85;
+      display: flex;
+      gap: 0.4rem;
+      align-items: flex-start;
+    }
+    .checklist-strip .item::before {
+      content: '·';
+      opacity: 0.5;
+      flex-shrink: 0;
+    }
+  </style>
+</head>
+<body>
+
+<header class="page-header">
+  <a href="../index.html" class="back-btn">← Back</a>
+  <div>
+    <h1>Tournaments &amp; Outings</h1>
+  </div>
+  <span class="role-tag">All Staff</span>
+</header>
+
+<div class="content">
+
+  <!-- FLOW DIAGRAM -->
+  <div class="flow-wrap">
+    <div class="mermaid">
+flowchart LR
+    A([📞 Booking]) --> B([📋 Prep\n1–4 wks out]) --> C([⛳ Day Of]) --> D([✉️ Follow-Up])
+    style A fill:#e8f0ea,stroke:#2D5A3D,color:#1C3320
+    style B fill:#faf3e0,stroke:#8B6914,color:#8B6914
+    style C fill:#f5e8eb,stroke:#7A1E2E,color:#7A1E2E
+    style D fill:#ece8f4,stroke:#4a3080,color:#4a3080
+    </div>
+  </div>
+
+  <!-- PHASE 1: BOOKING -->
+  <div class="phase phase--book">
+    <div class="phase-header">
+      <div class="phase-dot phase-dot--book">1</div>
+      <div>
+        <div class="phase-title">Booking</div>
+        <div class="phase-sub">When someone asks about holding an event</div>
+      </div>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">Lock in the basics</div>
+          <div class="step-note">Date, format (scramble, stroke play, etc.), estimated player count.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">Collect agreement &amp; deposit</div>
+          <div class="step-note">Signed tournament agreement required. No date is held without it.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">Assign a staff contact</div>
+          <div class="step-note">The organizer needs one person to call. Decide who that is now.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <div class="step-title">Start the internal checklist</div>
+          <div class="step-note">Player gifts · hole contests · F&B plan · prizes/awards · signage.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 2: PREP -->
+  <div class="phase phase--prep">
+    <div class="phase-header">
+      <div class="phase-dot phase-dot--prep">2</div>
+      <div>
+        <div class="phase-title">Prep</div>
+        <div class="phase-sub">1–4 weeks before the event</div>
+      </div>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">Confirm final headcount &amp; full payment</div>
+          <div class="step-note">Do this 7–10 days out — not the day before.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">Make the tournament materials</div>
+          <div class="step-note">Pairings list, cart signs, scorecards, rules sheet.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">Brief F&amp;B</div>
+          <div class="step-note">What's being served, when, how many people. See Event Catering SOP.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <div class="step-title">Brief grounds crew</div>
+          <div class="step-note">Pin placements, tee markers, mowing plan, any known course conditions.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <div class="step-title">Assign staff roles</div>
+          <div class="step-note">Registration table · scoring · on-course · food service. Everyone knows their job before the day.</div>
+        </div>
+      </div>
+    </div>
+    <div class="callout callout--warn" style="margin-top:0.75rem;">
+      <span class="callout-icon">⚠️</span>
+      <span>Don't confirm headcount and payment on the same day as the event. 7–10 days is the minimum — you need time to order food and print materials.</span>
+    </div>
+  </div>
+
+  <!-- PHASE 3: DAY OF -->
+  <div class="phase phase--day">
+    <div class="phase-header">
+      <div class="phase-dot phase-dot--day">3</div>
+      <div>
+        <div class="phase-title">Day Of</div>
+        <div class="phase-sub">Arrive 2–3 hours before players do</div>
+      </div>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">Set up before anyone arrives</div>
+          <div class="step-note">Registration table · carts staged &amp; labeled · all signage placed · staff in position.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">Check in players &amp; explain the format</div>
+          <div class="step-note">Hand out gifts, go over rules, announce start format (shotgun or tee times).</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">Monitor pace by radio</div>
+          <div class="step-note">Address slow play early. One hole behind is a warning. Two holes is a problem.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <div class="step-title">Collect scorecards &amp; run awards</div>
+          <div class="step-note">Enter scores as groups finish. Run awards ceremony before people leave the property.</div>
+        </div>
+      </div>
+    </div>
+    <div class="callout callout--tip" style="margin-top:0.75rem;">
+      <span class="callout-icon">💡</span>
+      <span>Shotgun starts work best for groups of 20+. Tee time intervals are better for smaller groups or when carts are limited.</span>
+    </div>
+  </div>
+
+  <!-- PHASE 4: AFTER -->
+  <div class="phase phase--after">
+    <div class="phase-header">
+      <div class="phase-dot phase-dot--after">4</div>
+      <div>
+        <div class="phase-title">Follow-Up</div>
+        <div class="phase-sub">Within 48 hours of the event</div>
+      </div>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">Thank the organizer in person before they leave</div>
+          <div class="step-note">Then send a follow-up email within 48 hours. Both matter.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">Staff debrief</div>
+          <div class="step-note">What worked, what to change. Keep it short — 10 minutes is enough.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">Invoice any remaining balance</div>
+          <div class="step-note">Same day if possible — don't let it sit.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <div class="step-title">File event notes for next year</div>
+          <div class="step-note">Headcount, what food ran out, what worked on course. Future you will be grateful.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DAY-OF SETUP CHECKLIST -->
+  <div class="checklist-strip">
+    <h3>Day-Of Setup Checklist</h3>
+    <div class="items">
+      <div class="item">Registration table &amp; supplies</div>
+      <div class="item">Carts staged &amp; labeled</div>
+      <div class="item">Scorecards &amp; rules sheets printed</div>
+      <div class="item">Cart signs on every cart</div>
+      <div class="item">Hole contest markers placed</div>
+      <div class="item">Sponsor signage out</div>
+      <div class="item">Player gifts ready at registration</div>
+      <div class="item">Prizes &amp; trophies on-site</div>
+      <div class="item">F&amp;B confirmed &amp; staged</div>
+      <div class="item">Radios charged &amp; distributed</div>
+      <div class="item">Staff know their positions</div>
+      <div class="item">Organizer has your phone number</div>
+    </div>
+  </div>
+
+  <!-- FORMAT REFERENCE -->
+  <div class="formats-section">
+    <h2>Format Quick Reference</h2>
+    <div class="formats-grid">
+      <div class="format-card">
+        <div class="format-name">Scramble</div>
+        <div class="format-desc">Everyone tees off. Group plays from the best shot each time.</div>
+        <span class="format-tag">Best for mixed skill levels</span>
+      </div>
+      <div class="format-card">
+        <div class="format-name">Best Ball</div>
+        <div class="format-desc">Each player plays their own ball. Group score = lowest individual score per hole.</div>
+        <span class="format-tag">More competitive</span>
+      </div>
+      <div class="format-card">
+        <div class="format-name">Stroke Play</div>
+        <div class="format-desc">Standard golf. Every shot counts. Lowest total score wins.</div>
+        <span class="format-tag">Serious tournaments</span>
+      </div>
+      <div class="format-card">
+        <div class="format-name">Shotgun Start</div>
+        <div class="format-desc">All groups start at the same time from different holes.</div>
+        <span class="format-tag">20+ players</span>
+      </div>
+      <div class="format-card">
+        <div class="format-name">Tee Time Start</div>
+        <div class="format-desc">Groups go off Hole 1 at staggered intervals, usually 10 minutes apart.</div>
+        <span class="format-tag">Smaller groups</span>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /content -->
+
+<script>
+  mermaid.initialize({ startOnLoad: true, theme: 'base', themeVariables: {
+    primaryColor: '#e8f0ea', primaryTextColor: '#1C3320', primaryBorderColor: '#2D5A3D',
+    lineColor: '#6B6259', fontSize: '14px'
+  }});
+</script>
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Membership Service Checklist — Cherrywood</title>
+  <link rel="stylesheet" href="process.css">
+</head>
+<body>
+<header class="page-header">
+  <a href="../index.html" class="back-btn">← Back</a>
+  <h1>Membership Service Checklist</h1>
+  <span class="role-tag">Front Office</span>
+</header>
+<div class="content">
+
+  <div class="check-section">
+    <div class="check-section-title">👋 At Check-In</div>
+    <div class="check-items">
+      <div class="check-item" onclick="toggle(this)"><div class="check-box"></div><div><div class="check-label">Greeted by name within 5 seconds</div></div></div>
+      <div class="check-item" onclick="toggle(this)"><div class="check-box"></div><div><div class="check-label">Membership status verified (ID card or system lookup)</div><div class="check-sub">Not by their word alone.</div></div></div>
+      <div class="check-item" onclick="toggle(this)"><div class="check-box"></div><div><div class="check-label">Number of holes confirmed</div></div></div>
+      <div class="check-item" onclick="toggle(this)"><div class="check-box"></div><div><div class="check-label">Cart number assigned and logged</div></div></div>
+      <div class="check-item" onclick="toggle(this)"><div class="check-box"></div><div><div class="check-label">Payment processed before cart key given</div></div></div>
+      <div class="check-item" onclick="toggle(this)"><div class="check-box"></div><div><div class="check-label">Scorecard offered</div></div></div>
+    </div>
+  </div>
+
+  <div class="check-section">
+    <div class="check-section-title">⛳ During the Visit</div>
+    <div class="check-items">
+      <div class="check-item" onclick="toggle(this)"><div class="check-box"></div><div><div class="check-label">Responded to questions or requests promptly</div></div></div>
+      <div class="check-item" onclick="toggle(this)"><div class="check-box"></div><div><div class="check-label">Any complaints: acknowledged, resolved, logged if significant</div></div></div>
+      <div class="check-item" onclick="toggle(this)"><div class="check-box"></div><div><div class="check-label">Pace monitored — slow-play noted in daily log if applicable</div></div></div>
+    </div>
+  </div>
+
+  <div class="check-section">
+    <div class="check-section-title">🏅 Member Interactions</div>
+    <div class="check-items">
+      <div class="check-item" onclick="toggle(this)"><div class="check-box"></div><div><div class="check-label">Addressed by name when possible</div></div></div>
+      <div class="check-item" onclick="toggle(this)"><div class="check-box"></div><div><div class="check-label">Correct discount tier applied without being asked to verify</div></div></div>
+      <div class="check-item" onclick="toggle(this)"><div class="check-box"></div><div><div class="check-label">Any feedback or special requests noted for manager</div></div></div>
+    </div>
+  </div>
+
+  <div class="check-section">
+    <div class="check-section-title">👋 At Departure</div>
+    <div class="check-items">
+      <div class="check-item" onclick="toggle(this)"><div class="check-box"></div><div><div class="check-label">Thanked for visiting</div></div></div>
+      <div class="check-item" onclick="toggle(this)"><div class="check-box"></div><div><div class="check-label">Cart return logged and cart condition checked</div></div></div>
+      <div class="check-item" onclick="toggle(this)"><div class="check-box"></div><div><div class="check-label">Lost items: in Lost & Found, customer contacted immediately</div></div></div>
+    </div>
+  </div>
+
+  <button class="reset-btn" onclick="document.querySelectorAll('.check-item.done').forEach(e=>e.classList.remove('done'))">Reset all checkboxes</button>
+
+</div>
+<script>function toggle(el){el.classList.toggle('done');}</script>
+</body>
+</html>

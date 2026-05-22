@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tee Time Scheduling — Cherrywood</title>
+  <link rel="stylesheet" href="process.css">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+</head>
+<body>
+<header class="page-header">
+  <a href="../index.html" class="back-btn">← Back</a>
+  <h1>Tee Time Scheduling</h1>
+  <span class="role-tag">Clubhouse Staff</span>
+</header>
+<div class="content">
+
+  <div class="flow-wrap">
+    <div class="mermaid">
+flowchart TD
+  A([📞 Phone Call\nor Walk-In]) --> B{Slot\nAvailable?}
+  B -->|Yes| C([📋 Record in Log]) --> D([✅ Confirm to Player])
+  B -->|No| E([Offer nearest\nopen time])
+  E --> C
+  style A fill:#e8f0ea,stroke:#2D5A3D,color:#1C3320
+  style B fill:#faf3e0,stroke:#8B6914,color:#8B6914
+  style C fill:#e8f0ea,stroke:#2D5A3D,color:#1C3320
+  style D fill:#e8f0ea,stroke:#2D5A3D,color:#1C3320
+  style E fill:#f5e8eb,stroke:#7A1E2E,color:#7A1E2E
+    </div>
+  </div>
+
+  <div class="rate-table">
+    <div class="rate-row"><span class="rate-label">Spacing between tee times</span><span class="rate-value">10 minutes</span></div>
+    <div class="rate-row"><span class="rate-label">9 holes — target pace</span><span class="rate-value">2 hours</span><span class="rate-tag">max 4 players</span></div>
+    <div class="rate-row"><span class="rate-label">18 holes — target pace</span><span class="rate-value">4 hours</span><span class="rate-tag">max 4 players</span></div>
+    <div class="rate-row"><span class="rate-label">Start hole</span><span class="rate-value">Hole 1 only (unless manager directs otherwise)</span></div>
+    <div class="rate-row"><span class="rate-label">No-show grace period</span><span class="rate-value">10 minutes, then give spot to walk-in</span></div>
+  </div>
+
+  <div class="phase">
+    <div class="phase-header">
+      <div class="phase-dot dot-green">📞</div>
+      <div><div class="phase-title">Taking a Phone Reservation</div></div>
+    </div>
+    <div class="steps">
+      <div class="step"><div class="step-num num-green">1</div><div><div class="step-title">Get the details</div><div class="step-note">Name, phone number, number of players, 9 or 18 holes, preferred time.</div></div></div>
+      <div class="step"><div class="step-num num-green">2</div><div><div class="step-title">Check the log</div><div class="step-note">Find the next open slot at least 10 minutes after the last booking.</div></div></div>
+      <div class="step"><div class="step-num num-green">3</div><div><div class="step-title">Confirm back</div><div class="step-note">"You're set — [X] players at [time] for [9/18] holes. Please arrive 15 minutes early to check in."</div></div></div>
+      <div class="step"><div class="step-num num-green">4</div><div><div class="step-title">Record in the log</div><div class="step-note">Name, player count, holes, time. Done.</div></div></div>
+    </div>
+  </div>
+
+  <div class="phase">
+    <div class="phase-header">
+      <div class="phase-dot dot-gold">🚶</div>
+      <div><div class="phase-title">Walk-Ins</div></div>
+    </div>
+    <div class="steps">
+      <div class="step"><div class="step-num num-gold">1</div><div><div class="step-title">Find the next open slot</div><div class="step-note">Don't squeeze them in front of an existing reservation.</div></div></div>
+      <div class="step"><div class="step-num num-gold">2</div><div><div class="step-title">Pair singles and twosomes</div><div class="step-note">When it makes sense — keeps cart efficiency up and pace smoother for everyone.</div></div></div>
+      <div class="step"><div class="step-num num-gold">3</div><div><div class="step-title">Log as "WALK-IN"</div><div class="step-note">Note it in the comments column.</div></div></div>
+    </div>
+  </div>
+
+  <div class="phase">
+    <div class="phase-header">
+      <div class="phase-dot dot-burg">🕒</div>
+      <div><div class="phase-title">Pace Monitoring (No Marshal)</div><div class="phase-sub">Clubhouse attendant owns this</div></div>
+    </div>
+    <div class="steps">
+      <div class="step"><div class="step-num num-burg">1</div><div><div class="step-title">Visual check every 30–45 minutes</div><div class="step-note">From the clubhouse or a quick drive out.</div></div></div>
+      <div class="step"><div class="step-num num-burg">2</div><div><div class="step-title">One hole behind = polite reminder</div><div class="step-note">Go out or radio them. Document in the daily log.</div></div></div>
+    </div>
+  </div>
+
+  <div class="phase">
+    <div class="phase-header">
+      <div class="phase-dot dot-purple">📋</div>
+      <div><div class="phase-title">End of Day</div></div>
+    </div>
+    <div class="steps">
+      <div class="step"><div class="step-num num-purple">1</div><div><div class="step-title">Review the log</div><div class="step-note">Mark no-shows, confirm walk-ins are noted.</div></div></div>
+      <div class="step"><div class="step-num num-purple">2</div><div><div class="step-title">Reconcile with Square</div><div class="step-note">Total rounds in the log should match POS transaction count.</div></div></div>
+      <div class="step"><div class="step-num num-purple">3</div><div><div class="step-title">File for manager review</div></div></div>
+    </div>
+  </div>
+
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'base',themeVariables:{lineColor:'#6B6259',fontSize:'13px'}});</script>
+</body>
+</html>

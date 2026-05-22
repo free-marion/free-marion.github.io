@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inventory & Square POS — Cherrywood</title>
+  <link rel="stylesheet" href="process.css">
+</head>
+<body>
+<header class="page-header">
+  <a href="../index.html" class="back-btn">← Back</a>
+  <h1>Inventory &amp; Square POS</h1>
+  <span class="role-tag">All Staff</span>
+</header>
+<div class="content">
+
+  <div class="callout callout--rule" style="margin-bottom:1.5rem;"><span class="callout-icon">📋</span><span>Every transaction goes through Square — no exceptions. This includes discounted and complimentary transactions.</span></div>
+
+  <div class="pos-flow" style="margin-bottom:1rem;">
+    <div class="pos-flow-title">Receiving New Stock</div>
+    <div class="pos-steps">
+      <div class="pos-step"><span class="pos-arrow">▶</span><span class="pos-step-text">Count items against packing slip before putting anything away</span></div>
+      <div class="pos-step"><span class="pos-arrow">▶</span><span class="pos-step-text"><strong>More → Items → Stock on Hand → Stock Received</strong></span></div>
+      <div class="pos-step"><span class="pos-arrow">▶</span><span class="pos-step-text">Enter quantity received → Save</span></div>
+      <div class="pos-step"><span class="pos-arrow">▶</span><span class="pos-step-text">Store in correct location, file packing slip</span></div>
+    </div>
+  </div>
+
+  <div class="pos-flow" style="margin-bottom:1rem;">
+    <div class="pos-flow-title">Manual Recount (numbers seem off)</div>
+    <div class="pos-steps">
+      <div class="pos-step"><span class="pos-arrow">▶</span><span class="pos-step-text">Count actual physical items on hand</span></div>
+      <div class="pos-step"><span class="pos-arrow">▶</span><span class="pos-step-text"><strong>More → Items → Stock on Hand → Inventory Recount</strong></span></div>
+      <div class="pos-step"><span class="pos-arrow">▶</span><span class="pos-step-text">Enter correct physical count → Save</span></div>
+    </div>
+  </div>
+
+  <div class="pos-flow" style="margin-bottom:1rem;">
+    <div class="pos-flow-title">Standard Round</div>
+    <div class="pos-steps">
+      <div class="pos-step"><span class="pos-arrow">▶</span><span class="pos-step-text">Enter cart fee per person</span></div>
+      <div class="pos-step"><span class="pos-arrow">▶</span><span class="pos-step-text">Select holes (9 or 18)</span></div>
+      <div class="pos-step"><span class="pos-arrow">▶</span><span class="pos-step-text">Process payment</span></div>
+    </div>
+  </div>
+
+  <div class="pos-flow" style="margin-bottom:1rem;">
+    <div class="pos-flow-title">Member / Employee Discount</div>
+    <div class="pos-steps">
+      <div class="pos-step"><span class="pos-arrow">▶</span><span class="pos-step-text">Ring up normally</span></div>
+      <div class="pos-step"><span class="pos-arrow">▶</span><span class="pos-step-text"><strong>Add Discount</strong> → select correct tier</span></div>
+      <div class="pos-step"><span class="pos-arrow">▶</span><span class="pos-step-text">100% (employee/spouse/child in home) or 50% (child not in home)</span></div>
+    </div>
+  </div>
+
+  <div class="pos-flow" style="margin-bottom:1.5rem;">
+    <div class="pos-flow-title">Event Space Booking</div>
+    <div class="pos-steps">
+      <div class="pos-step"><span class="pos-arrow">▶</span><span class="pos-step-text"><strong>Event Space (variable)</strong> → enter $350 (full day) or $175 (half day)</span></div>
+      <div class="pos-step"><span class="pos-arrow">▶</span><span class="pos-step-text">Add note: customer name + event date</span></div>
+      <div class="pos-step"><span class="pos-arrow">▶</span><span class="pos-step-text">Process payment</span></div>
+    </div>
+  </div>
+
+  <h2 class="section-heading">Eggs — Special Handling</h2>
+  <div class="callout callout--tip"><span class="callout-icon">🥚</span><span>If eggs are taken without a transaction (internal use, owner use, or pre-approved arrangement): manually subtract the quantity in Square and note the reason in the inventory log. This keeps the count accurate for ordering.</span></div>
+
+  <h2 class="section-heading">Low Stock</h2>
+  <div class="rule-list">
+    <ul>
+      <li>Flag any item at 2 units remaining (or your pre-set reorder threshold)</li>
+      <li>Add to the restock list at the counter</li>
+      <li>Items requiring an outside order: notify the manager — don't wait until it runs out</li>
+    </ul>
+  </div>
+
+  <h2 class="section-heading">End-of-Day Discrepancies</h2>
+  <div class="callout callout--warn"><span class="callout-icon">⚠️</span><span>Square total doesn't match your drawer or inventory? Document exactly what you see and flag to the manager immediately. Do not correct it yourself without manager oversight — the paper trail matters.</span></div>
+
+</div>
+</body>
+</html>

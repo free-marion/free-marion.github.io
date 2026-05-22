@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pro Shop Closing — Cherrywood</title>
+  <link rel="stylesheet" href="process.css">
+</head>
+<body>
+<header class="page-header">
+  <a href="../index.html" class="back-btn">← Back</a>
+  <h1>Pro Shop Closing</h1>
+  <span class="role-tag">Closing Staff</span>
+</header>
+<div class="content">
+
+  <div class="callout callout--rule" style="margin-bottom:1.5rem;"><span class="callout-icon">📋</span><span>Complete in order. Do not leave until every section is done.</span></div>
+
+  <div class="check-section">
+    <div class="check-section-title">🍎 1. Food &amp; Inventory</div>
+    <div class="check-items">
+      <div class="check-item" onclick="toggle(this)"><div class="check-box"></div><div><div class="check-label">All displayed food items returned to proper storage</div></div></div>
+      <div class="check-item" onclick="toggle(this)"><div class="check-box"></div><div><div class="check-label">Perishables checked — anything past date discarded</div></div></div>
+      <div class="check-item" onclick="toggle(this)"><div class="check-box"></div><div><div class="check-label">Shelves restocked for tomorrow (if supplies available)</div></div></div>
+      <div class="check-item" onclick="toggle(this)"><div class="check-box"></div><div><div class="check-label">Low-stock items added to restock list</div></div></div>
+    </div>
+  </div>
+
+  <div class="check-section">
+    <div class="check-section-title">💵 2. Register &amp; Financials</div>
+    <div class="check-items">
+      <div class="check-item" onclick="toggle(this)"><div class="check-box"></div><div><div class="check-label">Drawer counted down</div></div></div>
+      <div class="check-item" onclick="toggle(this)"><div class="check-box"></div><div><div class="check-label">Daily drop slip completed and signed</div></div></div>
+      <div class="check-item" onclick="toggle(this)"><div class="check-box"></div><div><div class="check-label">Drawer reset to $100 (small bills preferred)</div></div></div>
+      <div class="check-item" onclick="toggle(this)"><div class="check-box"></div><div><div class="check-label">Cash drop made to safe</div></div></div>
+    </div>
+  </div>
+
+  <div class="check-section">
+    <div class="check-section-title">🧹 3. Cleaning &amp; Organization</div>
+    <div class="check-items">
+      <div class="check-item" onclick="toggle(this)"><div class="check-box"></div><div><div class="check-label">PM cleaning checklist completed (posted at counter)</div></div></div>
+      <div class="check-item" onclick="toggle(this)"><div class="check-box"></div><div><div class="check-label">Display merchandise returned to correct positions</div></div></div>
+      <div class="check-item" onclick="toggle(this)"><div class="check-box"></div><div><div class="check-label">Counter and POS terminal wiped down</div></div></div>
+    </div>
+  </div>
+
+  <div class="check-section">
+    <div class="check-section-title">🔑 4. Carts &amp; Keys</div>
+    <div class="check-items">
+      <div class="check-item" onclick="toggle(this)"><div class="check-box"></div><div><div class="check-label">All carts in the shed — count matches the log</div></div></div>
+      <div class="check-item" onclick="toggle(this)"><div class="check-box"></div><div><div class="check-label">All cart keys on designated hooks</div></div></div>
+      <div class="check-item" onclick="toggle(this)"><div class="check-box"></div><div><div class="check-label">Nothing left in any cart (trash, tees, balls, scorecards)</div></div></div>
+      <div class="check-item" onclick="toggle(this)"><div class="check-box"></div><div><div class="check-label">Problem carts tagged "Out of Service"</div></div></div>
+    </div>
+  </div>
+
+  <div class="check-section">
+    <div class="check-section-title">🔒 5. Facility Lockdown</div>
+    <div class="check-items">
+      <div class="check-item" onclick="toggle(this)"><div class="check-box"></div><div><div class="check-label">All shed doors closed and latched</div></div></div>
+      <div class="check-item" onclick="toggle(this)"><div class="check-box"></div><div><div class="check-label">Bathrooms, storage rooms, and back areas checked</div></div></div>
+      <div class="check-item" onclick="toggle(this)"><div class="check-box"></div><div><div class="check-label">Every door locked</div></div></div>
+      <div class="check-item" onclick="toggle(this)"><div class="check-box"></div><div><div class="check-label">Every light off</div></div></div>
+    </div>
+  </div>
+
+  <div class="callout callout--warn" style="margin-top:0.5rem;"><span class="callout-icon">⚠️</span><span>Find something unusual — unlocked door, lights that shouldn't be on, unfamiliar vehicle? Note it and call the manager before leaving.</span></div>
+
+  <button class="reset-btn" onclick="document.querySelectorAll('.check-item.done').forEach(e=>e.classList.remove('done'))">Reset all checkboxes</button>
+
+</div>
+<script>function toggle(el){el.classList.toggle('done');}</script>
+</body>
+</html>

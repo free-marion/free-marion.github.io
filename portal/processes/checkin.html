@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Customer Check-In — Cherrywood</title>
+  <link rel="stylesheet" href="process.css">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+</head>
+<body>
+<header class="page-header">
+  <a href="../index.html" class="back-btn">← Back</a>
+  <h1>Customer Check-In &amp; Rental</h1>
+  <span class="role-tag">Clubhouse Staff</span>
+</header>
+<div class="content">
+
+  <div class="flow-wrap">
+    <div class="mermaid">
+flowchart LR
+  A([👋 Greet]) --> B([📝 Sign In]) --> C([💳 Payment]) --> D([🔑 Cart Key]) --> E([⛳ Send Off])
+  style A fill:#e8f0ea,stroke:#2D5A3D,color:#1C3320
+  style B fill:#e8f0ea,stroke:#2D5A3D,color:#1C3320
+  style C fill:#f5e8eb,stroke:#7A1E2E,color:#7A1E2E
+  style D fill:#faf3e0,stroke:#8B6914,color:#8B6914
+  style E fill:#e8f0ea,stroke:#2D5A3D,color:#1C3320
+    </div>
+  </div>
+
+  <div class="phase">
+    <div class="phase-header">
+      <div class="phase-dot dot-green">1</div>
+      <div><div class="phase-title">Check-In Steps</div></div>
+    </div>
+    <div class="steps">
+      <div class="step"><div class="step-num num-green">1</div><div><div class="step-title">Greet immediately</div><div class="step-note">Stop what you're doing. Eye contact. Before they say a word.</div></div></div>
+      <div class="step"><div class="step-num num-green">2</div><div><div class="step-title">Sign-in sheet</div><div class="step-note">Name, date, number of holes. Every customer, every time.</div></div></div>
+      <div class="step"><div class="step-num num-green">3</div><div><div class="step-title">9 or 18 holes?</div><div class="step-note">Confirm before assigning a cart — it affects rotation on busy days.</div></div></div>
+      <div class="step"><div class="step-num num-green">4</div><div><div class="step-title">Assign cart number</div><div class="step-note">Write cart number on the sign-in sheet next to their name.</div></div></div>
+      <div class="step"><div class="step-num num-green">5</div><div><div class="step-title">Payment in Square — then the key</div><div class="step-note">No exceptions. If they push back: "I just need to get you checked out and you're all set."</div></div></div>
+      <div class="step"><div class="step-num num-green">6</div><div><div class="step-title">Hand over key + scorecard</div><div class="step-note">Offer the scorecard, don't just leave it on the counter.</div></div></div>
+      <div class="step"><div class="step-num num-green">7</div><div><div class="step-title">Send-off</div><div class="step-note">"Start on Hole 1, keep pace — about 2 hours for 9. Enjoy your round."</div></div></div>
+    </div>
+  </div>
+
+  <h2 class="section-heading">Square POS — Transactions</h2>
+
+  <div class="pos-flow">
+    <div class="pos-flow-title">Standard Round</div>
+    <div class="pos-steps">
+      <div class="pos-step"><span class="pos-arrow">▶</span><span class="pos-step-text">Enter <strong>cart fee per person</strong></span></div>
+      <div class="pos-step"><span class="pos-arrow">▶</span><span class="pos-step-text">Select <strong>number of holes</strong> (9 or 18)</span></div>
+      <div class="pos-step"><span class="pos-arrow">▶</span><span class="pos-step-text">Process payment</span></div>
+    </div>
+  </div>
+
+  <div class="pos-flow">
+    <div class="pos-flow-title">Member / Employee Discount</div>
+    <div class="pos-steps">
+      <div class="pos-step"><span class="pos-arrow">▶</span><span class="pos-step-text">Ring up normally (cart fee + holes)</span></div>
+      <div class="pos-step"><span class="pos-arrow">▶</span><span class="pos-step-text">Tap <strong>Add Discount</strong></span></div>
+      <div class="pos-step"><span class="pos-arrow">▶</span><span class="pos-step-text">Select correct tier (100% or 50%)</span></div>
+    </div>
+  </div>
+
+  <div class="info-grid">
+    <div class="info-card">
+      <div class="info-card-title">100% Discount</div>
+      <div class="info-card-body">Employee, their spouse, and dependent children living in the home.</div>
+    </div>
+    <div class="info-card">
+      <div class="info-card-title">50% Discount</div>
+      <div class="info-card-body">Employee's children who do not live in the home.</div>
+    </div>
+  </div>
+
+  <div class="callout callout--rule"><span class="callout-icon">📋</span><span>Everyone pays a cart fee. Discounts apply to green fees only. Every transaction — including 100% discounts — must be rung through Square.</span></div>
+
+  <h2 class="section-heading">Cart Return</h2>
+  <div class="steps">
+    <div class="step"><div class="step-num num-burg">1</div><div><div class="step-title">Mark returned on sign-in sheet</div></div></div>
+    <div class="step"><div class="step-num num-burg">2</div><div><div class="step-title">Check cart for trash and personal items</div><div class="step-note">If something's left behind: check the sheet for the cart number, call the customer immediately.</div></div></div>
+    <div class="step"><div class="step-num num-burg">3</div><div><div class="step-title">Wipe down and return to staging area</div></div></div>
+  </div>
+
+  <div class="callout callout--tip" style="margin-top:1rem;"><span class="callout-icon">💡</span><span>Busy day? Let 9-hole customers know at check-in: "Carts are in high demand today — book 18 holes now to keep the cart for the full round."</span></div>
+
+</div>
+<script>mermaid.initialize({startOnLoad:true,theme:'base',themeVariables:{lineColor:'#6B6259',fontSize:'13px'}});</script>
+</body>
+</html>

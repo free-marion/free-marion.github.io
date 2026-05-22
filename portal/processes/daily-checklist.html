@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daily Attendant Checklist — Cherrywood</title>
+  <link rel="stylesheet" href="process.css">
+</head>
+<body>
+<header class="page-header">
+  <a href="../index.html" class="back-btn">← Back</a>
+  <h1>Daily Attendant Checklist</h1>
+  <span class="role-tag">Clubhouse Staff</span>
+</header>
+<div class="content">
+
+  <div class="check-section" id="morning">
+    <div class="check-section-title">🌅 Morning — Before First Customer</div>
+    <div class="check-items">
+      <div class="check-item" onclick="toggle(this)"><div class="check-box"></div><div><div class="check-label">All carts inspected — damage, trash, tires, operational</div></div></div>
+      <div class="check-item" onclick="toggle(this)"><div class="check-box"></div><div><div class="check-label">Carts staged neatly in designated area</div></div></div>
+      <div class="check-item" onclick="toggle(this)"><div class="check-box"></div><div><div class="check-label">Sand bottles and ball washers filled</div></div></div>
+      <div class="check-item" onclick="toggle(this)"><div class="check-box"></div><div><div class="check-label">All keys stored inside — none pre-assigned</div></div></div>
+      <div class="check-item" onclick="toggle(this)"><div class="check-box"></div><div><div class="check-label">Hole 1 tee area clear and ready</div></div></div>
+      <div class="check-item" onclick="toggle(this)"><div class="check-box"></div><div><div class="check-label">Scorecard supply stocked at counter</div></div></div>
+      <div class="check-item" onclick="toggle(this)"><div class="check-box"></div><div><div class="check-label">Registration sheet in place for today</div></div></div>
+      <div class="check-item" onclick="toggle(this)"><div class="check-box"></div><div><div class="check-label">Tee time log reviewed — notes from manager?</div></div></div>
+      <div class="check-item" onclick="toggle(this)"><div class="check-box"></div><div><div class="check-label">Register drawer confirmed at $100</div></div></div>
+      <div class="check-item" onclick="toggle(this)"><div class="check-box"></div><div><div class="check-label">Square POS operational and logged in</div></div></div>
+      <div class="check-item" onclick="toggle(this)"><div class="check-box"></div><div><div class="check-label">Phone charged and working</div></div></div>
+      <div class="check-item" onclick="toggle(this)"><div class="check-box"></div><div><div class="check-label">Bathrooms checked — stocked and clean</div></div></div>
+      <div class="check-item" onclick="toggle(this)"><div class="check-box"></div><div><div class="check-label">First aid kit visible and accessible</div></div></div>
+    </div>
+  </div>
+
+  <div class="check-section" id="customers">
+    <div class="check-section-title">⛳ Every Incoming Customer</div>
+    <div class="check-items">
+      <div class="check-item" onclick="toggle(this)"><div class="check-box"></div><div><div class="check-label">Signed in on registration sheet</div></div></div>
+      <div class="check-item" onclick="toggle(this)"><div class="check-box"></div><div><div class="check-label">9 or 18 holes confirmed</div></div></div>
+      <div class="check-item" onclick="toggle(this)"><div class="check-box"></div><div><div class="check-label">Payment in Square BEFORE cart key given</div></div></div>
+      <div class="check-item" onclick="toggle(this)"><div class="check-box"></div><div><div class="check-label">Cart number assigned and logged</div></div></div>
+      <div class="check-item" onclick="toggle(this)"><div class="check-box"></div><div><div class="check-label">Scorecard offered</div></div></div>
+      <div class="check-item" onclick="toggle(this)"><div class="check-box"></div><div><div class="check-label">Hole 1 start and pace reminder given</div></div></div>
+    </div>
+  </div>
+
+  <div class="check-section" id="returns">
+    <div class="check-section-title">🔄 Every Cart Return</div>
+    <div class="check-items">
+      <div class="check-item" onclick="toggle(this)"><div class="check-box"></div><div><div class="check-label">Marked returned on registration sheet</div></div></div>
+      <div class="check-item" onclick="toggle(this)"><div class="check-box"></div><div><div class="check-label">Trash removed and cart wiped down</div></div></div>
+      <div class="check-item" onclick="toggle(this)"><div class="check-box"></div><div><div class="check-label">Sand bottle and ball washer checked</div></div></div>
+      <div class="check-item" onclick="toggle(this)"><div class="check-box"></div><div><div class="check-label">Lost items: customer contacted, item in Lost & Found</div></div></div>
+    </div>
+  </div>
+
+  <div class="check-section" id="closing">
+    <div class="check-section-title">🌙 Closing</div>
+    <div class="check-items">
+      <div class="check-item" onclick="toggle(this)"><div class="check-box"></div><div><div class="check-label">All carts returned and accounted for</div></div></div>
+      <div class="check-item" onclick="toggle(this)"><div class="check-box"></div><div><div class="check-label">All carts wiped down, trash removed</div></div></div>
+      <div class="check-item" onclick="toggle(this)"><div class="check-box"></div><div><div class="check-label">Carts stored in shed</div></div></div>
+      <div class="check-item" onclick="toggle(this)"><div class="check-box"></div><div><div class="check-label">All keys returned to designated hooks</div></div></div>
+      <div class="check-item" onclick="toggle(this)"><div class="check-box"></div><div><div class="check-label">Problem carts tagged "Out of Service"</div></div></div>
+      <div class="check-item" onclick="toggle(this)"><div class="check-box"></div><div><div class="check-label">Square POS reconciled for the day</div></div></div>
+      <div class="check-item" onclick="toggle(this)"><div class="check-box"></div><div><div class="check-label">Drawer counted, drop slip completed</div></div></div>
+      <div class="check-item" onclick="toggle(this)"><div class="check-box"></div><div><div class="check-label">Drawer reset to $100 for tomorrow</div></div></div>
+      <div class="check-item" onclick="toggle(this)"><div class="check-box"></div><div><div class="check-label">Cash drop made to safe</div></div></div>
+      <div class="check-item" onclick="toggle(this)"><div class="check-box"></div><div><div class="check-label">Tee time log complete — no-shows marked</div></div></div>
+      <div class="check-item" onclick="toggle(this)"><div class="check-box"></div><div><div class="check-label">Trash emptied in all areas</div></div></div>
+      <div class="check-item" onclick="toggle(this)"><div class="check-box"></div><div><div class="check-label">Bathrooms restocked for tomorrow</div></div></div>
+      <div class="check-item" onclick="toggle(this)"><div class="check-box"></div><div><div class="check-label">All lights off, all doors and sheds locked</div></div></div>
+    </div>
+  </div>
+
+  <button class="reset-btn" onclick="resetAll()">Reset all checkboxes</button>
+
+</div>
+<script>
+  function toggle(el) {
+    el.classList.toggle('done');
+  }
+  function resetAll() {
+    document.querySelectorAll('.check-item.done').forEach(el => el.classList.remove('done'));
+  }
+</script>
+</body>
+</html>
