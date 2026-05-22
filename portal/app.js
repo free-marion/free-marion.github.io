@@ -2,17 +2,6 @@
 // CHERRYWOOD PORTAL
 // ============================================
 
-// Synchronously hide the login screen if a Supabase session is already stored.
-// This prevents a login-screen flash when navigating back from a process page.
-(function () {
-  try {
-    const key = Object.keys(localStorage).find(k => k.startsWith('sb-') && k.endsWith('-auth-token'));
-    if (key && localStorage.getItem(key)) {
-      document.getElementById('loginScreen').hidden = true;
-    }
-  } catch (e) {}
-})();
-
 const SUPABASE_URL  = 'https://giwfigekjatujubjknjf.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdpd2ZpZ2VramF0dWp1YmprbmpmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMDEwMDMsImV4cCI6MjA4OTU3NzAwM30.p3OaPA5qYROqz8d0tNyhytl__n_bzH2l2MOX3olDn3A';
 
