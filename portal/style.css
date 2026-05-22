@@ -380,6 +380,8 @@ body {
 .lib-badge--doc   { background: #e4ede8; color: #2a5a3a; }
 .lib-badge--video { background: #f5e8eb; color: var(--burgundy); }
 .lib-coming { margin-left: auto; font-size: 0.72rem; color: var(--text-muted); font-style: italic; }
+.lib-item--link { cursor: pointer; color: var(--green); text-decoration: none; }
+.lib-item--link:hover { background: #f0ebe0; }
 
 .training-card {
   display: flex;
