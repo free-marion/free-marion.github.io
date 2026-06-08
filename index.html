@@ -349,7 +349,7 @@
         </div>
         <div class="contact-line">
           <span class="contact-label">Hours</span>
-          <span id="courseHours">7 Days a Week &nbsp;|&nbsp; 8am–7pm</span>
+          <span id="courseHours">Mon–Fri: 8am–8pm &nbsp;|&nbsp; Sat–Sun: 7am–8pm</span>
         </div>
       </address>
       <div class="contact-map">
@@ -441,14 +441,16 @@
         const now = new Date();
         const ct  = new Date(now.toLocaleString('en-US', { timeZone: 'America/Chicago' }));
         const h   = ct.getHours();
-        return h >= 8 && h < 19; // 8am–7pm
+        const dow = ct.getDay(); // 0=Sun, 6=Sat
+        const isWeekend = dow === 0 || dow === 6;
+        return isWeekend ? (h >= 7 && h < 20) : (h >= 8 && h < 20);
       }
 
       function showStatus(isOpen, message) {
         const badge  = document.getElementById('courseStatusBadge');
         const banner = document.getElementById('courseClosedBanner');
         if (!isOpen) {
-          document.getElementById('courseClosedMsg').textContent = message || 'Course is currently closed. Hours: 8am–7pm daily.';
+          document.getElementById('courseClosedMsg').textContent = message || 'Course is currently closed. Hours: Mon–Fri 8am–8pm, Sat–Sun 7am–8pm.';
           banner.style.display = 'block';
           badge.textContent = '⛔ Course Closed';
           badge.className = 'course-status-badge course-status-badge--closed';
