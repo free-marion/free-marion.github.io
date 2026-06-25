@@ -138,6 +138,12 @@ db.auth.onAuthStateChange(async (event, session) => {
   const role  = data?.role;
   const tools = data?.tools || { tabs: [], actions: [] };
   if (role === 'admin' || role === 'viewer' || role === 'staff') {
+    // Persist display name + email so the admin panel can show them
+    const displayName = session.user.user_metadata?.full_name
+      || session.user.user_metadata?.name
+      || session.user.email;
+    db.from('profiles').update({ display_name: displayName, email: session.user.email })
+      .eq('id', session.user.id);
     unlock(role, session.user, tools);
   } else {
     showAccessDenied(session.user.email);
@@ -959,21 +965,20 @@ async function loadAdmin() {
   list.innerHTML = loading();
   detail.hidden = true;
 
-  const { data, error } = await db.from('profiles').select('id, role, tools');
+  const { data, error } = await db.from('profiles').select('id, role, tools, display_name, email');
   if (error) { list.innerHTML = dbErr('profiles', error); return; }
   _adminUsers = data || [];
 
-  // Fetch emails via auth — not directly accessible; use userLabel email as proxy.
-  // We store user metadata on login; for admin list use id + role only with truncated id.
   list.innerHTML = '';
   _adminUsers.forEach(u => {
     const card = document.createElement('div');
     card.className = 'data-card';
     card.style.cursor = 'pointer';
-    const tabs = (u.tools?.tabs || []).join(', ') || 'none';
+    const label = u.display_name || u.email || `${u.id.slice(0,8)}…`;
+    const tabs  = (u.tools?.tabs || []).join(', ') || 'none';
     card.innerHTML = `
       <div class="data-card__header">
-        <span class="data-card__title" style="font-size:0.85rem;font-family:monospace;">${esc(u.id.slice(0,8))}…</span>
+        <span class="data-card__title">${esc(label)}</span>
         <span class="data-card__badge">${esc(u.role)}</span>
       </div>
       <div class="data-card__body" style="font-size:0.82rem;color:#666;">Tabs: ${esc(tabs)}</div>
@@ -986,7 +991,8 @@ async function loadAdmin() {
 function openAdminDetail(u) {
   document.getElementById('adminUserList').hidden   = true;
   document.getElementById('adminUserDetail').hidden = false;
-  document.getElementById('adminDetailName').textContent = `${u.role} · ${u.id.slice(0,8)}…`;
+  const label = u.display_name || u.email || `${u.id.slice(0,8)}…`;
+  document.getElementById('adminDetailName').textContent = `${label} · ${u.role}`;
 
   const tools = u.tools || { tabs: [], actions: [] };
   const isAdmin = u.role === 'admin';
