@@ -4,8 +4,6 @@
 
 const SUPABASE_URL  = 'https://giwfigekjatujubjknjf.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdpd2ZpZ2VramF0dWp1YmprbmpmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMDEwMDMsImV4cCI6MjA4OTU3NzAwM30.p3OaPA5qYROqz8d0tNyhytl__n_bzH2l2MOX3olDn3A';
-const PORTAL_EMAIL  = 'portal@cherrywoodgolf.com';
-
 const { createClient } = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_ANON);
 
@@ -40,22 +38,22 @@ function stopInactivityTimer() {
   );
 }
 
-async function signInWithPassword() {
-  const btn      = document.getElementById('loginBtn');
-  const pwdInput = document.getElementById('loginPassword');
-  const errEl    = document.getElementById('loginError');
-  const password = pwdInput.value;
-  errEl.hidden   = true;
-  btn.disabled   = true;
-  btn.textContent = 'Signing in…';
+async function signInWithGoogle() {
+  const btn   = document.getElementById('loginBtn');
+  const errEl = document.getElementById('loginError');
+  errEl.hidden    = true;
+  btn.disabled    = true;
+  btn.textContent = 'Redirecting…';
 
-  const { error } = await db.auth.signInWithPassword({ email: PORTAL_EMAIL, password });
-
-  btn.disabled  = false;
-  btn.textContent = 'Sign In';
+  const { error } = await db.auth.signInWithOAuth({
+    provider: 'google',
+    options: { redirectTo: 'https://cherrywoodgolf.com/portal/' },
+  });
 
   if (error) {
-    errEl.textContent = 'Incorrect password.';
+    btn.disabled    = false;
+    btn.textContent = 'Sign in with Google';
+    errEl.textContent = 'Sign-in failed. Try again.';
     errEl.hidden      = false;
   }
 }
@@ -65,12 +63,6 @@ async function signOut() {
   try { await db.auth.signOut(); } catch (e) {}
   window.location.reload();
 }
-
-// Wire up password login button and Enter key
-document.getElementById('loginBtn').addEventListener('click', signInWithPassword);
-document.getElementById('loginPassword').addEventListener('keydown', e => {
-  if (e.key === 'Enter') signInWithPassword();
-});
 
 function unlock(role, user) {
   PORTAL_ROLE = role;
