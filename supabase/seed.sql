@@ -39,6 +39,12 @@ insert into auth.identities (
   now(), now(), now()
 ) on conflict (provider_id, provider) do nothing;
 
+-- Ensure the portal user has admin role in profiles
+-- (handle_new_user trigger creates the row with role='member'; override it here)
+insert into public.profiles (id, display_name, role)
+values ('00000000-0000-0000-0000-000000000099', 'Portal Admin', 'admin')
+on conflict (id) do update set role = 'admin';
+
 -- Course status (open by default)
 update course_status set is_open = true, closed_on = null where id = 1;
 

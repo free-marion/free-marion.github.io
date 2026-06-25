@@ -4,6 +4,7 @@
 
 const SUPABASE_URL  = 'https://giwfigekjatujubjknjf.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdpd2ZpZ2VramF0dWp1YmprbmpmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMDEwMDMsImV4cCI6MjA4OTU3NzAwM30.p3OaPA5qYROqz8d0tNyhytl__n_bzH2l2MOX3olDn3A';
+const PORTAL_EMAIL  = 'portal@cherrywoodgolf.com';
 
 const { createClient } = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_ANON);
@@ -39,20 +40,23 @@ function stopInactivityTimer() {
   );
 }
 
-async function signInWithGoogle() {
-  const btn = document.getElementById('loginBtn');
-  btn.disabled = true;
-  btn.textContent = 'Redirecting…';
-  const { error } = await db.auth.signInWithOAuth({
-    provider: 'google',
-    options: { redirectTo: 'https://cherrywoodgolf.com/portal/' },
-  });
+async function signInWithPassword() {
+  const btn      = document.getElementById('loginBtn');
+  const pwdInput = document.getElementById('loginPassword');
+  const errEl    = document.getElementById('loginError');
+  const password = pwdInput.value;
+  errEl.hidden   = true;
+  btn.disabled   = true;
+  btn.textContent = 'Signing in…';
+
+  const { error } = await db.auth.signInWithPassword({ email: PORTAL_EMAIL, password });
+
+  btn.disabled  = false;
+  btn.textContent = 'Sign In';
+
   if (error) {
-    const err = document.getElementById('loginError');
-    err.textContent = error.message;
-    err.hidden = false;
-    btn.disabled = false;
-    btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908C16.658 11.83 17.64 9.525 17.64 9.2z" fill="#4285F4"/><path d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z" fill="#34A853"/><path d="M3.964 10.707c-.18-.54-.282-1.117-.282-1.707s.102-1.167.282-1.707V4.961H.957C.347 6.175 0 7.548 0 9s.348 2.825.957 4.039l3.007-2.332z" fill="#FBBC05"/><path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z" fill="#EA4335"/></svg> Sign in with Google`;
+    errEl.textContent = 'Incorrect password.';
+    errEl.hidden      = false;
   }
 }
 
@@ -61,6 +65,12 @@ async function signOut() {
   try { await db.auth.signOut(); } catch (e) {}
   window.location.reload();
 }
+
+// Wire up password login button and Enter key
+document.getElementById('loginBtn').addEventListener('click', signInWithPassword);
+document.getElementById('loginPassword').addEventListener('keydown', e => {
+  if (e.key === 'Enter') signInWithPassword();
+});
 
 function unlock(role, user) {
   PORTAL_ROLE = role;
@@ -86,6 +96,7 @@ function unlock(role, user) {
   if (!isAdmin) {
     document.getElementById('addTournamentBtn').hidden = true;
     document.getElementById('tournamentForm').hidden   = true;
+    document.getElementById('addContactBtn').hidden    = true;
   }
 
   startInactivityTimer();
@@ -136,6 +147,7 @@ function switchTab(tabName) {
   if (panel) { panel.hidden = false; panel.classList.add('tab-panel--active'); }
   if (tabName === 'tournaments') loadTournaments();
   if (tabName === 'eggs')        loadEggs();
+  if (tabName === 'crm')         loadCRM();
 }
 
 document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -495,4 +507,342 @@ document.getElementById('closeRegPanel').addEventListener('click', () => {
   document.getElementById('tournamentsList').style.display = '';
   if (PORTAL_ROLE === 'admin') document.getElementById('addTournamentBtn').style.display = '';
   loadTournaments();
+});
+
+// ============================================
+// CRM
+// ============================================
+
+let _crmAllContacts   = [];    // full result set — search filters client-side
+let _crmDebounceTimer = null;
+
+async function loadCRM() {
+  // Always reset to list view when the tab is switched to
+  _showCrmList();
+  document.getElementById('crmContactsList').innerHTML = loading();
+  document.getElementById('crmEmpty').hidden = true;
+
+  const { data, error } = await db
+    .from('contacts')
+    .select('*')
+    .order('last_name');
+
+  if (error) {
+    document.getElementById('crmContactsList').innerHTML = dbErr('contacts', error);
+    return;
+  }
+  _crmAllContacts = data || [];
+  renderContacts(_crmAllContacts);
+}
+
+function _showCrmList() {
+  document.getElementById('crmContactsList').style.display = '';
+  document.getElementById('crmEmpty').hidden               = true;
+  document.getElementById('crmDetail').hidden              = true;
+  document.getElementById('crmSearch').value               = '';
+}
+
+function _crmTypeBadge(type) {
+  if (!type) return '';
+  const label = type.replace('_', ' ');
+  return `<span class="crm-type-badge crm-type-badge--${esc(type)}">${esc(label)}</span>`;
+}
+
+function renderContacts(rows) {
+  const list  = document.getElementById('crmContactsList');
+  const empty = document.getElementById('crmEmpty');
+  list.innerHTML = '';
+
+  if (!rows.length) {
+    empty.hidden = false;
+    return;
+  }
+  empty.hidden = true;
+
+  const grid = document.createElement('div');
+  grid.className = 'crm-contacts-grid';
+
+  rows.forEach(c => {
+    const card = document.createElement('div');
+    card.className = 'crm-contact-card';
+    card.innerHTML = `
+      <div class="crm-contact-card__name">${esc(c.first_name)} ${esc(c.last_name)}</div>
+      ${_crmTypeBadge(c.type)}
+      <div class="crm-contact-card__meta">
+        ${c.phone ? `<span>${esc(c.phone)}</span>` : ''}
+        ${c.email ? `<span>${esc(c.email)}</span>` : ''}
+      </div>
+      <div style="margin-top:0.4rem;">
+        <button class="btn btn--ghost btn--sm" data-view-contact="${esc(c.id)}">View</button>
+      </div>
+    `;
+    card.querySelector('[data-view-contact]').addEventListener('click', () => openContact(c.id));
+    grid.appendChild(card);
+  });
+
+  list.appendChild(grid);
+}
+
+async function openContact(id) {
+  document.getElementById('crmContactsList').style.display = 'none';
+  document.getElementById('crmEmpty').hidden               = true;
+  document.getElementById('crmDetail').hidden              = false;
+  document.getElementById('crmDetailBody').innerHTML       = loading();
+  document.getElementById('crmInteractionsList').innerHTML = '';
+  document.getElementById('crmMembershipsList').innerHTML  = '';
+  document.getElementById('crmInquiriesList').innerHTML    = '';
+  document.getElementById('addInteractionForm').hidden     = true;
+
+  // Parallel fetches
+  const [cRes, iRes, mRes, eRes] = await Promise.all([
+    db.from('contacts').select('*').eq('id', id).single(),
+    db.from('interactions').select('*').eq('contact_id', id).order('interaction_date', { ascending: false }),
+    db.from('memberships').select('*').eq('contact_id', id).order('created_at', { ascending: false }),
+    db.from('event_inquiries').select('*').eq('contact_id', id).order('created_at', { ascending: false }),
+  ]);
+
+  if (cRes.error) {
+    document.getElementById('crmDetailBody').innerHTML = dbErr('contacts', cRes.error);
+    return;
+  }
+
+  const c = cRes.data;
+  document.getElementById('crmDetailName').textContent = `${c.first_name} ${c.last_name}`;
+
+  document.getElementById('crmDetailBody').innerHTML = `
+    <div class="data-card" style="margin-top:0.75rem;">
+      <div class="data-card__body" style="gap:0.4rem;">
+        ${_crmTypeBadge(c.type)}
+        ${c.phone   ? `<span>📞 ${esc(c.phone)}</span>`   : ''}
+        ${c.email   ? `<span>✉ ${esc(c.email)}</span>`   : ''}
+        ${c.address ? `<span>📍 ${esc(c.address)}</span>` : ''}
+        ${c.source  ? `<span style="font-size:0.8rem;color:#888;">Source: ${esc(c.source)}</span>` : ''}
+        ${c.notes   ? `<span class="data-card__notes">${esc(c.notes)}</span>` : ''}
+        <span style="font-size:0.78rem;color:#aaa;">Added ${fmtDate(c.created_at)}</span>
+      </div>
+    </div>
+  `;
+
+  // Interactions
+  _renderInteractions(iRes.data || []);
+
+  // Memberships
+  _renderMemberships(mRes.data || []);
+
+  // Event Inquiries
+  _renderInquiries(eRes.data || []);
+
+  // Store id on back button handler so the sub-form can reference it
+  document.getElementById('crmDetailBack')._contactId = id;
+  document.getElementById('saveInteractionBtn')._contactId = id;
+}
+
+function _renderInteractions(rows) {
+  const list  = document.getElementById('crmInteractionsList');
+  const empty = document.getElementById('crmInteractionsEmpty');
+  list.innerHTML = '';
+  if (!rows.length) { empty.hidden = false; return; }
+  empty.hidden = true;
+  rows.forEach(i => {
+    const el = document.createElement('div');
+    el.className = 'crm-interaction-item';
+    el.innerHTML = `
+      <div class="crm-interaction-item__meta">
+        <span>${fmtDate(i.interaction_date)}</span>
+        ${i.type ? `<span style="text-transform:capitalize;">${esc(i.type)}</span>` : ''}
+      </div>
+      <div>${esc(i.summary)}</div>
+    `;
+    list.appendChild(el);
+  });
+}
+
+function _renderMemberships(rows) {
+  const list  = document.getElementById('crmMembershipsList');
+  const empty = document.getElementById('crmMembershipsEmpty');
+  list.innerHTML = '';
+  if (!rows.length) { empty.hidden = false; return; }
+  empty.hidden = true;
+  rows.forEach(m => {
+    const el = document.createElement('div');
+    el.className = 'crm-membership-item';
+    el.innerHTML = `
+      <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;">
+        ${m.type ? `<strong style="text-transform:capitalize;">${esc(m.type)}</strong>` : ''}
+        <span class="tag ${m.status === 'active' ? 'tag--complete' : 'tag--cancelled'}">${esc(m.status)}</span>
+      </div>
+      ${m.start_date || m.end_date ? `<span style="font-size:0.82rem;color:#888;">${fmtDate(m.start_date)} — ${fmtDate(m.end_date)}</span>` : ''}
+      ${m.fee_paid != null ? `<span style="font-size:0.82rem;">Fee paid: $${parseFloat(m.fee_paid).toFixed(2)}</span>` : ''}
+      ${m.notes ? `<span class="data-card__notes">${esc(m.notes)}</span>` : ''}
+    `;
+    list.appendChild(el);
+  });
+}
+
+function _renderInquiries(rows) {
+  const list  = document.getElementById('crmInquiriesList');
+  const empty = document.getElementById('crmInquiriesEmpty');
+  list.innerHTML = '';
+  if (!rows.length) { empty.hidden = false; return; }
+  empty.hidden = true;
+  rows.forEach(q => {
+    const el = document.createElement('div');
+    el.className = 'crm-inquiry-item';
+    el.innerHTML = `
+      <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;">
+        ${q.event_type ? `<strong style="text-transform:capitalize;">${esc(q.event_type)}</strong>` : ''}
+        <span class="tag">${esc(q.status)}</span>
+      </div>
+      ${q.requested_date ? `<span style="font-size:0.82rem;color:#888;">Requested: ${fmtDate(q.requested_date)}</span>` : ''}
+      ${q.headcount ? `<span style="font-size:0.82rem;">Headcount: ${q.headcount}</span>` : ''}
+      ${q.notes ? `<span class="data-card__notes">${esc(q.notes)}</span>` : ''}
+    `;
+    list.appendChild(el);
+  });
+}
+
+async function saveContact(data) {
+  const { error } = await db.from('contacts').insert(data);
+  return error;
+}
+
+async function saveInteraction(contactId, data) {
+  const { error } = await db.from('interactions').insert({ contact_id: contactId, ...data });
+  return error;
+}
+
+// ── Add Contact Modal ──
+
+document.getElementById('addContactBtn').addEventListener('click', () => {
+  _clearContactForm();
+  document.getElementById('addContactModal').hidden = false;
+});
+
+document.getElementById('cancelContactBtn').addEventListener('click', () => {
+  document.getElementById('addContactModal').hidden = true;
+  _clearContactForm();
+});
+
+// Close modal on overlay click
+document.getElementById('addContactModal').addEventListener('click', e => {
+  if (e.target === document.getElementById('addContactModal')) {
+    document.getElementById('addContactModal').hidden = true;
+    _clearContactForm();
+  }
+});
+
+document.getElementById('saveContactBtn').addEventListener('click', async () => {
+  const firstName = document.getElementById('contactFirstName').value.trim();
+  const lastName  = document.getElementById('contactLastName').value.trim();
+  const errEl     = document.getElementById('contactFormError');
+  const btn       = document.getElementById('saveContactBtn');
+  errEl.hidden    = true;
+
+  if (!firstName) { errEl.textContent = 'First name is required.'; errEl.hidden = false; return; }
+  if (!lastName)  { errEl.textContent = 'Last name is required.';  errEl.hidden = false; return; }
+
+  btn.disabled    = true;
+  btn.textContent = 'Saving…';
+
+  const payload = {
+    first_name: firstName,
+    last_name:  lastName,
+    phone:   document.getElementById('contactPhone').value.trim()  || null,
+    email:   document.getElementById('contactEmail').value.trim()  || null,
+    type:    document.getElementById('contactType').value          || null,
+    source:  document.getElementById('contactSource').value.trim() || null,
+    notes:   document.getElementById('contactNotes').value.trim()  || null,
+  };
+
+  const error = await saveContact(payload);
+
+  btn.disabled    = false;
+  btn.textContent = 'Save Contact';
+
+  if (error) { errEl.textContent = error.message; errEl.hidden = false; return; }
+
+  document.getElementById('addContactModal').hidden = true;
+  _clearContactForm();
+  loadCRM();
+});
+
+function _clearContactForm() {
+  ['contactFirstName','contactLastName','contactPhone','contactEmail','contactSource','contactNotes'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('contactType').value = '';
+  document.getElementById('contactFormError').hidden = true;
+}
+
+// ── Add Interaction (inline in detail panel) ──
+
+document.getElementById('addInteractionBtn').addEventListener('click', () => {
+  document.getElementById('addInteractionForm').hidden = false;
+  document.getElementById('interactionSummary').focus();
+});
+
+document.getElementById('cancelInteractionBtn').addEventListener('click', () => {
+  document.getElementById('addInteractionForm').hidden = true;
+  document.getElementById('interactionSummary').value  = '';
+  document.getElementById('interactionFormError').hidden = true;
+});
+
+document.getElementById('saveInteractionBtn').addEventListener('click', async () => {
+  const contactId = document.getElementById('saveInteractionBtn')._contactId;
+  const summary   = document.getElementById('interactionSummary').value.trim();
+  const errEl     = document.getElementById('interactionFormError');
+  const btn       = document.getElementById('saveInteractionBtn');
+  errEl.hidden    = true;
+
+  if (!summary) { errEl.textContent = 'Summary is required.'; errEl.hidden = false; return; }
+
+  btn.disabled    = true;
+  btn.textContent = 'Saving…';
+
+  const error = await saveInteraction(contactId, {
+    type:    document.getElementById('interactionType').value || 'note',
+    summary,
+  });
+
+  btn.disabled    = false;
+  btn.textContent = 'Save';
+
+  if (error) { errEl.textContent = error.message; errEl.hidden = false; return; }
+
+  document.getElementById('addInteractionForm').hidden  = true;
+  document.getElementById('interactionSummary').value   = '';
+
+  // Refresh interactions list only
+  const { data } = await db
+    .from('interactions')
+    .select('*')
+    .eq('contact_id', contactId)
+    .order('interaction_date', { ascending: false });
+  _renderInteractions(data || []);
+});
+
+// ── Back button from detail ──
+
+document.getElementById('crmDetailBack').addEventListener('click', () => {
+  _showCrmList();
+  renderContacts(_crmAllContacts);
+});
+
+// ── Search (client-side debounce) ──
+
+document.getElementById('crmSearch').addEventListener('input', e => {
+  clearTimeout(_crmDebounceTimer);
+  _crmDebounceTimer = setTimeout(() => {
+    const q = e.target.value.trim().toLowerCase();
+    if (!q) {
+      renderContacts(_crmAllContacts);
+      return;
+    }
+    const filtered = _crmAllContacts.filter(c =>
+      `${c.first_name} ${c.last_name}`.toLowerCase().includes(q) ||
+      (c.email  && c.email.toLowerCase().includes(q))  ||
+      (c.phone  && c.phone.includes(q))
+    );
+    renderContacts(filtered);
+  }, 200);
 });
