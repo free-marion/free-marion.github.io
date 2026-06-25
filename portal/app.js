@@ -80,7 +80,7 @@ function unlock(role, user) {
 
   const roleBadge = document.getElementById('roleLabel');
   if (!isAdmin) {
-    roleBadge.textContent = 'Viewer';
+    roleBadge.textContent = role === 'staff' ? 'Staff' : 'Viewer';
     roleBadge.style.display = 'inline-block';
   }
 
@@ -106,7 +106,7 @@ db.auth.onAuthStateChange(async (event, session) => {
   if (!session) return;
   const { data } = await db.from('profiles').select('role').eq('id', session.user.id).single();
   const role = data?.role;
-  if (role === 'admin' || role === 'viewer') {
+  if (role === 'admin' || role === 'viewer' || role === 'staff') {
     unlock(role, session.user);
   } else {
     showAccessDenied(session.user.email);
