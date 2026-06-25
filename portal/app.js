@@ -129,6 +129,10 @@ function showAccessDenied(email) {
 
 // Handles both OAuth redirect callback and session restore on page load.
 db.auth.onAuthStateChange(async (event, session) => {
+  // Skip token refreshes once the portal is already unlocked — avoids stacking
+  // inactivity timers and resetting button visibility mid-session.
+  if (event === 'TOKEN_REFRESHED' && PORTAL_ROLE) return;
+
   if (!session) return;
   const { data } = await db.from('profiles').select('role, tools').eq('id', session.user.id).single();
   const role  = data?.role;
@@ -869,6 +873,27 @@ document.getElementById('crmSearch').addEventListener('input', e => {
     );
     renderContacts(filtered);
   }, 200);
+});
+
+// ============================================
+// SPA BACK-BUTTON MANAGEMENT
+// Push a history entry on load so pressing the browser back button fires
+// popstate within this page rather than navigating to the OAuth redirect URL
+// (which would try to re-exchange the already-consumed PKCE code and sign
+// the user out).
+// ============================================
+
+history.pushState({ portal: true }, '');
+
+window.addEventListener('popstate', () => {
+  // If the CRM contact detail is open, close it
+  const detail = document.getElementById('crmDetail');
+  if (detail && !detail.hidden) {
+    _showCrmList();
+    renderContacts(_crmAllContacts);
+  }
+  // Re-push so the next back press is caught here too
+  history.pushState({ portal: true }, '');
 });
 
 // ============================================
