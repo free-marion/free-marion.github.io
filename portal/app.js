@@ -567,6 +567,8 @@ function _showCrmList() {
   document.getElementById('crmEmpty').hidden               = true;
   document.getElementById('crmDetail').hidden              = true;
   document.getElementById('crmSearch').value               = '';
+  const countEl = document.getElementById('crmCount');
+  if (countEl) countEl.hidden = true;
 }
 
 function _crmTypeBadge(type) {
@@ -575,39 +577,75 @@ function _crmTypeBadge(type) {
   return `<span class="crm-type-badge crm-type-badge--${esc(type)}">${esc(label)}</span>`;
 }
 
+function _crmInitials(c) {
+  return ((c.first_name?.[0] || '') + (c.last_name?.[0] || '')).toUpperCase() || '?';
+}
+
+const _CRM_AVATAR_COLORS = {
+  member:        ['#d1e7d4','#1C3320'],
+  guest:         ['#f0ece2','#6b4a1a'],
+  event_inquiry: ['#f5e8eb','#7a1a2e'],
+  vendor:        ['#e8e8f0','#3a3a6a'],
+  donor:         ['#f0e8d6','#7a5c00'],
+  other:         ['#ebebeb','#555555'],
+};
+
+function _crmAvatarStyle(type) {
+  const [bg, fg] = _CRM_AVATAR_COLORS[type] || _CRM_AVATAR_COLORS.other;
+  return `background:${bg};color:${fg};`;
+}
+
 function renderContacts(rows) {
   const list  = document.getElementById('crmContactsList');
   const empty = document.getElementById('crmEmpty');
   list.innerHTML = '';
 
+  const countEl = document.getElementById('crmCount');
   if (!rows.length) {
-    empty.hidden = false;
+    empty.hidden   = false;
+    countEl.hidden = true;
     return;
   }
-  empty.hidden = true;
+  countEl.hidden       = false;
+  countEl.textContent  = `${rows.length} contact${rows.length === 1 ? '' : 's'}`;
 
-  const grid = document.createElement('div');
-  grid.className = 'crm-contacts-grid';
+  const wrap = document.createElement('div');
+  wrap.className = 'crm-table-wrap';
+
+  wrap.innerHTML = `
+    <table class="crm-table">
+      <thead>
+        <tr>
+          <th class="crm-th crm-th--name">Name</th>
+          <th class="crm-th crm-th--type">Type</th>
+          <th class="crm-th crm-th--contact crm-th--hide-sm">Email</th>
+          <th class="crm-th crm-th--contact crm-th--hide-sm">Phone</th>
+          <th class="crm-th crm-th--notes crm-th--hide-md">Notes</th>
+        </tr>
+      </thead>
+      <tbody id="crmTableBody"></tbody>
+    </table>
+  `;
+
+  list.appendChild(wrap);
+  const tbody = document.getElementById('crmTableBody');
 
   rows.forEach(c => {
-    const card = document.createElement('div');
-    card.className = 'crm-contact-card';
-    card.innerHTML = `
-      <div class="crm-contact-card__name">${esc(c.first_name)} ${esc(c.last_name)}</div>
-      ${_crmTypeBadge(c.type)}
-      <div class="crm-contact-card__meta">
-        ${c.phone ? `<span>${esc(c.phone)}</span>` : ''}
-        ${c.email ? `<span>${esc(c.email)}</span>` : ''}
-      </div>
-      <div style="margin-top:0.4rem;">
-        <button class="btn btn--ghost btn--sm" data-view-contact="${esc(c.id)}">View</button>
-      </div>
+    const tr = document.createElement('tr');
+    tr.className = 'crm-row';
+    tr.innerHTML = `
+      <td class="crm-td crm-td--name">
+        <div class="crm-avatar" style="${_crmAvatarStyle(c.type)}">${_crmInitials(c)}</div>
+        <span class="crm-name-text">${esc(c.first_name)} ${esc(c.last_name)}</span>
+      </td>
+      <td class="crm-td">${_crmTypeBadge(c.type)}</td>
+      <td class="crm-td crm-td--muted crm-th--hide-sm">${c.email ? esc(c.email) : '<span class="crm-empty-cell">—</span>'}</td>
+      <td class="crm-td crm-td--muted crm-th--hide-sm">${c.phone ? esc(c.phone) : '<span class="crm-empty-cell">—</span>'}</td>
+      <td class="crm-td crm-td--notes crm-th--hide-md">${c.notes ? `<span class="crm-notes-preview">${esc(c.notes)}</span>` : '<span class="crm-empty-cell">—</span>'}</td>
     `;
-    card.querySelector('[data-view-contact]').addEventListener('click', () => openContact(c.id));
-    grid.appendChild(card);
+    tr.addEventListener('click', () => openContact(c.id));
+    tbody.appendChild(tr);
   });
-
-  list.appendChild(grid);
 }
 
 async function openContact(id) {
