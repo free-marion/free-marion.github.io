@@ -11,7 +11,18 @@ const db = createClient(SUPABASE_URL, SUPABASE_ANON);
 // AUTH
 // ============================================
 
-let PORTAL_ROLE = null; // 'admin' | 'viewer' | null
+let PORTAL_ROLE  = null; // 'admin' | 'viewer' | 'staff' | null
+let PORTAL_TOOLS = { tabs: [], actions: [] }; // populated on login for non-admins
+
+// ---- permission helpers ----
+function canSeeTab(key) {
+  if (PORTAL_ROLE === 'admin') return true;
+  return (PORTAL_TOOLS.tabs || []).includes(key);
+}
+function canDo(action) {
+  if (PORTAL_ROLE === 'admin') return true;
+  return (PORTAL_TOOLS.actions || []).includes(action);
+}
 
 const INACTIVITY_MS = 20 * 60 * 1000;
 let _inactivityTimer = null;
@@ -64,8 +75,9 @@ async function signOut() {
   window.location.reload();
 }
 
-function unlock(role, user) {
-  PORTAL_ROLE = role;
+function unlock(role, user, tools) {
+  PORTAL_ROLE  = role;
+  PORTAL_TOOLS = tools || { tabs: [], actions: [] };
   const isAdmin = role === 'admin';
 
   document.getElementById('loginScreen').hidden        = true;
@@ -75,21 +87,35 @@ function unlock(role, user) {
   // Identity in header and welcome panel
   const name = user.user_metadata?.full_name || user.user_metadata?.name || user.email;
   const firstName = name.split(' ')[0];
-  document.getElementById('userLabel').textContent = name;
+  document.getElementById('userLabel').textContent  = name;
   document.getElementById('welcomeName').textContent = firstName;
 
   const roleBadge = document.getElementById('roleLabel');
   if (!isAdmin) {
-    roleBadge.textContent = role === 'staff' ? 'Staff' : 'Viewer';
+    roleBadge.textContent   = role === 'staff' ? 'Staff' : 'Viewer';
     roleBadge.style.display = 'inline-block';
   }
 
-  // Hide admin-only shell elements
-  if (!isAdmin) {
-    document.getElementById('addTournamentBtn').hidden = true;
-    document.getElementById('tournamentForm').hidden   = true;
-    document.getElementById('addContactBtn').hidden    = true;
-  }
+  // Show/hide sidebar tabs based on permissions
+  document.querySelectorAll('.tab-btn[data-tab]').forEach(btn => {
+    const key = btn.dataset.tab;
+    if (key === 'home' || key === 'admin') return; // handled separately
+    btn.hidden = !canSeeTab(key);
+  });
+
+  // Admin tab: admins only
+  document.getElementById('adminTabBtn').hidden = !isAdmin;
+
+  // Start all write-action buttons hidden; loaders re-show them if canDo() passes
+  document.getElementById('addTournamentBtn').hidden = true;
+  document.getElementById('tournamentForm').hidden   = true;
+  document.getElementById('addContactBtn').hidden    = true;
+
+  // Hide home welcome cards for tabs user can't see
+  document.querySelectorAll('.welcome-card[data-tab]').forEach(card => {
+    card.closest('button, a') && (card.closest('button,a').hidden = !canSeeTab(card.dataset.tab));
+    if (!card.closest('button,a')) card.hidden = !canSeeTab(card.dataset.tab);
+  });
 
   startInactivityTimer();
   loadTournaments();
@@ -104,10 +130,11 @@ function showAccessDenied(email) {
 // Handles both OAuth redirect callback and session restore on page load.
 db.auth.onAuthStateChange(async (event, session) => {
   if (!session) return;
-  const { data } = await db.from('profiles').select('role').eq('id', session.user.id).single();
-  const role = data?.role;
+  const { data } = await db.from('profiles').select('role, tools').eq('id', session.user.id).single();
+  const role  = data?.role;
+  const tools = data?.tools || { tabs: [], actions: [] };
   if (role === 'admin' || role === 'viewer' || role === 'staff') {
-    unlock(role, session.user);
+    unlock(role, session.user, tools);
   } else {
     showAccessDenied(session.user.email);
   }
@@ -140,6 +167,7 @@ function switchTab(tabName) {
   if (tabName === 'tournaments') loadTournaments();
   if (tabName === 'eggs')        loadEggs();
   if (tabName === 'crm')         loadCRM();
+  if (tabName === 'admin')       loadAdmin();
 }
 
 document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -188,10 +216,10 @@ async function loadEggs() {
 }
 
 function renderEggs(rows) {
-  const isAdmin = PORTAL_ROLE === 'admin';
-  const list    = document.getElementById('eggsList');
-  const empty   = document.getElementById('eggsEmpty');
-  list.innerHTML = '';
+  const canPickup = canDo('eggs:pickup');
+  const list      = document.getElementById('eggsList');
+  const empty     = document.getElementById('eggsEmpty');
+  list.innerHTML  = '';
   if (!rows.length) { empty.hidden = false; return; }
   empty.hidden = true;
 
@@ -209,12 +237,12 @@ function renderEggs(rows) {
         ${o.notes ? `<span class="data-card__notes">${esc(o.notes)}</span>` : ''}
       </div>
       ${o.status !== 'complete'
-        ? (isAdmin
+        ? (canPickup
             ? `<button class="btn btn--primary btn--sm" data-complete="${o.id}">Mark Picked Up</button>`
             : `<span class="tag">Pending pickup</span>`)
         : '<span class="tag tag--complete">Picked Up</span>'}
     `;
-    if (isAdmin) {
+    if (canPickup) {
       card.querySelector('[data-complete]')?.addEventListener('click', async () => {
         await db.from('egg_orders').update({ status: 'complete' }).eq('id', o.id);
         loadEggs();
@@ -243,7 +271,7 @@ async function loadTournaments() {
   document.getElementById('registrationsPanel').hidden = true;
   document.getElementById('tournamentsList').style.display = '';
   document.getElementById('tournamentsEmpty').hidden = true;
-  if (PORTAL_ROLE === 'admin') document.getElementById('addTournamentBtn').style.display = '';
+  if (canDo('tournaments:create')) document.getElementById('addTournamentBtn').style.display = '';
 
   document.getElementById('tournamentsList').innerHTML = loading();
   const { data, error } = await db.from('tournaments').select('*').order('date', { ascending: false });
@@ -264,7 +292,7 @@ async function loadTournaments() {
 }
 
 function renderTournaments(rows, counts) {
-  const isAdmin = PORTAL_ROLE === 'admin';
+  const isAdmin = canDo('tournaments:create');
   const list    = document.getElementById('tournamentsList');
   const empty   = document.getElementById('tournamentsEmpty');
   list.innerHTML = '';
@@ -427,7 +455,7 @@ async function loadRegistrations(tournamentId, name) {
 }
 
 function renderRegistrations(rows, tournamentId) {
-  const isAdmin = PORTAL_ROLE === 'admin';
+  const isAdmin = canDo('tournaments:create');
   const list    = document.getElementById('registrationsList');
   const empty   = document.getElementById('registrationsEmpty');
   list.innerHTML = '';
@@ -497,7 +525,7 @@ function renderRegistrations(rows, tournamentId) {
 document.getElementById('closeRegPanel').addEventListener('click', () => {
   document.getElementById('registrationsPanel').hidden = true;
   document.getElementById('tournamentsList').style.display = '';
-  if (PORTAL_ROLE === 'admin') document.getElementById('addTournamentBtn').style.display = '';
+  if (canDo('tournaments:create')) document.getElementById('addTournamentBtn').style.display = '';
   loadTournaments();
 });
 
@@ -509,6 +537,9 @@ let _crmAllContacts   = [];    // full result set — search filters client-side
 let _crmDebounceTimer = null;
 
 async function loadCRM() {
+  // Show/hide write button based on permission
+  document.getElementById('addContactBtn').hidden = !canDo('crm:write');
+
   // Always reset to list view when the tab is switched to
   _showCrmList();
   document.getElementById('crmContactsList').innerHTML = loading();
@@ -584,6 +615,7 @@ async function openContact(id) {
   document.getElementById('crmMembershipsList').innerHTML  = '';
   document.getElementById('crmInquiriesList').innerHTML    = '';
   document.getElementById('addInteractionForm').hidden     = true;
+  document.getElementById('addInteractionBtn').hidden      = !canDo('crm:write');
 
   // Parallel fetches
   const [cRes, iRes, mRes, eRes] = await Promise.all([
@@ -838,3 +870,151 @@ document.getElementById('crmSearch').addEventListener('input', e => {
     renderContacts(filtered);
   }, 200);
 });
+
+// ============================================
+// ADMIN PANEL
+// ============================================
+
+const TOOL_TABS = [
+  { key: 'tournaments', label: 'Tournaments' },
+  { key: 'eggs',        label: 'Egg Orders'  },
+  { key: 'resources',   label: 'Resources'   },
+  { key: 'crm',         label: 'CRM'         },
+];
+
+const TOOL_ACTIONS = [
+  { key: 'tournaments:create', label: 'Create / edit tournaments',    tab: 'tournaments' },
+  { key: 'eggs:pickup',        label: 'Mark egg orders as picked up', tab: 'eggs'        },
+  { key: 'crm:write',          label: 'Add / edit CRM contacts',      tab: 'crm'         },
+];
+
+let _adminUsers = [];
+
+async function loadAdmin() {
+  const list = document.getElementById('adminUserList');
+  const detail = document.getElementById('adminUserDetail');
+  list.innerHTML = loading();
+  detail.hidden = true;
+
+  const { data, error } = await db.from('profiles').select('id, role, tools');
+  if (error) { list.innerHTML = dbErr('profiles', error); return; }
+  _adminUsers = data || [];
+
+  // Fetch emails via auth — not directly accessible; use userLabel email as proxy.
+  // We store user metadata on login; for admin list use id + role only with truncated id.
+  list.innerHTML = '';
+  _adminUsers.forEach(u => {
+    const card = document.createElement('div');
+    card.className = 'data-card';
+    card.style.cursor = 'pointer';
+    const tabs = (u.tools?.tabs || []).join(', ') || 'none';
+    card.innerHTML = `
+      <div class="data-card__header">
+        <span class="data-card__title" style="font-size:0.85rem;font-family:monospace;">${esc(u.id.slice(0,8))}…</span>
+        <span class="data-card__badge">${esc(u.role)}</span>
+      </div>
+      <div class="data-card__body" style="font-size:0.82rem;color:#666;">Tabs: ${esc(tabs)}</div>
+    `;
+    card.addEventListener('click', () => openAdminDetail(u));
+    list.appendChild(card);
+  });
+}
+
+function openAdminDetail(u) {
+  document.getElementById('adminUserList').hidden   = true;
+  document.getElementById('adminUserDetail').hidden = false;
+  document.getElementById('adminDetailName').textContent = `${u.role} · ${u.id.slice(0,8)}…`;
+
+  const tools = u.tools || { tabs: [], actions: [] };
+  const isAdmin = u.role === 'admin';
+
+  let html = '';
+
+  if (isAdmin) {
+    html = '<p style="color:#666;font-size:0.88rem;margin-top:1rem;">Admin role has full access — no restrictions apply.</p>';
+  } else {
+    html += '<h4 style="font-family:\'Playfair Display\',serif;font-size:0.9rem;color:#1C3320;margin:1.25rem 0 0.5rem;">Tabs</h4>';
+    html += '<div class="toolbox-grid">';
+    TOOL_TABS.forEach(t => {
+      const on = (tools.tabs || []).includes(t.key);
+      html += `
+        <label class="tool-toggle ${on ? 'tool-toggle--on' : ''}">
+          <input type="checkbox" ${on ? 'checked' : ''} data-uid="${esc(u.id)}" data-type="tab" data-key="${esc(t.key)}">
+          <span class="tool-toggle__label">${esc(t.label)}</span>
+          <span class="tool-toggle__state">${on ? 'On' : 'Off'}</span>
+        </label>`;
+    });
+    html += '</div>';
+
+    html += '<h4 style="font-family:\'Playfair Display\',serif;font-size:0.9rem;color:#1C3320;margin:1.25rem 0 0.5rem;">Actions</h4>';
+    html += '<div class="toolbox-grid">';
+    TOOL_ACTIONS.forEach(a => {
+      const tabOn = (tools.tabs || []).includes(a.tab);
+      const on    = (tools.actions || []).includes(a.key);
+      html += `
+        <label class="tool-toggle ${on ? 'tool-toggle--on' : ''} ${!tabOn ? 'tool-toggle--disabled' : ''}" title="${!tabOn ? 'Enable the ' + a.tab + ' tab first' : ''}">
+          <input type="checkbox" ${on ? 'checked' : ''} ${!tabOn ? 'disabled' : ''} data-uid="${esc(u.id)}" data-type="action" data-key="${esc(a.key)}">
+          <span class="tool-toggle__label">${esc(a.label)}</span>
+          <span class="tool-toggle__state">${on ? 'On' : 'Off'}</span>
+        </label>`;
+    });
+    html += '</div>';
+  }
+
+  const container = document.getElementById('adminDetailToggles');
+  container.innerHTML = html;
+
+  container.querySelectorAll('input[type=checkbox]').forEach(cb => {
+    cb.addEventListener('change', () => handleToolToggle(cb, u));
+  });
+}
+
+async function handleToolToggle(cb, u) {
+  const uid  = cb.dataset.uid;
+  const type = cb.dataset.type; // 'tab' | 'action'
+  const key  = cb.dataset.key;
+  const on   = cb.checked;
+
+  // Optimistic UI
+  const label = cb.closest('.tool-toggle');
+  label.classList.toggle('tool-toggle--on', on);
+  label.querySelector('.tool-toggle__state').textContent = on ? 'On' : 'Off';
+
+  // Fetch fresh tools from local cache
+  const user = _adminUsers.find(u2 => u2.id === uid);
+  const tools = JSON.parse(JSON.stringify(user.tools || { tabs: [], actions: [] }));
+
+  if (type === 'tab') {
+    if (on && !tools.tabs.includes(key)) tools.tabs.push(key);
+    if (!on) tools.tabs = tools.tabs.filter(k => k !== key);
+    // If tab disabled, also disable its actions
+    if (!on) tools.actions = tools.actions.filter(a => {
+      const def = TOOL_ACTIONS.find(x => x.key === a);
+      return !def || def.tab !== key;
+    });
+  } else {
+    if (on && !tools.actions.includes(key)) tools.actions.push(key);
+    if (!on) tools.actions = tools.actions.filter(k => k !== key);
+  }
+
+  const { error } = await db.from('profiles').update({ tools }).eq('id', uid);
+  if (error) {
+    // Revert on failure
+    cb.checked = !on;
+    label.classList.toggle('tool-toggle--on', !on);
+    label.querySelector('.tool-toggle__state').textContent = !on ? 'On' : 'Off';
+    alert('Failed to save. Try again.');
+    return;
+  }
+
+  // Update local cache and re-render to sync disabled states
+  user.tools = tools;
+  openAdminDetail(user);
+}
+
+function closeAdminDetail() {
+  document.getElementById('adminUserList').hidden   = false;
+  document.getElementById('adminUserDetail').hidden = true;
+}
+
+window.closeAdminDetail = closeAdminDetail;

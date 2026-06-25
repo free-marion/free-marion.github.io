@@ -68,6 +68,7 @@
       <button class="tab-btn" data-tab="eggs">Egg Orders</button>
       <button class="tab-btn" data-tab="resources">Resources</button>
       <button class="tab-btn" data-tab="crm">CRM</button>
+      <button class="tab-btn tab-btn--admin" data-tab="admin" id="adminTabBtn" hidden>Admin</button>
     </nav>
     <div class="content-area">
 
@@ -333,6 +334,21 @@
             <div id="crmInquiriesList"></div>
             <p id="crmInquiriesEmpty" class="empty-msg" style="padding:0.75rem;font-size:0.85rem;" hidden>No event inquiries on file.</p>
           </div>
+        </div>
+      </section>
+
+      <!-- ADMIN -->
+      <section id="tabAdmin" class="tab-panel" hidden>
+        <div class="panel-header">
+          <h2 class="panel-title">Admin</h2>
+        </div>
+        <div id="adminUserList"></div>
+        <div id="adminUserDetail" hidden>
+          <div class="panel-header" style="margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid #e8dfc8;">
+            <h3 id="adminDetailName" style="font-family:'Playfair Display',serif;font-size:1.05rem;color:#1C3320;"></h3>
+            <button class="btn btn--ghost btn--sm" onclick="closeAdminDetail()">← Back</button>
+          </div>
+          <div id="adminDetailToggles"></div>
         </div>
       </section>
 

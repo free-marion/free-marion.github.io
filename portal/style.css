@@ -611,3 +611,68 @@ body {
   flex-direction: column;
   gap: 0.2rem;
 }
+
+/* ============================================================
+   TOOLBOX / ADMIN PANEL
+   ============================================================ */
+
+.tab-btn--admin {
+  margin-top: auto;
+  border-top: 1px solid rgba(255,255,255,0.15);
+  padding-top: 0.85rem;
+  color: #c8b97a;
+}
+
+.toolbox-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-width: 520px;
+}
+
+.tool-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.7rem 1rem;
+  background: #fff;
+  border: 1px solid #e0d8c6;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.tool-toggle--on {
+  background: #f0f7f1;
+  border-color: #4a8c5c;
+}
+
+.tool-toggle--disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.tool-toggle input[type=checkbox] {
+  width: 16px;
+  height: 16px;
+  accent-color: #1C3320;
+  flex-shrink: 0;
+}
+
+.tool-toggle__label {
+  flex: 1;
+  font-size: 0.9rem;
+  color: #2d2d2d;
+}
+
+.tool-toggle__state {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #888;
+  min-width: 24px;
+  text-align: right;
+}
+
+.tool-toggle--on .tool-toggle__state {
+  color: #2e7d46;
+}
