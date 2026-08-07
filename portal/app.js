@@ -283,7 +283,7 @@ async function loadTournaments() {
   document.getElementById('registrationsPanel').hidden = true;
   document.getElementById('tournamentsList').style.display = '';
   document.getElementById('tournamentsEmpty').hidden = true;
-  if (canDo('tournaments:create')) document.getElementById('addTournamentBtn').style.display = '';
+  document.getElementById('addTournamentBtn').hidden = !canDo('tournaments:create');
 
   document.getElementById('tournamentsList').innerHTML = loading();
   const { data, error } = await db.from('tournaments').select('*').order('date', { ascending: false });
@@ -451,7 +451,7 @@ function clearTournamentForm() {
 async function loadRegistrations(tournamentId, name) {
   document.getElementById('tournamentsList').style.display   = 'none';
   document.getElementById('tournamentsEmpty').hidden         = true;
-  document.getElementById('addTournamentBtn').style.display  = 'none';
+  document.getElementById('addTournamentBtn').hidden          = true;
   document.getElementById('tournamentForm').hidden           = true;
   document.getElementById('regPanelTitle').textContent       = name;
   document.getElementById('registrationsPanel').hidden       = false;
@@ -537,7 +537,7 @@ function renderRegistrations(rows, tournamentId) {
 document.getElementById('closeRegPanel').addEventListener('click', () => {
   document.getElementById('registrationsPanel').hidden = true;
   document.getElementById('tournamentsList').style.display = '';
-  if (canDo('tournaments:create')) document.getElementById('addTournamentBtn').style.display = '';
+  document.getElementById('addTournamentBtn').hidden = !canDo('tournaments:create');
   loadTournaments();
 });
 
