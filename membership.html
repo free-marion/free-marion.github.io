@@ -172,6 +172,59 @@
       color: var(--muted);
       border-top: 1px solid var(--border);
     }
+
+    /* PRICING */
+    .pricing-wrap {
+      max-width: 720px;
+      margin: -2rem auto 2.5rem;
+      padding: 0 1.25rem;
+    }
+    .pricing-card {
+      background: #fff;
+      border-radius: 14px;
+      padding: 2rem 2rem 1.5rem;
+      box-shadow: 0 6px 28px rgba(0,0,0,0.1);
+    }
+    .pricing-card__title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.25rem;
+      color: var(--green);
+      margin-bottom: 1.5rem;
+    }
+    .mtype { margin-bottom: 1.75rem; }
+    .mtype:last-child { margin-bottom: 0; }
+    .mtype__name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.02rem;
+      color: var(--green);
+      margin-bottom: 0.2rem;
+    }
+    .mtype__note { font-size: 0.82rem; color: var(--muted); margin-bottom: 0.6rem; }
+    .price-table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+    .price-table th {
+      text-align: left;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      padding: 0.3rem 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .price-table td {
+      padding: 0.4rem 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .price-table tr:last-child td { border-bottom: none; }
+    .price-val { font-weight: 600; color: var(--burgundy); }
+    .mtype__footnote {
+      font-size: 0.8rem;
+      color: var(--muted);
+      font-style: italic;
+      margin-top: 1.5rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+    }
   </style>
 </head>
 <body>
@@ -185,6 +238,70 @@
   <p class="hero__kicker">Cherrywood Farm &amp; Golf Club</p>
   <h1 class="hero__title">Membership Application</h1>
   <p class="hero__sub">Join our community. Fill out the form below and we'll be in touch shortly.</p>
+</div>
+
+<div class="pricing-wrap">
+  <div class="pricing-card">
+    <h2 class="pricing-card__title">2026 Membership Rates</h2>
+
+    <div class="mtype">
+      <div class="mtype__name">1. Resident Membership</div>
+      <table class="price-table">
+        <thead><tr><th></th><th>Price</th><th>w/ Cart</th></tr></thead>
+        <tbody>
+          <tr><td>Single</td><td><span class="price-val">$1,000</span></td><td><span class="price-val">$1,300</span></td></tr>
+          <tr><td>Couple</td><td><span class="price-val">$1,200</span></td><td><span class="price-val">$1,500</span></td></tr>
+          <tr><td>Family (up to 4 in household)</td><td><span class="price-val">$1,800</span></td><td><span class="price-val">$2,400</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="mtype">
+      <div class="mtype__name">2. Non-Resident Membership</div>
+      <div class="mtype__note">Must reside outside of Madison County (proof of residence required)</div>
+      <table class="price-table">
+        <thead><tr><th></th><th>Price</th><th>w/ Cart</th></tr></thead>
+        <tbody>
+          <tr><td>Single</td><td><span class="price-val">$650</span></td><td><span class="price-val">$900</span></td></tr>
+          <tr><td>Couple</td><td><span class="price-val">$750</span></td><td><span class="price-val">$1,000</span></td></tr>
+          <tr><td>Family (up to 4 in household)</td><td><span class="price-val">$1,000</span></td><td><span class="price-val">$1,300</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="mtype">
+      <div class="mtype__name">3. Student Membership</div>
+      <div class="mtype__note">18 years or younger, 22 years if provide proper college I.D.</div>
+      <table class="price-table">
+        <tbody>
+          <tr><td>Student (cart not included)</td><td><span class="price-val">$550</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="mtype">
+      <div class="mtype__name">4. Senior Membership</div>
+      <div class="mtype__note">60 and older — weekday only</div>
+      <table class="price-table">
+        <thead><tr><th></th><th>Price</th><th>w/ Cart</th></tr></thead>
+        <tbody>
+          <tr><td>Senior</td><td><span class="price-val">$800</span></td><td><span class="price-val">$1,100</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="mtype">
+      <div class="mtype__name">5. Cart Shed Rentals</div>
+      <table class="price-table">
+        <tbody>
+          <tr><td>Electric Cart</td><td><span class="price-val">$300</span></td></tr>
+          <tr><td>Gas Cart (gas not provided)</td><td><span class="price-val">$250</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="mtype__footnote">Family Membership includes husband and/or wife and any dependents 22 years of age or younger still attending school. Questions? Call the Pro Shop at <a href="tel:+15737830012" style="color:var(--burgundy);">(573) 783-0012</a>.</p>
+  </div>
 </div>
 
 <div class="form-wrap">
