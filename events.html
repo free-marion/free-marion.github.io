@@ -777,7 +777,13 @@
 
       btn.disabled = true; btn.textContent = 'Submitting…';
 
-      const { data: inserted, error } = await db.from('tournament_registrations').insert({
+      // Generate the ID client-side — anon has no SELECT policy on this
+      // table, so asking Supabase to hand the inserted row back via
+      // .select() would silently return nothing even if the insert works.
+      const registrationId = crypto.randomUUID();
+
+      const { error } = await db.from('tournament_registrations').insert({
+        id:            registrationId,
         tournament_id: t.id,
         captain_name:  player1,
         team_name:     player2 || null,
@@ -786,7 +792,7 @@
         num_players:   t.type === 'team' ? (t.team_size || 1) : 1,
         cart,
         status:        'confirmed',
-      }).select('id').single();
+      });
 
       if (error) {
         btn.disabled = false; btn.textContent = 'Submit Registration';
@@ -795,12 +801,16 @@
 
       // Fire confirmation email (non-blocking — don't fail registration if email fails)
       let confNo = '';
-      if (email && inserted?.id) {
+      if (email) {
         try {
           const cfRes = await fetch(`${SUPABASE_URL}/functions/v1/send-registration-confirmation`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_ANON },
-            body: JSON.stringify({ registration_id: inserted.id }),
+            headers: {
+              'Content-Type':  'application/json',
+              'apikey':        SUPABASE_ANON,
+              'Authorization': `Bearer ${SUPABASE_ANON}`,
+            },
+            body: JSON.stringify({ registration_id: registrationId }),
           });
           const cfData = await cfRes.json();
           if (cfData.confirmation_no) confNo = cfData.confirmation_no;

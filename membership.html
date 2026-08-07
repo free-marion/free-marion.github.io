@@ -403,7 +403,11 @@
     try {
       await fetch(`${SUPABASE_URL}/functions/v1/notify-membership-application`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_ANON },
+        headers: {
+          'Content-Type':  'application/json',
+          'apikey':        SUPABASE_ANON,
+          'Authorization': `Bearer ${SUPABASE_ANON}`,
+        },
         body: JSON.stringify({ application_id: applicationId }),
       });
     } catch (e) { /* notification failed silently — application still saved */ }
