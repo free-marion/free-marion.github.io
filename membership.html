@@ -380,12 +380,18 @@
 
     btn.disabled = true; btn.textContent = 'Submitting…';
 
-    const { data: inserted, error } = await db.from('membership_applications').insert({
+    // Generate the ID client-side — anon has no SELECT policy on this
+    // table, so asking Supabase to hand the inserted row back would
+    // silently return nothing even though the insert succeeded.
+    const applicationId = crypto.randomUUID();
+
+    const { error } = await db.from('membership_applications').insert({
+      id: applicationId,
       name, phone,
       email:            email || null,
       membership_type:  type  || null,
       notes:            notes || null,
-    }).select('id').single();
+    });
 
     if (error) {
       btn.disabled = false; btn.textContent = 'Submit Application';
@@ -394,15 +400,13 @@
       return;
     }
 
-    if (inserted?.id) {
-      try {
-        await fetch(`${SUPABASE_URL}/functions/v1/notify-membership-application`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_ANON },
-          body: JSON.stringify({ application_id: inserted.id }),
-        });
-      } catch (e) { /* notification failed silently — application still saved */ }
-    }
+    try {
+      await fetch(`${SUPABASE_URL}/functions/v1/notify-membership-application`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_ANON },
+        body: JSON.stringify({ application_id: applicationId }),
+      });
+    } catch (e) { /* notification failed silently — application still saved */ }
 
     document.getElementById('formArea').style.display = 'none';
     document.getElementById('successArea').style.display = '';
