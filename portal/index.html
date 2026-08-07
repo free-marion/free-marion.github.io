@@ -184,15 +184,14 @@
                 </div>
               </div>
 
-              <div class="field">
-                <label>Registration Status</label>
-                <select id="tStatus">
-                  <option value="draft">Draft (hidden from public)</option>
-                  <option value="open">Open for Registration</option>
-                  <option value="closed">Closed</option>
-                  <option value="cancelled">Cancelled</option>
-                </select>
+              <div class="field field-toggle" data-type-for="individual team">
+                <label class="toggle-label">
+                  <input type="checkbox" id="tAllowReg" checked>
+                  Allow Registrants
+                </label>
+                <p class="field-hint">When on, this event accepts public registrations on the events page.</p>
               </div>
+              <p class="field-hint" data-type-for="venue">Private events are never listed or open for registration on the public website.</p>
 
               <div class="field">
                 <label>Internal Notes</label>
@@ -454,7 +453,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="app.js?v=54"></script>
+<script src="app.js?v=55"></script>
 <script>
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.getRegistrations().then(regs => regs.forEach(r => r.unregister()));

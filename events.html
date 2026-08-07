@@ -497,7 +497,8 @@
     const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
     async function loadTournaments() {
-      const { data } = await db.from('tournaments').select('*').order('date', { ascending: true });
+      // Private venue bookings never appear on the public site
+      const { data } = await db.from('tournaments').select('*').neq('type', 'venue').order('date', { ascending: true });
       allTournaments = data || [];
       renderCalendar();
     }
@@ -609,7 +610,7 @@
       const list  = document.getElementById('eventCardsGrid');
       const today = new Date().toISOString().split('T')[0];
       const upcoming = allTournaments.filter(t =>
-        t.date >= today && t.status !== 'cancelled'
+        t.date >= today && t.status !== 'cancelled' && t.status !== 'draft'
       );
 
       if (!upcoming.length) {

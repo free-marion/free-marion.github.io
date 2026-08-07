@@ -375,7 +375,7 @@ function editTournament(t) {
   document.getElementById('tMaxSlots').value = t.max_slots || '';
   document.getElementById('tFormat').value   = t.format || '';
   document.getElementById('tEntryFee').value = t.entry_fee || '';
-  document.getElementById('tStatus').value   = t.status || 'open';
+  document.getElementById('tAllowReg').checked = t.status === 'open';
   document.getElementById('tNotes').value    = t.notes || '';
   applyTypeVisibility();
   document.getElementById('eventFormTitle').textContent = `Editing: ${t.name}`;
@@ -414,7 +414,7 @@ function buildTournamentPayload() {
     max_slots:   parseInt(document.getElementById('tMaxSlots').value),
     format:      document.getElementById('tFormat').value.trim() || null,
     entry_fee:   parseFloat(document.getElementById('tEntryFee').value) || null,
-    status:      document.getElementById('tStatus').value,
+    status:      type === 'venue' ? 'closed' : (document.getElementById('tAllowReg').checked ? 'open' : 'closed'),
     notes:       document.getElementById('tNotes').value.trim() || null,
   };
 }
@@ -435,7 +435,7 @@ function showConfirmModal() {
       <dt>${p.type === 'venue' ? 'Capacity' : 'Max registrations'}</dt><dd>${p.max_slots}</dd>
       ${p.format ? `<dt>Format</dt><dd>${esc(p.format)}</dd>` : ''}
       ${p.entry_fee ? `<dt>Fee</dt><dd>$${p.entry_fee.toFixed(2)}</dd>` : ''}
-      <dt>Status</dt><dd>${p.status}</dd>
+      <dt>Public site</dt><dd>${p.type === 'venue' ? 'Private — not listed publicly' : (p.status === 'open' ? 'Listed, open for registration' : 'Listed, registration closed')}</dd>
     </dl>
   `;
   document.getElementById('confirmEventModal').hidden = false;
@@ -469,8 +469,8 @@ function clearTournamentForm() {
   ['tName','tDate','tTime','tDesc','tTeamSize','tMaxSlots','tFormat','tEntryFee','tNotes'].forEach(id => {
     document.getElementById(id).value = '';
   });
-  document.getElementById('tType').value   = 'individual';
-  document.getElementById('tStatus').value = 'open';
+  document.getElementById('tType').value     = 'individual';
+  document.getElementById('tAllowReg').checked = true;
   document.getElementById('tournamentFormError').hidden = true;
   document.getElementById('eventFormTitle').textContent = 'Create an Event';
   document.getElementById('cancelTournamentBtn').hidden = true;
