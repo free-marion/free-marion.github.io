@@ -119,47 +119,100 @@
       </section>
 
       <!-- TOURNAMENTS -->
-      <section id="tabTournaments" class="tab-panel" hidden>
+      <section id="tabTournaments" class="tab-panel tab-panel--wide" hidden>
         <div class="panel-header">
-          <h2 class="panel-title">Tournaments</h2>
-          <button id="addTournamentBtn" class="btn btn--primary btn--sm">+ Create Tournament</button>
+          <h2 class="panel-title">Tournaments &amp; Events</h2>
         </div>
 
-        <div id="tournamentForm" class="inline-form" hidden>
-          <input type="text" id="tName" placeholder="Tournament name *" maxlength="120">
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem">
-            <input type="date" id="tDate">
-            <input type="time" id="tTime">
-          </div>
-          <textarea id="tDesc" placeholder="Description" rows="2" style="font-family:inherit;padding:0.55rem 0.75rem;border:1px solid #d4c8b0;border-radius:5px;resize:vertical;"></textarea>
-          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.6rem">
-            <select id="tType" style="font-family:inherit;padding:0.55rem 0.75rem;border:1px solid #d4c8b0;border-radius:5px;">
-              <option value="individual">Individual</option>
-              <option value="team">Team</option>
-            </select>
-            <input type="number" id="tTeamSize" placeholder="Team size" min="1">
-            <input type="number" id="tMaxSlots" placeholder="Max slots *" min="0">
-          </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem">
-            <input type="text"   id="tFormat"   placeholder="Format (e.g. Scramble)">
-            <input type="number" id="tEntryFee" placeholder="Entry fee ($)" step="0.01" min="0">
-          </div>
-          <select id="tStatus" style="font-family:inherit;padding:0.55rem 0.75rem;border:1px solid #d4c8b0;border-radius:5px;">
-            <option value="draft">Draft</option>
-            <option value="open">Open</option>
-            <option value="closed">Closed</option>
-            <option value="cancelled">Cancelled</option>
-          </select>
-          <textarea id="tNotes" placeholder="Internal notes (not shown publicly)" rows="2" style="font-family:inherit;padding:0.55rem 0.75rem;border:1px solid #d4c8b0;border-radius:5px;resize:vertical;"></textarea>
-          <p id="tournamentFormError" class="error-msg" hidden></p>
-          <div class="inline-form__actions">
-            <button id="saveTournamentBtn"   class="btn btn--primary btn--sm">Save Tournament</button>
-            <button id="cancelTournamentBtn" class="btn btn--ghost btn--sm">Cancel</button>
-          </div>
-        </div>
+        <div class="events-layout">
+          <div class="events-main">
+            <div id="tournamentForm" class="event-template">
+              <div class="event-template__header">
+                <h3 id="eventFormTitle">Create an Event</h3>
+                <button id="cancelTournamentBtn" class="btn btn--ghost btn--sm" hidden>Cancel Edit</button>
+              </div>
 
-        <div id="tournamentsList"></div>
-        <p id="tournamentsEmpty" class="empty-msg" hidden>No tournaments yet. Create one above.</p>
+              <div class="field">
+                <label>Event Type</label>
+                <select id="tType">
+                  <option value="individual">Tournament — Individual</option>
+                  <option value="team">Tournament — Team</option>
+                  <option value="venue">Private Event / Venue Booking</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label>Event Name *</label>
+                <input type="text" id="tName" placeholder="e.g. Fall Classic" maxlength="120">
+              </div>
+
+              <div class="field-row">
+                <div class="field">
+                  <label>Date *</label>
+                  <input type="date" id="tDate">
+                </div>
+                <div class="field">
+                  <label>Time</label>
+                  <input type="time" id="tTime">
+                </div>
+              </div>
+
+              <div class="field">
+                <label>Description</label>
+                <textarea id="tDesc" placeholder="Shown to the public on the events page" rows="2"></textarea>
+              </div>
+
+              <div class="field-row" data-type-for="team">
+                <div class="field">
+                  <label>Players per Team</label>
+                  <input type="number" id="tTeamSize" placeholder="e.g. 4" min="1">
+                </div>
+              </div>
+
+              <div class="field-row">
+                <div class="field" data-type-for="individual team">
+                  <label>Format</label>
+                  <input type="text" id="tFormat" placeholder="e.g. Scramble">
+                </div>
+                <div class="field">
+                  <label id="tMaxSlotsLabel">Max Registrations *</label>
+                  <input type="number" id="tMaxSlots" min="0">
+                </div>
+                <div class="field">
+                  <label id="tEntryFeeLabel">Entry Fee ($)</label>
+                  <input type="number" id="tEntryFee" step="0.01" min="0">
+                </div>
+              </div>
+
+              <div class="field">
+                <label>Registration Status</label>
+                <select id="tStatus">
+                  <option value="draft">Draft (hidden from public)</option>
+                  <option value="open">Open for Registration</option>
+                  <option value="closed">Closed</option>
+                  <option value="cancelled">Cancelled</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label>Internal Notes</label>
+                <textarea id="tNotes" placeholder="Not shown publicly" rows="2"></textarea>
+              </div>
+
+              <p id="tournamentFormError" class="error-msg" hidden></p>
+
+              <div class="inline-form__actions">
+                <button id="saveTournamentBtn" class="btn btn--primary">Review &amp; Save</button>
+              </div>
+            </div>
+          </div>
+
+          <aside class="events-sidebar">
+            <h3 class="events-sidebar__title">Existing Events</h3>
+            <div id="tournamentsList"></div>
+            <p id="tournamentsEmpty" class="empty-msg" hidden>No events yet — create one to the left.</p>
+          </aside>
+        </div>
 
         <div id="registrationsPanel" hidden>
           <div class="panel-header" style="margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid #e8dfc8;">
@@ -388,8 +441,20 @@
   </div>
 </div>
 
+<!-- Confirm Event Modal -->
+<div id="confirmEventModal" class="modal-overlay" hidden>
+  <div class="modal-card">
+    <h2 class="modal-title">Confirm Event</h2>
+    <div id="confirmEventSummary" class="confirm-summary"></div>
+    <div style="display:flex;gap:0.5rem;margin-top:1rem;">
+      <button id="confirmEventSaveBtn" class="btn btn--primary">Confirm &amp; Save</button>
+      <button id="confirmEventBackBtn" class="btn btn--ghost">Back to Edit</button>
+    </div>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="app.js?v=52"></script>
+<script src="app.js?v=53"></script>
 <script>
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.getRegistrations().then(regs => regs.forEach(r => r.unregister()));

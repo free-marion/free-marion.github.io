@@ -302,6 +302,108 @@ body {
 .inline-form input { padding: 0.5rem 0.75rem; border: 1px solid var(--border); border-radius: 6px; font-family: inherit; font-size: 0.95rem; width: 100%; }
 .inline-form__actions { display: flex; gap: 0.5rem; }
 
+/* ── WIDE PANEL (Tournaments/Events) ── */
+.tab-panel--wide { max-width: 1140px; }
+
+/* ── EVENTS LAYOUT ── */
+.events-layout {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 1.5rem;
+  align-items: start;
+}
+@media (max-width: 800px) {
+  .events-layout { grid-template-columns: 1fr; }
+}
+
+.event-template {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem 1.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+.event-template__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+.event-template__header h3 { font-family: 'Playfair Display', serif; font-size: 1.1rem; color: var(--green); }
+
+.event-template .field { display: flex; flex-direction: column; gap: 0.35rem; }
+.event-template .field label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+.event-template input,
+.event-template select,
+.event-template textarea {
+  padding: 0.55rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  width: 100%;
+  resize: vertical;
+}
+.field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0.75rem;
+}
+.field-row:has(.field:only-child) { grid-template-columns: 1fr; }
+
+.events-sidebar {
+  position: sticky;
+  top: 0;
+}
+.events-sidebar__title {
+  font-family: 'Playfair Display', serif;
+  font-size: 0.95rem;
+  color: var(--green);
+  margin-bottom: 0.6rem;
+}
+
+.event-row {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.65rem 0.8rem;
+  margin-bottom: 0.6rem;
+  overflow: hidden;
+}
+.event-row__name { font-weight: 600; font-size: 0.88rem; }
+.event-row__meta { font-size: 0.78rem; color: var(--text-muted); margin-top: 0.15rem; }
+.event-row__actions {
+  display: flex;
+  gap: 0.4rem;
+  margin-top: 0.5rem;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: max-height 0.15s ease, opacity 0.15s ease;
+}
+.event-row:hover .event-row__actions,
+.event-row:focus-within .event-row__actions {
+  max-height: 40px;
+  opacity: 1;
+  margin-top: 0.5rem;
+}
+.event-row__actions .btn { padding: 0.25rem 0.6rem; font-size: 0.76rem; }
+
+/* ── CONFIRM SUMMARY ── */
+.confirm-summary { font-size: 0.92rem; line-height: 1.7; }
+.confirm-summary dl { display: grid; grid-template-columns: auto 1fr; gap: 0.2rem 0.75rem; margin-top: 0.5rem; }
+.confirm-summary dt { color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.04em; }
+.confirm-summary dd { font-weight: 500; }
+
 /* ── VTO ── */
 .vto-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
 @media (max-width: 640px) { .vto-grid { grid-template-columns: 1fr; } }
