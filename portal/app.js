@@ -17,10 +17,12 @@ let PORTAL_TOOLS = { tabs: [], actions: [] }; // populated on login for non-admi
 // ---- permission helpers ----
 function canSeeTab(key) {
   if (PORTAL_ROLE === 'admin') return true;
+  if (key === 'tournaments' && PORTAL_ROLE) return true;
   return (PORTAL_TOOLS.tabs || []).includes(key);
 }
 function canDo(action) {
   if (PORTAL_ROLE === 'admin') return true;
+  if (action === 'tournaments:create' && PORTAL_ROLE) return true;
   return (PORTAL_TOOLS.actions || []).includes(action);
 }
 
