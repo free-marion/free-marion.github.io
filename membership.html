@@ -380,18 +380,28 @@
 
     btn.disabled = true; btn.textContent = 'Submitting…';
 
-    const { error } = await db.from('membership_applications').insert({
+    const { data: inserted, error } = await db.from('membership_applications').insert({
       name, phone,
       email:            email || null,
       membership_type:  type  || null,
       notes:            notes || null,
-    });
+    }).select('id').single();
 
     if (error) {
       btn.disabled = false; btn.textContent = 'Submit Application';
       errEl.textContent = 'Something went wrong — please try again.';
       errEl.style.display = '';
       return;
+    }
+
+    if (inserted?.id) {
+      try {
+        await fetch(`${SUPABASE_URL}/functions/v1/notify-membership-application`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_ANON },
+          body: JSON.stringify({ application_id: inserted.id }),
+        });
+      } catch (e) { /* notification failed silently — application still saved */ }
     }
 
     document.getElementById('formArea').style.display = 'none';
