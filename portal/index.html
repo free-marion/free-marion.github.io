@@ -64,7 +64,7 @@
   <div class="app-body">
     <nav class="sidebar" id="sidebar">
       <button class="tab-btn tab-btn--active" data-tab="home">Home</button>
-      <button class="tab-btn" data-tab="tournaments">Tournaments</button>
+      <button class="tab-btn" data-tab="tournaments">Events</button>
       <button class="tab-btn" data-tab="eggs">Egg Orders</button>
       <button class="tab-btn" data-tab="resources">Resources</button>
       <button class="tab-btn" data-tab="crm">CRM</button>
@@ -90,8 +90,8 @@
             <button data-tab="tournaments" class="welcome-card" style="display:flex;align-items:flex-start;gap:1rem;background:#fff;border:1px solid #d4c8b0;border-radius:8px;padding:1rem 1.25rem;cursor:pointer;text-align:left;width:100%;">
               <span style="font-size:1.5rem;line-height:1;">🏆</span>
               <div>
-                <div style="font-family:'Playfair Display',serif;font-weight:600;color:#1C3320;font-size:1rem;margin-bottom:0.2rem;">Tournaments</div>
-                <div style="color:#6b7c6b;font-size:0.875rem;line-height:1.5;">Create and manage tournaments, view registrations, and track signups.</div>
+                <div style="font-family:'Playfair Display',serif;font-weight:600;color:#1C3320;font-size:1rem;margin-bottom:0.2rem;">Events</div>
+                <div style="color:#6b7c6b;font-size:0.875rem;line-height:1.5;">Create and manage tournaments and events, view registrations, and track signups.</div>
               </div>
             </button>
             <button data-tab="eggs" class="welcome-card" style="display:flex;align-items:flex-start;gap:1rem;background:#fff;border:1px solid #d4c8b0;border-radius:8px;padding:1rem 1.25rem;cursor:pointer;text-align:left;width:100%;">
@@ -121,7 +121,7 @@
       <!-- TOURNAMENTS -->
       <section id="tabTournaments" class="tab-panel tab-panel--wide" hidden>
         <div class="panel-header">
-          <h2 class="panel-title">Tournaments &amp; Events</h2>
+          <h2 class="panel-title">Events</h2>
         </div>
 
         <div class="events-layout">
@@ -454,7 +454,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="app.js?v=53"></script>
+<script src="app.js?v=54"></script>
 <script>
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.getRegistrations().then(regs => regs.forEach(r => r.unregister()));
