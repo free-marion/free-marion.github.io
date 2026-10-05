@@ -150,3 +150,19 @@ document.querySelectorAll('.farm-card').forEach(card => {
     }
   });
 });
+
+// =====================
+// WAGON HERO ROTATOR
+// =====================
+(function() {
+  const rotator = document.getElementById('wagonHeroRotator');
+  if (!rotator) return;
+  const slides = rotator.querySelectorAll('img.wagon-slide');
+  if (slides.length < 2) return;
+  let current = 0;
+  setInterval(() => {
+    slides[current].classList.remove('is-active');
+    current = (current + 1) % slides.length;
+    slides[current].classList.add('is-active');
+  }, 5000);
+})();

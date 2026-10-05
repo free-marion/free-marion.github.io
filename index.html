@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=5" />
+  <link rel="stylesheet" href="style.css?v=6" />
   <link rel="manifest" href="/manifest.json">
   <link rel="apple-touch-icon" href="/icon-192.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -300,8 +300,15 @@
   <!-- WAGONS -->
   <section id="stay" class="wagon-section">
     <div class="wagon-inner">
-      <div class="wagon-image">
-        <img src="images/wagon.jpg" alt="Conestoga Wagon vacation rental at Cherrywood" />
+      <div class="wagon-image" id="wagonHeroRotator">
+        <img class="wagon-slide is-active" src="images/wagons/wagon-hearthstone.jpg" alt="Pond + Farm View | Wagon Glamping | Fire Pit" />
+        <img class="wagon-slide" src="images/wagons/wagon-oakheart.jpg" alt="Farm Life | Pond View Glamping | Fire Pit | River" />
+        <img class="wagon-slide" src="images/wagons/wagon-willowmere.jpg" alt="Pond View | Glamping Getaway | Farm | Fire Pit" />
+        <img class="wagon-slide" src="images/wagons/wagon-foxglove-hollow.jpg" alt="Glamping in the Woods | Farm | Golf | River" />
+        <img class="wagon-slide" src="images/wagons/wagon-bracken-hollow.jpg" alt="Glamping Adventure | Farm | Fish | River | Golf" />
+        <img class="wagon-slide" src="images/wagons/wagon-beehives.jpg" alt="Woodland Glamping | Missouri Farm | River Access" />
+        <img class="wagon-slide" src="images/wagons/wagon-golf-course-view.jpg" alt="Golf | Glamping on a Missouri Farm | River Access" />
+        <img class="wagon-slide" src="images/wagons/wagon-golf-views-fishing.jpg" alt="Golf + Pond View | Glamping in the Missouri Ozarks" />
         <div class="wagon-banner">Book Direct — 8 Wagons Available</div>
       </div>
       <div class="wagon-text">
@@ -473,7 +480,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="src/weather-utils.js"></script>
-  <script src="script.js"></script>
+  <script src="script.js?v=2"></script>
   <script src="egg-form.js"></script>
   <script>
     (function() {
