@@ -399,7 +399,7 @@
         </div>
         <div class="contact-line">
           <span class="contact-label">Hours</span>
-          <span id="courseHours">Mon–Fri: 8am–8pm &nbsp;|&nbsp; Sat–Sun: 7am–8pm</span>
+          <span id="courseHours">Mon–Fri: 9am–7pm &nbsp;|&nbsp; Sat–Sun: 8am–7pm</span>
         </div>
       </address>
       <div class="contact-map">
@@ -493,14 +493,14 @@
         const h   = ct.getHours();
         const dow = ct.getDay(); // 0=Sun, 6=Sat
         const isWeekend = dow === 0 || dow === 6;
-        return isWeekend ? (h >= 7 && h < 20) : (h >= 8 && h < 20);
+        return isWeekend ? (h >= 8 && h < 19) : (h >= 9 && h < 19);
       }
 
       function showStatus(isOpen, message) {
         const badge  = document.getElementById('courseStatusBadge');
         const banner = document.getElementById('courseClosedBanner');
         if (!isOpen) {
-          document.getElementById('courseClosedMsg').textContent = message || 'Course is currently closed. Hours: Mon–Fri 8am–8pm, Sat–Sun 7am–8pm.';
+          document.getElementById('courseClosedMsg').textContent = message || 'Course is currently closed. Hours: Mon–Fri 9am–7pm, Sat–Sun 8am–7pm.';
           banner.style.display = 'block';
           badge.textContent = '⛔ Course Closed';
           badge.className = 'course-status-badge course-status-badge--closed';
